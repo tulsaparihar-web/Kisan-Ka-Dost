@@ -138,6 +138,7 @@ private fun KisanKaDostApp() {
                 listOf("crops", "calendar", "plants", "animals", "trees", "soil", "water", "protection", "harvest", "schemes").forEach { route ->
                     composable(route) {
                         when (route) {
+                            "animals" -> AnimalCareScreen(isHindi = isHindi)
                             "crops" -> CropCareScreen(isHindi = isHindi)
                             "calendar" -> CropCalendarScreen(isHindi = isHindi)
                             "soil" -> SoilHealthScreen(isHindi = isHindi)
