@@ -1,12 +1,18 @@
-# Kisan Ka Dost – Android App
+# किसान का दोस्त – Android App
 
 **Parihar Digital Labs**  
+**Tagline:** खेती • बागवानी • पशुपालन  
 Hindi + English | Rajasthan-first | Offline-first
 
-Kisan Ka Dost is an all-round digital companion for **कृषि (खेती), बागवानी and पशुपालन**. The product scope includes field crops, horticulture, livestock, farm records, soil and water, weather, markets, government schemes and farm economics. See [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md) for the detailed feature blueprint and delivery roadmap.
+**किसान का दोस्त (Kisan Ka Dost)** is an all-round digital companion for **कृषि (खेती), बागवानी and पशुपालन**. The product scope includes field crops, horticulture, livestock, farm records, soil and water, weather, markets, government schemes and farm economics. See [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md) for the detailed feature blueprint and delivery roadmap.
 
 ## Project details
-- Package: `com.parihardigitallabs.kisankadost`
+- App display name: **किसान का दोस्त**
+- English brand name: **Kisan Ka Dost**
+- Tagline: **खेती • बागवानी • पशुपालन**
+- Parent brand: **Parihar Digital Labs**
+- Repository: Kisan-Ka-Dost (unchanged)
+- Package: com.parihardigitallabs.kisankadost
 - Kotlin + Jetpack Compose + Material 3
 - MVVM + Repository pattern
 - Room database for on-device farmer profile and future farm records
@@ -20,10 +26,10 @@ No Android Studio or local Android SDK is required.
 
 1. Open the [Actions page](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions).
 2. Open the latest successful **Android APK Build** run.
-3. Download the `Kisan-Ka-Dost-debug-apk` artifact.
-4. Extract the ZIP and install `app-debug.apk` on an Android phone.
+3. Download the Kisan-Ka-Dost-debug-apk artifact.
+4. Extract the ZIP and install app-debug.apk on an Android phone.
 
-Every push to `main` triggers a cloud build. Older in-progress builds are cancelled when a newer commit arrives.
+Every push to main triggers a cloud build. Older in-progress builds are cancelled when a newer commit arrives.
 
 ## Implemented and build-verified foundations
 - Home dashboard and feature navigation
@@ -49,7 +55,7 @@ Every push to `main` triggers a cloud build. Older in-progress builds are cancel
 ## Plant Doctor model scope
 The current model has 39 output classes, including a background class, and covers selected crop leaf classes. It is not a general plant species identifier. Indoor and ornamental plants currently have searchable care guides; broader photo-based identification is a later enhancement.
 
-The model is downloaded from a pinned upstream revision during GitHub Actions and its Git blob hash is verified before the APK build. Attribution and the upstream MIT license are included in `THIRD_PARTY_NOTICES.md` and the app assets.
+The model is downloaded from a pinned upstream revision during GitHub Actions and its Git blob hash is verified before the APK build. Attribution and the upstream MIT license are included in THIRD_PARTY_NOTICES.md and the app assets.
 
 ## Content and safety
 - Agricultural, horticultural and veterinary content will be based on official and research-backed sources, localized by district/region, season and crop/species.
