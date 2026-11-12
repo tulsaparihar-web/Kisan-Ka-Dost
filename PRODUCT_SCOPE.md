@@ -224,14 +224,14 @@ Do not assume that a single recommendation applies to every district. Recommenda
 |---|---|---|
 | M1 | App foundation | Bilingual app, navigation, cloud build and installable APK |
 | M2 | Farmer and farm profile | Offline profile and farm details saved and restored |
-| M3 | Agriculture and horticulture foundation | Crop/plant knowledge, Plant Doctor, soil/water basics and seasonal care content; verified APK |
+| M3 | Agriculture, horticulture and gardening foundation | Field crop guides, Plant Doctor, fruit/vegetable/flower/home-garden knowledge, soil/water basics and seasonal care content; verified APK and device checks for camera/gallery |
 | M4 | Animal husbandry foundation | Species/breed library, feeding, housing, preventive-care records and animal profiles; verified APK |
 | M5 | Farm, garden and livestock diaries | Activity logs, expenses, production records and reminders; verified APK |
-| M6 | Rajasthan advisory services | Verified local calendars, soil testing, weather and alerts where reliable sources/APIs exist |
+| M6 | Rajasthan advisory services (deferred) | Start only after M3–M5 core foundations are stable and the milestone is explicitly reactivated; verified local calendars, soil testing, weather and alerts where reliable sources/APIs exist |
 | M7 | Markets, schemes and services | Dated mandi prices, official schemes and verified service directory |
 | M8 | Farm economics and smart assistance | Cost/profit tools and carefully bounded AI/search assistance |
 
-Milestones can overlap when a shared foundation is ready, but each milestone must be built, cloud-compiled, checked and packaged before being called complete.
+Milestones can overlap only when a shared foundation is ready and the user-approved sequence is preserved. M6 is currently deferred. Each milestone must be implemented, cloud-compiled, checked, packaged and device-tested where applicable before being called complete. See [MILESTONE_TRACKER.md](MILESTONE_TRACKER.md) for the live audit and acceptance checklist.
 
 ## 9. M3/M4 immediate implementation priorities
 
