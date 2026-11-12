@@ -45,10 +45,12 @@ M3 must not be closed until all applicable items below are delivered or explicit
 
 ### Field agriculture
 - [x] Searchable bilingual starter crop guide (15 Rajasthan-relevant crops).
-- [x] Starter profiles for 15 Rajasthan-relevant field crops with season, soil, sowing context, water, care/protection and harvest information.\n- [ ] **Deferred content expansion:** locally validated variety, seed-rate, spacing and crop-duration tables by current district/agro-climatic zone; requires current official Packages of Practices and KVK review.
+- [x] Starter profiles for 15 Rajasthan-relevant field crops with season, soil, sowing context, water, care/protection and harvest information.
+- [ ] **Deferred content expansion:** locally validated variety, seed-rate, spacing and crop-duration tables by current district/agro-climatic zone; requires current official Packages of Practices and KVK review.
 - [x] Bilingual general crop-stage guide implemented from field preparation/sowing through harvest; cloud-build verified in [run 43209315460](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43209315460); agronomic review and crop-specific depth remain open.
 - [x] General bilingual Kharif, Rabi and Zaid seasonal crop calendar with month-by-month activities and clear local-validation caveat.
-- [x] Broad reference to Rajasthan's ten agro-climatic zones and major Kharif/Rabi crop patterns added from the Government of Rajasthan Economic Review 2023–24.\n- [ ] **Deferred content expansion:** precise district-/zone-validated sowing and harvest windows, including perennial calendars; must be checked against current district boundaries, weather and local university/KVK advisories.
+- [x] Broad reference to Rajasthan's ten agro-climatic zones and major Kharif/Rabi crop patterns added from the Government of Rajasthan Economic Review 2023–24.
+- [ ] **Deferred content expansion:** precise district-/zone-validated sowing and harvest windows, including perennial calendars; must be checked against current district boundaries, weather and local university/KVK advisories.
 - [x] Bilingual foundational soil-health guide: soil sampling/testing, pH/EC/salinity, organic carbon, major/micronutrients, organic matter and responsible fertilizer use. General education only; personalized rates and soil-report interpretation remain out of scope until reviewed locally.
 - [x] Irrigation and water-conservation bilingual guide implemented (planning, irrigation methods, drip/sprinkler, mulching, rainwater capture, soil moisture and water quality); cloud-build verified in [run 43209315460](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43209315460); content review and crop-specific recommendations remain open.
 - [x] Bilingual introductory crop protection/IPM guide implemented (scouting, prevention, beneficial insects, symptom assessment and pesticide-label safety); cloud-build verified in [run 43209315460](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43209315460); detailed crop/pest-specific reviewed library remains open.
@@ -75,8 +77,8 @@ M3 must not be closed until all applicable items below are delivered or explicit
 
 ## 3. Forward delivery sequence
 
-1. **Finish M3**: close remaining field agriculture and horticulture/gardening requirements; test and publish a verified APK.
-2. **M4 – Animal husbandry**: deliver species/breed knowledge first, then feeding/housing/preventive-care content and offline animal profiles. Add database migrations without deleting existing farmer data.
+1. **M3 implementation delivered**: bilingual guides, source register and APK are cloud-build verified. Physical-device camera/gallery and regression checks remain a user acceptance gate before calling the M3 release fully signed off. Detailed district-specific crop packages are a documented future content expansion; no unverified prescriptions are shipped.
+2. **M4 – Animal husbandry (next active milestone)**: deliver species/breed knowledge first, then feeding/housing/preventive-care education and offline animal profiles. Add database migrations without deleting existing farmer data.
 3. **M5 – Diaries**: implement reusable offline records for fields, gardens, animals, expenses and production, plus practical reminders. Reuse M2 farmer/farm context.
 4. **M6 – Rajasthan advisory services (deferred)**: only proceed when deliberately reactivated; integrate trusted data sources and show timestamps/freshness.
 5. **M7 – Markets, schemes and services**: verified sources, dated information and official links.
