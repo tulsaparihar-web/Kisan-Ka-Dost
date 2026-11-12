@@ -4,7 +4,14 @@
 **Primary audience:** Farmers and rural households in Rajasthan, with an architecture that can expand across India  
 **Languages:** Hindi and English  
 **Platform:** Android (Kotlin, Jetpack Compose, Material 3)  
-**Operating principle:** Offline-first; useful without an account or continuous internet
+**Operating principle:** Free for everyone, offline-first; useful without an account or continuous internet
+
+## Permanent promise: free for everyone
+
+Kisan Ka Dost will remain free to every user. There will be no subscriptions, premium tiers, paywalls or paid feature restrictions. All three pillars—agriculture, horticulture/gardening and animal husbandry—will remain accessible without payment.
+
+The project may sustain itself through responsible, limited and clearly identified advertising; voluntary donations; and mission-aligned institutional, CSR, university, NGO or cooperative support. Donations never affect access. Advertising must not interrupt essential tasks, imitate independent advice, or promote misleading/unsafe products. Farmer personal information, farm records, photos, phone numbers and precise location data must never be sold or rented to advertisers. Personal/farm records remain on-device by default; any sharing or sync must be explicit. Keep infrastructure lean and do not assume advertising or donations guarantee operating-cost coverage.
+
 
 ## Product vision
 
