@@ -164,7 +164,7 @@ private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
         Feature("फसल देखभाल", "Crop Care", Icons.Default.Grass, "crops", Color(0xFFE5F2E6)),
         Feature("पौधा डॉक्टर", "Plant Doctor", Icons.Default.Spa, "plants", Color(0xFFEAF3DF)),
         Feature("पशुपालन", "Animal Care", Icons.Default.Pets, "animals", Color(0xFFFFF0D8)),
-        Feature("पेड़-पौधे", "Trees", Icons.Default.Park, "trees", Color(0xFFE4F0E8)),
+        Feature("बागवानी व गार्डन", "Horticulture & Garden", Icons.Default.Park, "trees", Color(0xFFE4F0E8)),
         Feature("मिट्टी और खाद", "Soil & Fertilizer", Icons.Default.Grain, "soil", Color(0xFFF5EBDD)),
         Feature("सरकारी योजनाएं", "Government Schemes", Icons.Default.AccountBalance, "schemes", Color(0xFFE8EAF5)),
         Feature("मेरा खेत", "My Farm", Icons.Default.Agriculture, "myfarm", Color(0xFFE3F0E7))
