@@ -58,7 +58,7 @@ private val hi = Copy(
     "क्या जानना चाहेंगे?", "आज की खेती सलाह",
     "फसल में कोई भी खाद या दवा डालने से पहले स्थानीय कृषि विशेषज्ञ की सलाह और उत्पाद का लेबल अवश्य पढ़ें।",
     "होम", "खेत डायरी", "जानकारी", "सेटिंग्स",
-    "फसल देखभाल", "पौधा डॉक्टर", "पशुपालन", "बागवानी व गार्डन", "मिट्टी और खाद",
+    "फसल देखभाल", "पौधा डॉक्टर", "पशुपालन", "बागवानी व गार्डन", "मिट्टी और खाद", "सिंचाई और जल संरक्षण",
     "सरकारी योजनाएं", "यह सुविधा अगले चरण में जोड़ी जाएगी",
     "भाषा", "ऐप के बारे में", "खेती • बागवानी • पशुपालन"
 )
@@ -68,7 +68,7 @@ private val en = Copy(
     "What would you like to explore?", "Farming tip of the day",
     "Before applying fertilizer or pesticides, check the product label and consult a local agricultural expert.",
     "Home", "Farm Diary", "Learn", "Settings",
-    "Crop Care", "Plants", "Animal Care", "Horticulture & Garden", "Soil & Fertilizer",
+    "Crop Care", "Plants", "Animal Care", "Horticulture & Garden", "Soil & Fertilizer", "Irrigation & Water Saving",
     "Government Schemes", "This feature will be added in a future milestone",
     "Language", "About the app", "Farming • Gardening • Animal Husbandry"
 )
@@ -135,12 +135,13 @@ private fun KisanKaDostApp() {
                         prefs.edit().putBoolean("is_hindi", it).apply()
                     })
                 }
-                listOf("crops", "calendar", "plants", "animals", "trees", "soil", "schemes").forEach { route ->
+                listOf("crops", "calendar", "plants", "animals", "trees", "soil", "water", "schemes").forEach { route ->
                     composable(route) {
                         when (route) {
                             "crops" -> CropCareScreen(isHindi = isHindi)
                             "calendar" -> CropCalendarScreen(isHindi = isHindi)
                             "soil" -> SoilHealthScreen(isHindi = isHindi)
+                            "water" -> IrrigationScreen(isHindi = isHindi)
                             "plants" -> PlantDoctorScreen(isHindi = isHindi)
                             "trees" -> HorticultureScreen(isHindi = isHindi)
                             else -> {
@@ -169,6 +170,7 @@ private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
         Feature("पशुपालन", "Animal Care", Icons.Default.Pets, "animals", Color(0xFFFFF0D8)),
         Feature("बागवानी व गार्डन", "Horticulture & Garden", Icons.Default.Park, "trees", Color(0xFFE4F0E8)),
         Feature("मिट्टी और खाद", "Soil & Fertilizer", Icons.Default.Grain, "soil", Color(0xFFF5EBDD)),
+        Feature("सिंचाई और जल संरक्षण", "Irrigation & Water Saving", Icons.Default.WaterDrop, "water", Color(0xFFE1F1F7)),
         Feature("सरकारी योजनाएं", "Government Schemes", Icons.Default.AccountBalance, "schemes", Color(0xFFE8EAF5)),
         Feature("मेरा खेत", "My Farm", Icons.Default.Agriculture, "myfarm", Color(0xFFE3F0E7))
     )
