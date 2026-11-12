@@ -135,13 +135,14 @@ private fun KisanKaDostApp() {
                         prefs.edit().putBoolean("is_hindi", it).apply()
                     })
                 }
-                listOf("crops", "calendar", "plants", "animals", "trees", "soil", "water", "schemes").forEach { route ->
+                listOf("crops", "calendar", "plants", "animals", "trees", "soil", "water", "protection", "schemes").forEach { route ->
                     composable(route) {
                         when (route) {
                             "crops" -> CropCareScreen(isHindi = isHindi)
                             "calendar" -> CropCalendarScreen(isHindi = isHindi)
                             "soil" -> SoilHealthScreen(isHindi = isHindi)
                             "water" -> IrrigationScreen(isHindi = isHindi)
+                            "protection" -> CropStageScreen(isHindi = isHindi)
                             "plants" -> PlantDoctorScreen(isHindi = isHindi)
                             "trees" -> HorticultureScreen(isHindi = isHindi)
                             else -> {
@@ -171,6 +172,7 @@ private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
         Feature("बागवानी व गार्डन", "Horticulture & Garden", Icons.Default.Park, "trees", Color(0xFFE4F0E8)),
         Feature("मिट्टी और खाद", "Soil & Fertilizer", Icons.Default.Grain, "soil", Color(0xFFF5EBDD)),
         Feature("सिंचाई और जल संरक्षण", "Irrigation & Water Saving", Icons.Default.WaterDrop, "water", Color(0xFFE1F1F7)),
+        Feature("फसल अवस्था व सुरक्षा", "Crop Stages & Protection", Icons.Default.Shield, "protection", Color(0xFFF3E9E5)),
         Feature("सरकारी योजनाएं", "Government Schemes", Icons.Default.AccountBalance, "schemes", Color(0xFFE8EAF5)),
         Feature("मेरा खेत", "My Farm", Icons.Default.Agriculture, "myfarm", Color(0xFFE3F0E7))
     )
