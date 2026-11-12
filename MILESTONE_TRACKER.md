@@ -72,7 +72,8 @@ M3 must not be closed until all applicable items below are delivered or explicit
 - [x] Rajasthan-relevant recognized breed names included with clear expert-verification caveat.
 - [x] General feed/water, housing/comfort and preventive-care education included.
 - [x] Urgent warning signs direct owners to a qualified veterinarian; no diagnosis or drug dosage.
-- [x] M4 source register created from ICAR-NBAGR, Government of Rajasthan, DAHD, NDDB and ICAR references.\n- [x] First animal husbandry screen cloud-build verified in [run 43211738560](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43211738560); APK archive downloaded and inspected.
+- [x] M4 source register created from ICAR-NBAGR, Government of Rajasthan, DAHD, NDDB and ICAR references.
+- [x] First animal husbandry screen cloud-build verified in [run 43211738560](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43211738560); APK archive downloaded and inspected.
 - [ ] Detailed breed profiles and production-system comparisons reviewed by animal husbandry experts.
 - [ ] Species- and life-stage-specific fodder/ration guides validated by veterinary nutrition sources.
 - [ ] Preventive-care record/reminder workflow based on veterinarian-confirmed schedules.
