@@ -45,6 +45,7 @@ fun CropCareScreen(isHindi: Boolean) {
     var search by remember { mutableStateOf("") }
     var season by remember { mutableStateOf("All") }
     var expanded by remember { mutableStateOf<String?>(null) }
+    var showAgroZones by remember { mutableStateOf(false) }
     val seasons = listOf("All", "Kharif", "Rabi", "Both")
     val filtered = rajasthanCrops.filter { crop ->
         (season == "All" || crop.group == season || (season == "Kharif" && crop.group == "Kharif / Zaid") || (season == "Rabi" && crop.group == "Rabi / Zaid")) &&
@@ -55,6 +56,41 @@ fun CropCareScreen(isHindi: Boolean) {
         Text(if (isHindi) "राजस्थान की प्रमुख फसलों की मौसम, मिट्टी, बुवाई और देखभाल संबंधी जानकारी।" else "Season, soil, sowing and care guidance for important Rajasthan crops.", color = Color(0xFF66766B), fontSize = 13.sp)
         Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFEAF3E9))) {
             Text(if (isHindi) "ध्यान दें: समय, किस्म और कृषि पद्धति जिले, वर्षा, मिट्टी तथा स्थानीय कृषि विश्वविद्यालय/KVK की सलाह के अनुसार बदल सकती है।" else "Note: timing, varieties and practices vary by district, rainfall and soil. Follow current local university/KVK recommendations.", Modifier.padding(13.dp), fontSize = 12.sp, color = Color(0xFF203128), lineHeight = 17.sp)
+        }
+        Card(
+            onClick = { showAgroZones = !showAgroZones },
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F3E8)),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Column(Modifier.fillMaxWidth().padding(13.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                Text(if (isHindi) "राजस्थान के 10 कृषि-जलवायु क्षेत्र" else "Rajasthan's 10 agro-climatic zones",
+                    fontWeight = FontWeight.Bold, color = Color(0xFF203128), fontSize = 14.sp)
+                Text(if (showAgroZones) { if (isHindi) "संक्षिप्त फसल संदर्भ छिपाएँ −" else "Hide crop reference −" } else { if (isHindi) "क्षेत्रवार प्रमुख फसलों का सामान्य संदर्भ देखें +" else "View broad crop patterns by zone +"},
+                    color = Color(0xFF247A45), fontSize = 12.sp)
+                if (showAgroZones) {
+                    val zones = listOf(
+                        Triple("I-A · Arid Western Plain", "बाजरा, मोठ, तिल", "गेहूँ, सरसों, जीरा"),
+                        Triple("I-B · Irrigated North-Western Plain", "कपास, ग्वार", "गेहूँ, सरसों, चना"),
+                        Triple("I-C · Hyper-Arid Partial-Irrigated Western Plain", "बाजरा, मोठ, ग्वार", "गेहूँ, सरसों, चना"),
+                        Triple("II-A · Transitional Inland Drainage Plain", "बाजरा, ग्वार, दलहन", "सरसों, चना"),
+                        Triple("II-B · Transitional Luni Basin Plain", "बाजरा, ग्वार, तिल", "गेहूँ, सरसों"),
+                        Triple("III-A · Semi-Arid Eastern Plain", "बाजरा, ग्वार, ज्वार", "गेहूँ, सरसों, चना"),
+                        Triple("III-B · Flood-Prone Eastern Plain", "बाजरा, ग्वार, मूंगफली", "गेहूँ, जौ, सरसों, चना"),
+                        Triple("IV-A · Sub-Humid Southern Plain", "मक्का, दलहन, ज्वार", "गेहूँ, चना"),
+                        Triple("IV-B · Humid Southern Plain", "मक्का, धान, ज्वार, उड़द", "गेहूँ, चना"),
+                        Triple("V · Humid South-Eastern Plain", "ज्वार, सोयाबीन", "गेहूँ, सरसों")
+                    )
+                    zones.forEach { zone ->
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(zone.first, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, color = Color(0xFF203128))
+                            Text((if (isHindi) "खरीफ: " else "Kharif: ") + zone.second + "   " +
+                                (if (isHindi) "रबी: " else "Rabi: ") + zone.third, fontSize = 12.sp, color = Color(0xFF526258))
+                        }
+                    }
+                    Text(if (isHindi) "यह राजस्थान सरकार के आर्थिक समीक्षा 2023–24 में दिए गए प्रमुख फसल पैटर्न का सामान्य संदर्भ है; जिले/तहसील की वर्तमान सीमा, वर्षा, सिंचाई और नवीनतम स्थानीय पैकेज ऑफ प्रैक्टिस के अनुसार चयन की पुष्टि करें।" else "Broad crop patterns are adapted from the Rajasthan Economic Review 2023–24. Confirm current district/tehsil boundaries, rainfall, irrigation and the latest local Package of Practices before choosing a crop.",
+                        fontSize = 11.sp, lineHeight = 16.sp, color = Color(0xFF66766B))
+                }
+            }
         }
         OutlinedTextField(value = search, onValueChange = { search = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, leadingIcon = { Icon(Icons.Default.Search, null) }, label = { Text(if (isHindi) "फसल खोजें" else "Search crops") })
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
