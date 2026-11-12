@@ -45,11 +45,12 @@ Every push to main triggers a cloud build. Older in-progress builds are cancelle
 - Offline TensorFlow Lite leaf screening with top-three predictions and confidence display
 - Bilingual first-step care guidance and low-confidence warnings
 - Searchable bilingual care guide for field crops, vegetables, fruit trees, indoor plants, decorative flowers, herbs and medicinal plants
+- Bilingual soil-health learning guide covering soil sampling/testing, pH and salinity indicators, nutrients, organic matter and responsible fertilizer use (general education, not personalized fertilizer prescriptions)
 
 ## Development milestones
 - **M1 – App foundation:** complete; cloud APK build verified.
 - **M2 – Farmer and farm setup:** complete; offline farmer profile and basic farm details, cloud APK build verified.
-- **M3 – Agriculture, horticulture and gardening:** in progress; 15-crop Rajasthan guide, offline Plant Doctor screening for selected crop-leaf classes, 19 bilingual horticulture/gardening guides, and a general Kharif/Rabi/Zaid crop calendar are implemented. District-validated crop windows, soil/water, deeper crop/IPM content, orchard/nursery and kitchen-garden coverage remain open.
+- **M3 – Agriculture, horticulture and gardening:** in progress; 15-crop Rajasthan guide, offline Plant Doctor screening for selected crop-leaf classes, 19 bilingual horticulture/gardening guides, and a general Kharif/Rabi/Zaid crop calendar are implemented. District-validated crop windows, irrigation/water conservation, deeper crop/IPM content, orchard/nursery and kitchen-garden coverage remain open. A foundational soil-health and nutrient guide is now implemented and awaiting cloud-build verification.
 - **M4 – Animal husbandry:** planned; species/breed library, feeding, housing, preventive-care records and animal profiles.
 - **M5 – Farm, garden and livestock diaries:** planned.
 - **M6 – Rajasthan advisory services:** deferred until core M3–M5 foundations are stable and explicitly reactivated.
