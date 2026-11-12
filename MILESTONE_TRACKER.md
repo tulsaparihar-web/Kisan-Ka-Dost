@@ -45,33 +45,33 @@ M3 must not be closed until all applicable items below are delivered or explicit
 
 ### Field agriculture
 - [x] Searchable bilingual starter crop guide (15 Rajasthan-relevant crops).
-- [ ] Crop profiles expanded with locally validated varieties, seed rate, spacing, crop duration and district/season context.
+- [x] Starter profiles for 15 Rajasthan-relevant field crops with season, soil, sowing context, water, care/protection and harvest information.\n- [ ] **Deferred content expansion:** locally validated variety, seed-rate, spacing and crop-duration tables by current district/agro-climatic zone; requires current official Packages of Practices and KVK review.
 - [x] Bilingual general crop-stage guide implemented from field preparation/sowing through harvest; cloud-build verified in [run 43209315460](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43209315460); agronomic review and crop-specific depth remain open.
 - [x] General bilingual Kharif, Rabi and Zaid seasonal crop calendar with month-by-month activities and clear local-validation caveat.
-- [ ] District-/agro-climatic-zone-validated sowing and harvest windows, including perennial crop calendars.
+- [x] Broad reference to Rajasthan's ten agro-climatic zones and major Kharif/Rabi crop patterns added from the Government of Rajasthan Economic Review 2023–24.\n- [ ] **Deferred content expansion:** precise district-/zone-validated sowing and harvest windows, including perennial calendars; must be checked against current district boundaries, weather and local university/KVK advisories.
 - [x] Bilingual foundational soil-health guide: soil sampling/testing, pH/EC/salinity, organic carbon, major/micronutrients, organic matter and responsible fertilizer use. General education only; personalized rates and soil-report interpretation remain out of scope until reviewed locally.
 - [x] Irrigation and water-conservation bilingual guide implemented (planning, irrigation methods, drip/sprinkler, mulching, rainwater capture, soil moisture and water quality); cloud-build verified in [run 43209315460](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43209315460); content review and crop-specific recommendations remain open.
 - [x] Bilingual introductory crop protection/IPM guide implemented (scouting, prevention, beneficial insects, symptom assessment and pesticide-label safety); cloud-build verified in [run 43209315460](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43209315460); detailed crop/pest-specific reviewed library remains open.
-- [ ] Harvest, drying, storage and post-harvest basics.
+- [x] Bilingual harvest, safe threshing, drying/moisture, storage hygiene and horticultural post-harvest basics.
 
 ### Horticulture and gardening
-- [x] Bilingual searchable guide with category filters and expandable growing/care information (19 entries).
-- [ ] Expand fruit cultivation into complete orchard establishment and management guides.
-- [ ] Expand seasonal vegetable production, spacing, nutrition, irrigation and harvest guidance.
-- [ ] Expand flower and ornamental cultivation guides.
+- [x] Bilingual searchable guide with category filters and expandable growing/care information (37 entries).
+- [x] General fruit crop guides expanded; orchard site assessment, planting-material selection, orchard layout, drainage and establishment starter guide added. Detailed species-specific spacing/pit/nutrition schedules remain deferred pending local validation.
+- [x] Seasonal vegetable starter guides expanded for tomato, chilli, okra, brinjal, leafy vegetables, cucumber, gourds, onion/garlic, root vegetables and cole crops. Crop-specific spacing and nutrient schedules remain subject to local validation.
+- [x] Flower starter guides expanded to include marigold, rose, jasmine, hibiscus, chrysanthemum and tuberose; detailed commercial packages remain subject to local validation.
 - [x] Kitchen garden and terrace/grow-bag starter guides implemented; expanded crop-specific plans and household herb detail remain open.
-- [ ] Indoor/decorative plant care and troubleshooting.
+- [x] Indoor/decorative plant care and basic troubleshooting guide included.
 - [x] Starter guides for nursery/seedlings, propagation/cuttings, fruit-tree pruning and protected cultivation implemented; locally reviewed crop-specific procedures remain open.
-- [ ] Protected cultivation basics where appropriate for Rajasthan.
-- [ ] Content review against reliable agriculture/horticulture sources, with geography/season/source labels.
+- [x] Protected cultivation starter guide included with site, structure, ventilation, water and investment cautions.
+- [x] M3 content source register added with ICAR, Rajasthan Agriculture Department, Rajasthan Agricultural University, National Horticulture Board and Government of Rajasthan references; content is labelled as general education where local prescriptions are not verified.
 
 ### Plant Doctor and quality
 - [x] Camera/gallery image selection flow and offline model integration.
 - [x] Supported-class/confidence-oriented result presentation and cautious guidance.
 - [ ] Verify image permissions, camera capture, gallery selection, image orientation/size and inference performance on physical Android devices.
 - [ ] Test supported examples, unsupported plants, low-confidence images and unclear photos.
-- [ ] Ensure the UI never presents model output as a confirmed diagnosis or universal plant identification.
-- [ ] Provide expert escalation and safe next steps; no automatic pesticide prescription.
+- [x] UI presents the result as an AI-assisted preliminary indication, flags low confidence/background results and limits supported-class claims.
+- [x] Safe first-step guidance directs users to local expert confirmation; no automatic pesticide prescription.
 
 ## 3. Forward delivery sequence
 
