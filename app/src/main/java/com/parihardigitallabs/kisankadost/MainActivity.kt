@@ -53,24 +53,24 @@ private data class Copy(
 )
 
 private val hi = Copy(
-    "नमस्ते किसान भाई!", "आपका अपना खेती और पशुपालन साथी",
+    "नमस्ते किसान भाई!", "खेती, बागवानी और पशुपालन का आपका साथी",
     "आज का मौसम", "मौसम अपडेट के लिए इंटरनेट कनेक्शन उपलब्ध होने पर सेवा जोड़ेंगे",
     "क्या जानना चाहेंगे?", "आज की खेती सलाह",
     "फसल में कोई भी खाद या दवा डालने से पहले स्थानीय कृषि विशेषज्ञ की सलाह और उत्पाद का लेबल अवश्य पढ़ें।",
     "होम", "खेत डायरी", "जानकारी", "सेटिंग्स",
     "फसल देखभाल", "पौधा डॉक्टर", "पशुपालन", "पेड़-पौधे", "मिट्टी और खाद",
     "सरकारी योजनाएं", "यह सुविधा अगले चरण में जोड़ी जाएगी",
-    "भाषा", "ऐप के बारे में", "हर किसान का अपना डिजिटल साथी"
+    "भाषा", "ऐप के बारे में", "खेती • बागवानी • पशुपालन"
 )
 private val en = Copy(
-    "Namaste, Kisan!", "Your companion for farming and animal care",
+    "Namaste, Kisan!", "Your companion for farming, gardening and animal care",
     "Today's weather", "Weather updates will be available when an internet service is added",
     "What would you like to explore?", "Farming tip of the day",
     "Before applying fertilizer or pesticides, check the product label and consult a local agricultural expert.",
     "Home", "Farm Diary", "Learn", "Settings",
     "Crop Care", "Plants", "Animal Care", "Trees", "Soil & Fertilizer",
     "Government Schemes", "This feature will be added in a future milestone",
-    "Language", "About the app", "A digital companion for every farmer"
+    "Language", "About the app", "Farming • Gardening • Animal Husbandry"
 )
 
 private data class Feature(val titleHi: String, val titleEn: String, val icon: ImageVector, val route: String, val tint: Color)
@@ -279,7 +279,7 @@ private fun SettingsScreen(c: Copy, isHindi: Boolean, onLanguageChange: (Boolean
         Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(c.about, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                Text("Kisan Ka Dost", color = Forest, fontWeight = FontWeight.Bold)
+                Text(if (isHindi) "किसान का दोस्त" else "Kisan Ka Dost", color = Forest, fontWeight = FontWeight.Bold)
                 Text(c.tagline, color = Color(0xFF66766B), fontSize = 13.sp)
                 Text("Parihar Digital Labs  •  Version 1.0.0", color = Color(0xFF66766B), fontSize = 12.sp)
             }
