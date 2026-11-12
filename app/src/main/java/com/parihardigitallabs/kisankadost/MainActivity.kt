@@ -135,10 +135,11 @@ private fun KisanKaDostApp() {
                         prefs.edit().putBoolean("is_hindi", it).apply()
                     })
                 }
-                listOf("crops", "plants", "animals", "trees", "soil", "schemes").forEach { route ->
+                listOf("crops", "calendar", "plants", "animals", "trees", "soil", "schemes").forEach { route ->
                     composable(route) {
                         when (route) {
                             "crops" -> CropCareScreen(isHindi = isHindi)
+                            "calendar" -> CropCalendarScreen(isHindi = isHindi)
                             "plants" -> PlantDoctorScreen(isHindi = isHindi)
                             "trees" -> HorticultureScreen(isHindi = isHindi)
                             else -> {
@@ -162,6 +163,7 @@ private fun KisanKaDostApp() {
 private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
     val features = listOf(
         Feature("फसल देखभाल", "Crop Care", Icons.Default.Grass, "crops", Color(0xFFE5F2E6)),
+        Feature("फसल कैलेंडर", "Crop Calendar", Icons.Default.EventNote, "calendar", Color(0xFFEAF0FA)),
         Feature("पौधा डॉक्टर", "Plant Doctor", Icons.Default.Spa, "plants", Color(0xFFEAF3DF)),
         Feature("पशुपालन", "Animal Care", Icons.Default.Pets, "animals", Color(0xFFFFF0D8)),
         Feature("बागवानी व गार्डन", "Horticulture & Garden", Icons.Default.Park, "trees", Color(0xFFE4F0E8)),
