@@ -58,7 +58,7 @@ private val hi = Copy(
     "क्या जानना चाहेंगे?", "आज की खेती सलाह",
     "फसल में कोई भी खाद या दवा डालने से पहले स्थानीय कृषि विशेषज्ञ की सलाह और उत्पाद का लेबल अवश्य पढ़ें।",
     "होम", "खेत डायरी", "जानकारी", "सेटिंग्स",
-    "फसल देखभाल", "पौधा डॉक्टर", "पशुपालन", "पेड़-पौधे", "मिट्टी और खाद",
+    "फसल देखभाल", "पौधा डॉक्टर", "पशुपालन", "बागवानी व गार्डन", "मिट्टी और खाद",
     "सरकारी योजनाएं", "यह सुविधा अगले चरण में जोड़ी जाएगी",
     "भाषा", "ऐप के बारे में", "खेती • बागवानी • पशुपालन"
 )
@@ -68,7 +68,7 @@ private val en = Copy(
     "What would you like to explore?", "Farming tip of the day",
     "Before applying fertilizer or pesticides, check the product label and consult a local agricultural expert.",
     "Home", "Farm Diary", "Learn", "Settings",
-    "Crop Care", "Plants", "Animal Care", "Trees", "Soil & Fertilizer",
+    "Crop Care", "Plants", "Animal Care", "Horticulture & Garden", "Soil & Fertilizer",
     "Government Schemes", "This feature will be added in a future milestone",
     "Language", "About the app", "Farming • Gardening • Animal Husbandry"
 )
@@ -140,6 +140,7 @@ private fun KisanKaDostApp() {
                         when (route) {
                             "crops" -> CropCareScreen(isHindi = isHindi)
                             "plants" -> PlantDoctorScreen(isHindi = isHindi)
+                            "trees" -> HorticultureScreen(isHindi = isHindi)
                             else -> {
                                 val title = when (route) {
                                     "animals" -> c.animals
