@@ -81,8 +81,8 @@ private val plantGuides = listOf(
     PlantGuide("Lemongrass", "लेमनग्रास", "Herb", "हर्ब", "Full sun", "पूरा धूप", "Water regularly while establishing; reduce in cool weather.", "स्थापित होते समय नियमित पानी दें; ठंड में कम करें।", "Fertile, well-drained soil", "उपजाऊ, अच्छी जल निकासी वाली मिट्टी", "Divide clumps when crowded and harvest outer leaves.", "घना होने पर गुच्छों को बाँटें और बाहरी पत्तियों की कटाई करें।")
 )
 
-private data class PlantPrediction(val label: String, val confidence: Float)
-private data class PlantDoctorState(val bitmap: Bitmap? = null, val predictions: List<PlantPrediction> = emptyList(), val analyzing: Boolean = false, val error: String? = null)
+data class PlantPrediction(val label: String, val confidence: Float)
+data class PlantDoctorState(val bitmap: Bitmap? = null, val predictions: List<PlantPrediction> = emptyList(), val analyzing: Boolean = false, val error: String? = null)
 
 class PlantDoctorViewModel(application: Application) : AndroidViewModel(application) {
     private val _state = MutableStateFlow(PlantDoctorState())
