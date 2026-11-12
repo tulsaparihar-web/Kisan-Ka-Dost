@@ -36,6 +36,15 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Download and verify Plant Doctor model
+        run: |
+          mkdir -p app/src/main/assets
+          curl --fail --location --retry 3 \
+            https://raw.githubusercontent.com/YeshwanthRajSelvaraj/AgroVision-AI/150bf1c847cba7e70adc595d3685ed01e366434b/FarmerFriendApp/app/src/main/assets/model.tflite \
+            --output app/src/main/assets/plant_disease_model.tflite
+          actual_blob=$(git hash-object app/src/main/assets/plant_disease_model.tflite)
+          test "$actual_blob" = "17967ab19d1d7bfedb36cfcdbd959ea518700793"
+
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
 
