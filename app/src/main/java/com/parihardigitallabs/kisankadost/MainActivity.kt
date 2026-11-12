@@ -48,7 +48,7 @@ private data class Copy(
     val tipText: String, val home: String, val diary: String,
     val learn: String, val settings: String, val crops: String,
     val plants: String, val animals: String, val trees: String,
-    val soil: String, val schemes: String, val coming: String,
+    val soil: String, val water: String, val schemes: String, val coming: String,
     val language: String, val about: String, val tagline: String
 )
 
