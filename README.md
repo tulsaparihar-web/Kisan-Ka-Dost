@@ -45,7 +45,7 @@ Every push to main triggers a cloud build. Older in-progress builds are cancelle
 ## Development milestones
 - **M1 – App foundation:** complete; cloud APK build verified.
 - **M2 – Farmer and farm setup:** complete; offline farmer profile and basic farm details, cloud APK build verified.
-- **M3 – Agriculture, horticulture and gardening:** in progress; 15-crop Rajasthan guide, offline Plant Doctor screening for selected crop-leaf classes, and 19 bilingual horticulture/gardening guides are implemented. Crop calendar, soil/water, deeper crop/IPM content, orchard/nursery and kitchen-garden coverage remain open.
+- **M3 – Agriculture, horticulture and gardening:** in progress; 15-crop Rajasthan guide, offline Plant Doctor screening for selected crop-leaf classes, 19 bilingual horticulture/gardening guides, and a general Kharif/Rabi/Zaid crop calendar are implemented. District-validated crop windows, soil/water, deeper crop/IPM content, orchard/nursery and kitchen-garden coverage remain open.
 - **M4 – Animal husbandry:** planned; species/breed library, feeding, housing, preventive-care records and animal profiles.
 - **M5 – Farm, garden and livestock diaries:** planned.
 - **M6 – Rajasthan advisory services:** deferred until core M3–M5 foundations are stable and explicitly reactivated.
