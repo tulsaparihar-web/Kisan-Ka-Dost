@@ -58,7 +58,7 @@ private val hi = Copy(
     "क्या जानना चाहेंगे?", "आज की खेती सलाह",
     "फसल में कोई भी खाद या दवा डालने से पहले स्थानीय कृषि विशेषज्ञ की सलाह और उत्पाद का लेबल अवश्य पढ़ें।",
     "होम", "खेत डायरी", "जानकारी", "सेटिंग्स",
-    "फसल देखभाल", "पौधे", "पशुपालन", "पेड़-पौधे", "मिट्टी और खाद",
+    "फसल देखभाल", "पौधा डॉक्टर", "पशुपालन", "पेड़-पौधे", "मिट्टी और खाद",
     "सरकारी योजनाएं", "यह सुविधा अगले चरण में जोड़ी जाएगी",
     "भाषा", "ऐप के बारे में", "हर किसान का अपना डिजिटल साथी"
 )
@@ -160,7 +160,7 @@ private fun KisanKaDostApp() {
 private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
     val features = listOf(
         Feature("फसल देखभाल", "Crop Care", Icons.Default.Grass, "crops", Color(0xFFE5F2E6)),
-        Feature("पौधे", "Plants", Icons.Default.Spa, "plants", Color(0xFFEAF3DF)),
+        Feature("पौधा डॉक्टर", "Plant Doctor", Icons.Default.Spa, "plants", Color(0xFFEAF3DF)),
         Feature("पशुपालन", "Animal Care", Icons.Default.Pets, "animals", Color(0xFFFFF0D8)),
         Feature("पेड़-पौधे", "Trees", Icons.Default.Park, "trees", Color(0xFFE4F0E8)),
         Feature("मिट्टी और खाद", "Soil & Fertilizer", Icons.Default.Grain, "soil", Color(0xFFF5EBDD)),
