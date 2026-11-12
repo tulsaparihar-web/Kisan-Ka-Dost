@@ -3,11 +3,13 @@
 **Parihar Digital Labs**  
 Hindi + English | Rajasthan-first | Offline-first
 
+Kisan Ka Dost is an all-round digital companion for **कृषि (खेती), बागवानी and पशुपालन**. The product scope includes field crops, horticulture, livestock, farm records, soil and water, weather, markets, government schemes and farm economics. See [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md) for the detailed feature blueprint and delivery roadmap.
+
 ## Project details
 - Package: `com.parihardigitallabs.kisankadost`
 - Kotlin + Jetpack Compose + Material 3
 - MVVM + Repository pattern
-- Room database for on-device farmer profile storage
+- Room database for on-device farmer profile and future farm records
 - TensorFlow Lite for on-device plant leaf screening
 - Minimum Android: API 26 (Android 8.0)
 - Compile/Target SDK: 35
@@ -23,7 +25,7 @@ No Android Studio or local Android SDK is required.
 
 Every push to `main` triggers a cloud build. Older in-progress builds are cancelled when a newer commit arrives.
 
-## Current features
+## Implemented and build-verified foundations
 - Home dashboard and feature navigation
 - Hindi / English language switch, saved locally
 - My Farm profile: farmer name, mobile number, village, tehsil, district
@@ -33,24 +35,25 @@ Every push to `main` triggers a cloud build. Older in-progress builds are cancel
 - Offline TensorFlow Lite leaf screening with top-three predictions and confidence display
 - Bilingual first-step care guidance and low-confidence warnings
 - Searchable bilingual care guide for field crops, vegetables, fruit trees, indoor plants, decorative flowers, herbs and medicinal plants
-- Other future module entry points remain clearly marked as planned
 
 ## Development milestones
-- **M1 – App foundation:** branding, dashboard, navigation, bilingual UI and cloud APK build.
-- **M2 – Farmer and farm setup:** offline farmer profile and basic farm details. Source and cloud APK build verified.
-- **M3 – Plant Doctor and plant care:** in progress; photo-based crop leaf screening and searchable horticulture / home gardening guide.
-- **M4 – Animal husbandry:** planned.
-- **M5 – Farm diary and garden diary:** planned.
-- **Later / deferred:** Rajasthan government schemes, weather, alerts and smart assistance.
+- **M1 – App foundation:** complete; cloud APK build verified.
+- **M2 – Farmer and farm setup:** complete; offline farmer profile and basic farm details, cloud APK build verified.
+- **M3 – Agriculture and horticulture foundation:** in progress; Plant Doctor and plant-care guide are the first delivered pieces. Expand to crop library, crop calendar, soil/water and broader horticulture.
+- **M4 – Animal husbandry:** planned; species/breed library, feeding, housing, preventive-care records and animal profiles.
+- **M5 – Farm, garden and livestock diaries:** planned.
+- **M6 – Rajasthan advisory services:** planned; verified local calendars, weather and alerts.
+- **M7 – Markets, schemes and services:** planned.
+- **M8 – Farm economics and smart assistance:** planned.
 
 ## Plant Doctor model scope
-The current bundled model has 39 output classes, including a background class, and covers selected crop leaf classes. It is not a general plant species identifier. Indoor and ornamental plants currently have searchable care guides; broad photo-based species identification is a later M3 enhancement.
+The current model has 39 output classes, including a background class, and covers selected crop leaf classes. It is not a general plant species identifier. Indoor and ornamental plants currently have searchable care guides; broader photo-based identification is a later enhancement.
 
 The model is downloaded from a pinned upstream revision during GitHub Actions and its Git blob hash is verified before the APK build. Attribution and the upstream MIT license are included in `THIRD_PARTY_NOTICES.md` and the app assets.
 
-## Safety and limitations
-- AI output is an advisory screening result, not a confirmed diagnosis.
-- The model was trained for a limited set of crop/disease classes; results may be less reliable on real field photos, unfamiliar varieties, mixed backgrounds, or unsupported plants.
-- Low-confidence and unsupported-image results are explicitly flagged.
-- Confirm symptoms and local conditions with a qualified agricultural or horticultural expert before treatment. Follow approved product labels and local recommendations.
-- Weather and other live services are not connected.
+## Content and safety
+- Agricultural, horticultural and veterinary content will be based on official and research-backed sources, localized by district/region, season and crop/species.
+- AI output is advisory screening, not a confirmed diagnosis.
+- Do not treat an AI result as a pesticide or veterinary prescription. Seek qualified local advice before treatment.
+- Weather, live mandi prices and scheme updates must show their source and last-updated time; no live data is claimed until connected.
+- Farmer records work offline by default. Optional sharing/sync must be explicit.
