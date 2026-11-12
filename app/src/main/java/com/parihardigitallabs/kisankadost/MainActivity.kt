@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 private val Forest = Color(0xFF247A45)
 private val Leaf = Color(0xFF77B85A)
@@ -81,6 +82,7 @@ private fun KisanKaDostApp() {
     var isHindi by remember { mutableStateOf(prefs.getBoolean("is_hindi", true)) }
     val c = if (isHindi) hi else en
     val navController = rememberNavController()
+    val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
 
     MaterialTheme(
         colorScheme = lightColorScheme(
@@ -126,6 +128,7 @@ private fun KisanKaDostApp() {
                 }
                 composable("diary") { PlaceholderScreen(if (isHindi) "खेत डायरी" else "Farm Diary", c.coming, Icons.Default.EditNote) }
                 composable("learn") { PlaceholderScreen(if (isHindi) "किसान ज्ञान" else "Farmer Knowledge", c.coming, Icons.Default.MenuBook) }
+                composable("myfarm") { MyFarmScreen(isHindi = isHindi, viewModel = farmerSetupViewModel) }
                 composable("settings") {
                     SettingsScreen(c, isHindi, onLanguageChange = {
                         isHindi = it
@@ -158,7 +161,8 @@ private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
         Feature("पशुपालन", "Animal Care", Icons.Default.Pets, "animals", Color(0xFFFFF0D8)),
         Feature("पेड़-पौधे", "Trees", Icons.Default.Park, "trees", Color(0xFFE4F0E8)),
         Feature("मिट्टी और खाद", "Soil & Fertilizer", Icons.Default.Grain, "soil", Color(0xFFF5EBDD)),
-        Feature("सरकारी योजनाएं", "Government Schemes", Icons.Default.AccountBalance, "schemes", Color(0xFFE8EAF5))
+        Feature("सरकारी योजनाएं", "Government Schemes", Icons.Default.AccountBalance, "schemes", Color(0xFFE8EAF5)),
+        Feature("मेरा खेत", "My Farm", Icons.Default.Agriculture, "myfarm", Color(0xFFE3F0E7))
     )
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
