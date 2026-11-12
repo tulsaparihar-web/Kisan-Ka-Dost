@@ -30,7 +30,8 @@ M3 must not be closed until all applicable items below are delivered or explicit
 - [x] Searchable bilingual starter crop guide (15 Rajasthan-relevant crops).
 - [ ] Crop profiles expanded with locally validated varieties, seed rate, spacing, crop duration and district/season context.
 - [ ] Crop-stage guidance from land preparation through harvest.
-- [ ] Crop calendar for Kharif, Rabi, Zaid and perennial crops, with local-validation labels.
+- [x] General bilingual Kharif, Rabi and Zaid seasonal crop calendar with month-by-month activities and clear local-validation caveat.
+- [ ] District-/agro-climatic-zone-validated sowing and harvest windows, including perennial crop calendars.
 - [ ] Soil, soil testing, pH/salinity, nutrients, organic matter and fertilizer education.
 - [ ] Irrigation, water conservation, drip/sprinkler and moisture-management basics.
 - [ ] Pest/disease/deficiency library and IPM, safe handling and label-reading guidance.
