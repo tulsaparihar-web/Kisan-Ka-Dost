@@ -4,7 +4,7 @@
 **Tagline:** खेती • बागवानी • पशुपालन  
 Hindi + English | Rajasthan-first | Offline-first
 
-**किसान का दोस्त (Kisan Ka Dost)** is an all-round digital companion for **कृषि (खेती), बागवानी and पशुपालन**. The product scope includes field crops, horticulture, livestock, farm records, soil and water, weather, markets, government schemes and farm economics. See [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md) for the detailed feature blueprint and delivery roadmap.
+**किसान का दोस्त (Kisan Ka Dost)** is an all-round digital companion for **कृषि (खेती), बागवानी and पशुपालन**. The product scope includes field crops, horticulture, livestock, farm records, soil and water, weather, markets, government schemes and farm economics. See [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md) for the detailed feature blueprint and [MILESTONE_TRACKER.md](MILESTONE_TRACKER.md) for the implementation audit, acceptance checklist and delivery sequence.
 
 ## Project details
 - App display name: **किसान का दोस्त**
@@ -45,10 +45,10 @@ Every push to main triggers a cloud build. Older in-progress builds are cancelle
 ## Development milestones
 - **M1 – App foundation:** complete; cloud APK build verified.
 - **M2 – Farmer and farm setup:** complete; offline farmer profile and basic farm details, cloud APK build verified.
-- **M3 – Agriculture and horticulture foundation:** in progress; Plant Doctor and plant-care guide are the first delivered pieces. Expand to crop library, crop calendar, soil/water and broader horticulture.
+- **M3 – Agriculture, horticulture and gardening:** in progress; 15-crop Rajasthan guide, offline Plant Doctor screening for selected crop-leaf classes, and 19 bilingual horticulture/gardening guides are implemented. Crop calendar, soil/water, deeper crop/IPM content, orchard/nursery and kitchen-garden coverage remain open.
 - **M4 – Animal husbandry:** planned; species/breed library, feeding, housing, preventive-care records and animal profiles.
 - **M5 – Farm, garden and livestock diaries:** planned.
-- **M6 – Rajasthan advisory services:** planned; verified local calendars, weather and alerts.
+- **M6 – Rajasthan advisory services:** deferred until core M3–M5 foundations are stable and explicitly reactivated.
 - **M7 – Markets, schemes and services:** planned.
 - **M8 – Farm economics and smart assistance:** planned.
 
