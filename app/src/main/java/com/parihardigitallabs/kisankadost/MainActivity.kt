@@ -140,6 +140,7 @@ private fun KisanKaDostApp() {
                         when (route) {
                             "crops" -> CropCareScreen(isHindi = isHindi)
                             "calendar" -> CropCalendarScreen(isHindi = isHindi)
+                            "soil" -> SoilHealthScreen(isHindi = isHindi)
                             "plants" -> PlantDoctorScreen(isHindi = isHindi)
                             "trees" -> HorticultureScreen(isHindi = isHindi)
                             else -> {
