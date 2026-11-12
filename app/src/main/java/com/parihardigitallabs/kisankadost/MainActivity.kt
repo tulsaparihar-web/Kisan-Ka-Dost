@@ -137,17 +137,18 @@ private fun KisanKaDostApp() {
                 }
                 listOf("crops", "plants", "animals", "trees", "soil", "schemes").forEach { route ->
                     composable(route) {
-                        if (route == "plants") {
-                            PlantDoctorScreen(isHindi = isHindi)
-                        } else {
-                            val title = when (route) {
-                                "crops" -> c.crops
-                                "animals" -> c.animals
-                                "trees" -> c.trees
-                                "soil" -> c.soil
-                                else -> c.schemes
+                        when (route) {
+                            "crops" -> CropCareScreen(isHindi = isHindi)
+                            "plants" -> PlantDoctorScreen(isHindi = isHindi)
+                            else -> {
+                                val title = when (route) {
+                                    "animals" -> c.animals
+                                    "trees" -> c.trees
+                                    "soil" -> c.soil
+                                    else -> c.schemes
+                                }
+                                PlaceholderScreen(title, c.coming, Icons.Default.Agriculture)
                             }
-                            PlaceholderScreen(title, c.coming, Icons.Default.Agriculture)
                         }
                     }
                 }
