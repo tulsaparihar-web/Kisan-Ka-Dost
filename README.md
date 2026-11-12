@@ -2,9 +2,13 @@
 
 **Parihar Digital Labs**  
 **Tagline:** खेती • बागवानी • पशुपालन  
-Hindi + English | Rajasthan-first | Offline-first
+Hindi + English | Rajasthan-first | Offline-first | Free for everyone
 
 **किसान का दोस्त (Kisan Ka Dost)** is an all-round digital companion for **कृषि (खेती), बागवानी and पशुपालन**. The product scope includes field crops, horticulture, livestock, farm records, soil and water, weather, markets, government schemes and farm economics. See [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md) for the detailed feature blueprint and [MILESTONE_TRACKER.md](MILESTONE_TRACKER.md) for the implementation audit, acceptance checklist and delivery sequence.
+
+## Our promise: free for everyone
+
+Kisan Ka Dost will remain free for every user—no subscriptions, premium tiers, paywalls or paid feature restrictions. All three pillars (खेती, बागवानी and पशुपालन) stay accessible without payment. We aim to sustain the project through responsible, clearly identified and non-disruptive advertising, voluntary donations and mission-aligned institutional/CSR support. Donations never change access. We will not sell or rent farmers' personal information, farm records, photos, phone numbers or precise location data to advertisers. Personal/farm records remain on-device by default; any sync or sharing must be explicit. Advertising must be screened for misleading or unsafe claims and kept separate from independent agricultural guidance.
 
 ## Project details
 - App display name: **किसान का दोस्त**
