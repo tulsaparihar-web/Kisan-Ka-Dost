@@ -1,0 +1,87 @@
+package com.parihardigitallabs.kisankadost
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
+import com.parihardigitallabs.kisankadost.data.AppDatabase
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+
+class AnimalReminderWorker(
+    appContext: Context,
+    params: WorkerParameters
+) : CoroutineWorker(appContext, params) {
+
+    override suspend fun doWork(): Result {
+        val recordId = inputData.getLong(KEY_RECORD_ID, -1L)
+        if (recordId <= 0L) return Result.failure()
+
+        val database = AppDatabase.getInstance(applicationContext)
+        val event = database.animalHealthRecordDao().getById(recordId) ?: return Result.success()
+        if (!event.veterinarianConfirmed || event.nextReminderDate.isBlank()) return Result.success()
+        val animal = database.animalRecordDao().getById(event.animalId) ?: return Result.success()
+
+        val targetDate = runCatching { LocalDate.parse(event.nextReminderDate) }.getOrNull()
+            ?: return Result.failure()
+        val target = LocalDateTime.of(targetDate, LocalTime.of(9, 0))
+        if (LocalDateTime.now() < target) {
+            val delay = java.time.Duration.between(LocalDateTime.now(), target).toMillis().coerceAtLeast(60_000L)
+            return Result.retry().also {
+                // WorkManager retry backoff is not a date scheduler; a future date is scheduled by the UI.
+            }
+        }
+
+        createNotificationChannel()
+        val launchIntent = applicationContext.packageManager
+            .getLaunchIntentForPackage(applicationContext.packageName)
+        val contentIntent = launchIntent?.let {
+            PendingIntent.getActivity(
+                applicationContext, recordId.toInt(), it,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+        val title = if (event.eventTitle.isBlank()) "Animal care reminder" else event.eventTitle
+        val body = "${animal.name} • ${event.nextReminderDate}"
+        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .apply { if (contentIntent != null) setContentIntent(contentIntent) }
+            .build()
+
+        return try {
+            NotificationManagerCompat.from(applicationContext).notify(recordId.toInt(), notification)
+            Result.success()
+        } catch (_: SecurityException) {
+            Result.success()
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Animal care reminders",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply { description = "Reminders entered and confirmed by the animal owner and veterinarian." }
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    companion object {
+        const val KEY_RECORD_ID = "animal_health_record_id"
+        const val CHANNEL_ID = "animal_care_reminders"
+    }
+}
