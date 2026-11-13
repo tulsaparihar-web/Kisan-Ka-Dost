@@ -332,13 +332,52 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
 
 private fun displayDiseaseLabel(label: String, isHindi: Boolean): String {
     val crop = label.substringBefore(" ")
-    val cropsHi = mapOf("apple" to "सेब", "blueberry" to "ब्लूबेरी", "cherry" to "चेरी", "corn" to "मक्का", "grape" to "अंगूर", "orange" to "संतरा", "peach" to "आड़ू", "pepper" to "शिमला मिर्च", "potato" to "आलू", "raspberry" to "रास्पबेरी", "soybean" to "सोयाबीन", "squash" to "स्क्वैश", "strawberry" to "स्ट्रॉबेरी", "tomato" to "टमाटर")
-    val cropEn = when (crop) { "corn" -> "Maize"; "pepper" -> "Bell pepper"; else -> crop.replaceFirstChar { it.uppercase() } }
+    val cropsHi = mapOf(
+        "apple" to "सेब", "blueberry" to "ब्लूबेरी", "cherry" to "चेरी",
+        "corn" to "मक्का", "grape" to "अंगूर", "orange" to "संतरा",
+        "peach" to "आड़ू", "pepper" to "शिमला मिर्च", "potato" to "आलू",
+        "raspberry" to "रास्पबेरी", "soybean" to "सोयाबीन", "squash" to "स्क्वैश",
+        "strawberry" to "स्ट्रॉबेरी", "tomato" to "टमाटर"
+    )
+    val cropEn = when (crop) {
+        "corn" -> "Maize"
+        "pepper" -> "Bell pepper"
+        else -> crop.replaceFirstChar { it.uppercase() }
+    }
     if (label.contains("background", true)) return if (isHindi) "असमर्थित फोटो" else "Unsupported image"
     if (label.contains("healthy", true)) return if (isHindi) (cropsHi[crop] ?: cropEn) + " – स्वस्थ पत्ती" else cropEn + " – Healthy"
-    val disease = label.substringAfter(" ").replace("including sour", "").replace("maize", "").replace("bell", "").trim()
-    return if (isHindi) (cropsHi[crop] ?: cropEn) + " – " + disease.replace("early blight", "अगेती झुलसा").replace("late blight", "पछेती झुलसा").replace("powdery mildew", "चूर्णिल आसिता").replace("common rust", "रतुआ").replace("bacterial spot", "जीवाणु धब्बा").replace("leaf mold", "पत्ती फफूंद").replace("septoria leaf spot", "सेप्टोरिया धब्बा").replace("yellow leaf curl virus", "पीला पत्ती मरोड़ विषाणु")
-    else cropEn + " – " + disease.replaceFirstChar { it.uppercase() }
+
+    val disease = label.substringAfter(" ")
+        .replace("including sour", "")
+        .replace("maize", "")
+        .replace("bell", "")
+        .trim()
+    if (!isHindi) return cropEn + " – " + disease.replaceFirstChar { it.uppercase() }
+
+    val diseaseHi = listOf(
+        "cercospora leaf spot gray leaf spot" to "सर्कोस्पोरा / ग्रे लीफ स्पॉट",
+        "leaf blight isariopsis leaf spot" to "पत्ती झुलसा (इसारियोप्सिस धब्बा)",
+        "haunglongbing citrus greening" to "सिट्रस ग्रीनिंग (HLB)",
+        "spider mites two spotted spider mite" to "दो-धब्बेदार मकड़ी माइट",
+        "yellow leaf curl virus" to "पीला पत्ती मरोड़ विषाणु",
+        "cedar apple rust" to "सीडर-एप्पल रतुआ",
+        "northern leaf blight" to "उत्तरी पत्ती झुलसा",
+        "esca black measles" to "एस्का (ब्लैक मीज़ल्स)",
+        "septoria leaf spot" to "सेप्टोरिया पत्ती धब्बा",
+        "powdery mildew" to "चूर्णिल आसिता",
+        "bacterial spot" to "जीवाणु धब्बा",
+        "early blight" to "अगेती झुलसा",
+        "late blight" to "पछेती झुलसा",
+        "leaf scorch" to "पत्ती झुलसा",
+        "leaf mold" to "पत्ती फफूंद",
+        "target spot" to "लक्ष्य धब्बा",
+        "common rust" to "सामान्य रतुआ",
+        "black rot" to "काला सड़न रोग",
+        "apple scab" to "पपड़ी रोग",
+        "mosaic virus" to "मोज़ेक विषाणु"
+    ).firstOrNull { disease.contains(it.first) }?.second ?: disease
+
+    return (cropsHi[crop] ?: cropEn) + " – " + diseaseHi
 }
 
 private fun recommendationFor(label: String, isHindi: Boolean): String {
