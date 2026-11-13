@@ -54,6 +54,12 @@ object DiaryPhotoStore {
         }
     }.getOrNull()
 
+    fun isValidStoredPhoto(file: File): Boolean {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(file.absolutePath, bounds)
+        return bounds.outWidth in 1..1600 && bounds.outHeight in 1..1600
+    }
+
     fun pruneUnused(context: Context, referencedNames: Set<String>) {
         directory(context).listFiles()?.forEach { file ->
             if (isSafeName(file.name) && file.name !in referencedNames) file.delete()
