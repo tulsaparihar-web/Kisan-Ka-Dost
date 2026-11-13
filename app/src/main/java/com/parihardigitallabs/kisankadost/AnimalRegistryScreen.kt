@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.parihardigitallabs.kisankadost.data.AnimalRecordEntity
 import com.parihardigitallabs.kisankadost.data.AnimalHealthRecordEntity
+import java.time.LocalDate
 
 private val RegistryGreen = Color(0xFF247A45)
 private val RegistryInk = Color(0xFF203128)
@@ -201,11 +202,16 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                             if (eventsForAnimal.isNotEmpty()) {
                                 Text(if (isHindi) "स्वास्थ्य रिकॉर्ड" else "Health records", fontWeight = FontWeight.SemiBold, color = RegistryGreen, fontSize = 12.sp)
                                 eventsForAnimal.forEach { event ->
-                                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                        Text("${event.eventTitle} • ${event.eventDate}", fontSize = 12.sp, color = RegistryInk)
-                                        if (event.nextReminderDate.isNotBlank()) Text((if (isHindi) "अगली याद दिलाने की तारीख: " else "Next reminder date: ") + event.nextReminderDate, fontSize = 11.sp, color = RegistryGreen)
-                                        Text(if (event.veterinarianConfirmed) { if (isHindi) "पशु चिकित्सक से पुष्टि" else "Veterinarian confirmed" } else { if (isHindi) "स्वयं दर्ज • पुष्टि नहीं" else "Self-entered • unconfirmed" }, fontSize = 10.sp, color = Color(0xFF66766B))
-                                        if (event.notes.isNotBlank()) Text(event.notes, fontSize = 11.sp, color = Color(0xFF66766B))
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                            Text("${event.eventTitle} • ${event.eventDate}", fontSize = 12.sp, color = RegistryInk)
+                                            if (event.nextReminderDate.isNotBlank()) Text((if (isHindi) "अगली याद दिलाने की तारीख: " else "Next reminder date: ") + event.nextReminderDate, fontSize = 11.sp, color = RegistryGreen)
+                                            Text(if (event.veterinarianConfirmed) { if (isHindi) "पशु चिकित्सक से पुष्टि" else "Veterinarian confirmed" } else { if (isHindi) "स्वयं दर्ज • पुष्टि नहीं" else "Self-entered • unconfirmed" }, fontSize = 10.sp, color = Color(0xFF66766B))
+                                            if (event.notes.isNotBlank()) Text(event.notes, fontSize = 11.sp, color = Color(0xFF66766B))
+                                        }
+                                        IconButton(onClick = { viewModel.deleteHealthRecord(event) }) {
+                                            Icon(Icons.Default.DeleteOutline, contentDescription = if (isHindi) "स्वास्थ्य रिकॉर्ड हटाएँ" else "Delete health record", tint = Color(0xFF9B3D32))
+                                        }
                                     }
                                 }
                             }
@@ -245,11 +251,13 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
             },
             confirmButton = {
                 TextButton(onClick = {
-                    val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}")
+                    val parsedEventDate = runCatching { LocalDate.parse(healthDate) }.getOrNull()
+                    val parsedReminderDate = if (nextReminderDate.isBlank()) null else runCatching { LocalDate.parse(nextReminderDate) }.getOrNull()
                     when {
                         healthTitle.isBlank() -> healthError = if (isHindi) "घटना का नाम भरें।" else "Enter an event title."
-                        !healthDate.matches(datePattern) -> healthError = if (isHindi) "तारीख YYYY-MM-DD में भरें।" else "Enter date as YYYY-MM-DD."
-                        nextReminderDate.isNotBlank() && !nextReminderDate.matches(datePattern) -> healthError = if (isHindi) "अगली तारीख YYYY-MM-DD में भरें।" else "Enter next date as YYYY-MM-DD."
+                        parsedEventDate == null -> healthError = if (isHindi) "सही तारीख YYYY-MM-DD में भरें।" else "Enter a valid date as YYYY-MM-DD."
+                        nextReminderDate.isNotBlank() && parsedReminderDate == null -> healthError = if (isHindi) "अगली तारीख सही YYYY-MM-DD में भरें।" else "Enter a valid next date as YYYY-MM-DD."
+                        parsedReminderDate != null && parsedReminderDate.isBefore(parsedEventDate) -> healthError = if (isHindi) "अगली तारीख घटना की तारीख से पहले नहीं हो सकती।" else "Next date cannot be before the event date."
                         nextReminderDate.isNotBlank() && !vetConfirmed -> healthError = if (isHindi) "अगली तारीख के लिए पशु चिकित्सक की पुष्टि जरूरी है।" else "Veterinarian confirmation is required for a next date."
                         else -> viewModel.addHealthRecord(
                             AnimalHealthRecordEntity(
