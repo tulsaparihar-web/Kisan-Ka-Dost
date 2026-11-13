@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.parihardigitallabs.kisankadost.data.DiaryRecordEntity
 import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private val DiaryGreen=Color(0xFF247A45)
 private val DiaryInk=Color(0xFF203128)
@@ -46,6 +48,19 @@ private fun diaryLabel(t:String,hi:Boolean)=when(t){
  "PRODUCTION"->if(hi)"उत्पादन" else "Production";else->t
 }
 private fun photoNames(value:String)=value.lineSequence().filter{it.isNotBlank()}.toList()
+
+@Composable
+private fun DiaryPhotoThumbnail(fileName:String): androidx.compose.ui.graphics.ImageBitmap? {
+ val context=LocalContext.current
+ val thumbnail by produceState<androidx.compose.ui.graphics.ImageBitmap?>(initialValue=null,key1=fileName) {
+  value=withContext(Dispatchers.IO) {
+   DiaryPhotoStore.file(context,fileName)?.let { file ->
+    BitmapFactory.decodeFile(file.absolutePath,BitmapFactory.Options().apply{inSampleSize=4})?.asImageBitmap()
+   }
+  }
+ }
+ return thumbnail
+}
 
 @Composable
 fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
@@ -83,11 +98,17 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
  val photoPicker=rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()){uris->
   val room=(5-photoNames(photoPathsRaw).size).coerceAtLeast(0)
   var added=0
-  uris.take(room).forEach{uri->DiaryPhotoStore.copyFromUri(context,uri)?.let{name->
-   photoPathsRaw=(photoNames(photoPathsRaw)+name).joinToString("\n")
-   newPhotoPathsRaw=(photoNames(newPhotoPathsRaw)+name).joinToString("\n");added++
-  }}
-  message=if(isHindi)"$added फोटो जोड़े गए (अधिकतम 5)।" else "$added photo(s) attached (maximum 5)."
+  var failed=0
+  uris.take(room).forEach{uri->
+   val name=DiaryPhotoStore.copyFromUri(context,uri)
+   if(name!=null){
+    photoPathsRaw=(photoNames(photoPathsRaw)+name).joinToString("\n")
+    newPhotoPathsRaw=(photoNames(newPhotoPathsRaw)+name).joinToString("\n");added++
+   }else failed++
+  }
+  val skipped=(uris.size-room).coerceAtLeast(0)
+  message=if(isHindi)"$added फोटो जोड़े गए, $failed फोटो नहीं पढ़े जा सके, $skipped सीमा के कारण छोड़े गए।"
+   else "$added photo(s) attached; $failed could not be read; $skipped skipped because of the five-photo limit."
  }
  val csvLauncher=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){uri->
   if(uri!=null)runCatching{context.contentResolver.openOutputStream(uri)?.bufferedWriter(Charsets.UTF_8)?.use{it.write(DiaryCsvExporter.export(records))}?:error("No output stream")}
@@ -172,7 +193,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
     }
     if(photoNames(photoPathsRaw).isNotEmpty())Column(verticalArrangement=Arrangement.spacedBy(3.dp)){
      photoNames(photoPathsRaw).forEach{name->Row(verticalAlignment=Alignment.CenterVertically){
-      val thumb=remember(name){DiaryPhotoStore.file(context,name)?.let{file->BitmapFactory.decodeFile(file.absolutePath,BitmapFactory.Options().apply{inSampleSize=4})?.asImageBitmap()}}
+      val thumb=DiaryPhotoThumbnail(name)
       if(thumb!=null)Image(thumb,contentDescription=if(isHindi)"डायरी फोटो" else "Diary photo",modifier=Modifier.size(52.dp),contentScale=ContentScale.Crop)
       Text(name,modifier=Modifier.weight(1f),fontSize=11.sp,color=DiaryInk)
       TextButton(onClick={
@@ -205,7 +226,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
     if(details.isNotBlank())Text(details,fontSize=12.sp,color=DiaryInk)
     if(r.notes.isNotBlank())Text(r.notes,fontSize=12.sp,color=Color(0xFF66766B))
     if(r.reminderDate.isNotBlank())Text((if(isHindi)"रिमाइंडर: " else "Reminder: ")+r.reminderDate,fontSize=11.sp,color=DiaryGreen)
-    if(photoNames(r.photoPaths).isNotEmpty())Row(horizontalArrangement=Arrangement.spacedBy(5.dp)){photoNames(r.photoPaths).forEach{name->val thumb=remember(name){DiaryPhotoStore.file(context,name)?.let{file->BitmapFactory.decodeFile(file.absolutePath,BitmapFactory.Options().apply{inSampleSize=4})?.asImageBitmap()}};if(thumb!=null)Image(thumb,contentDescription=if(isHindi)"डायरी फोटो" else "Diary photo",modifier=Modifier.size(52.dp),contentScale=ContentScale.Crop)}}
+    if(photoNames(r.photoPaths).isNotEmpty())Row(horizontalArrangement=Arrangement.spacedBy(5.dp)){photoNames(r.photoPaths).forEach{name->val thumb=DiaryPhotoThumbnail(name);if(thumb!=null)Image(thumb,contentDescription=if(isHindi)"डायरी फोटो" else "Diary photo",modifier=Modifier.size(52.dp),contentScale=ContentScale.Crop)}}
    }
   }}
   if(message.isNotBlank())Text(message,color=DiaryGreen,fontSize=12.sp)
