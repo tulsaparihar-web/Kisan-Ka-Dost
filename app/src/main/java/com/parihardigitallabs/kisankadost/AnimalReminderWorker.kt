@@ -25,7 +25,7 @@ class AnimalReminderWorker(
 
         val database = AppDatabase.getInstance(applicationContext)
         val event = database.animalHealthRecordDao().getById(recordId) ?: return Result.success()
-        if (!event.veterinarianConfirmed || event.nextReminderDate.isBlank()) return Result.success()
+        if (!event.veterinarianConfirmed || event.nextReminderDate.isBlank() || event.reminderNotified) return Result.success()
         val animal = database.animalRecordDao().getById(event.animalId) ?: return Result.success()
 
         val targetDate = runCatching { LocalDate.parse(event.nextReminderDate) }.getOrNull()
@@ -58,6 +58,7 @@ class AnimalReminderWorker(
 
         return try {
             NotificationManagerCompat.from(applicationContext).notify(recordId.toInt(), notification)
+            database.animalHealthRecordDao().markReminderNotified(recordId)
             Result.success()
         } catch (_: SecurityException) {
             Result.success()
