@@ -57,7 +57,7 @@ object DiaryPhotoStore {
 
     fun calculateSampleSize(width: Int, height: Int, maxDimension: Int): Int {
         var sample = 1
-        while (width / (sample * 2) >= maxDimension || height / (sample * 2) >= maxDimension) sample *= 2
+        while (width / sample > maxDimension || height / sample > maxDimension) sample *= 2
         return sample.coerceAtLeast(1)
     }
 }
