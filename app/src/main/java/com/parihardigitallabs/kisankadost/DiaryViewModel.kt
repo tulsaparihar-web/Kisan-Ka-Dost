@@ -20,7 +20,7 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
  init {
   viewModelScope.launch(Dispatchers.IO) {
    val referenced = db.diaryRecordDao().getAllForBackup()
-    .flatMap { it.photoPaths.lineSequence().filter(String::isNotBlank).toList() }.toSet()
+    .flatMap { it.photoPaths.lineSequence().filter { it.isNotBlank() }.toList() }.toSet()
    DiaryPhotoStore.pruneUnused(app, referenced)
   }
  }
