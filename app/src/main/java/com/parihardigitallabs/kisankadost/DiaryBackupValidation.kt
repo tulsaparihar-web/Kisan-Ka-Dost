@@ -17,6 +17,10 @@ object DiaryBackupValidation {
         photoFiles: Set<String>
     ): Set<String> {
         require(farmers.size <= 1 && farmers.all { it.id == 1 }) { "Backup must contain at most one farmer profile" }
+        require(animals.size <= 5_000 && health.size <= 10_000 && diaries.size <= 10_000) {
+            "Backup contains too many records"
+        }
+        require(photoFiles.size <= 25_000) { "Backup contains too many photos" }
         require(animals.map { it.id }.all { it > 0 } && animals.map { it.id }.distinct().size == animals.size) { "Animal IDs are invalid or duplicated" }
         require(health.map { it.id }.all { it > 0 } && health.map { it.id }.distinct().size == health.size) { "Health record IDs are invalid or duplicated" }
         require(diaries.map { it.id }.all { it > 0 } && diaries.map { it.id }.distinct().size == diaries.size) { "Diary record IDs are invalid or duplicated" }
