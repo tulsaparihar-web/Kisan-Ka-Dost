@@ -130,7 +130,7 @@ Supporting services (farm diary, soil, water, weather, markets, schemes, machine
 - Newborn care and colostrum education.
 - Lactation, milking hygiene, milk yield and quality records.
 - Dry-period and reproductive-cycle tracking.
-- Offline individual animal profile: name, species, identification tag, sex, age/date of birth, purpose and notes; breed, purchase details and photographs are planned extensions.
+- Offline individual animal profile: name, species, breed, identification tag, sex, age/date of birth, purpose and notes; purchase details and photographs are planned extensions.
 - Health-event history with event date, notes and optional veterinarian-confirmed next date; local Android notification attempt around 9 AM, subject to permission and battery-management delays.
 - Production and expense records for milk, eggs, wool and other outputs remain in the later diary milestone.
 
