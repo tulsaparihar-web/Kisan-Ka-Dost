@@ -261,11 +261,9 @@ private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
                     ) {
                         Text(if (isHindi) "मेरा खेत" else "My Farm")
                     }
-                    OutlinedButton(
+                    TextButton(
                         onClick = { onFeature("diary") },
-                        border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Color.White.copy(alpha = 0.65f))),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
                     ) {
                         Text(if (isHindi) "डायरी खोलें" else "Open diary")
                     }
