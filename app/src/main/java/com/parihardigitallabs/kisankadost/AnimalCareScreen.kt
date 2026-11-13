@@ -56,7 +56,7 @@ private val animalGuides = listOf(
         "दूध, प्रजनन, टीकाकरण और स्वास्थ्य का रिकॉर्ड रखें। टीकाकरण/कृमिनाशन का समय स्थानीय पशु चिकित्सक से तय करें।", "Keep milk, breeding, vaccination and health records. Set vaccination and deworming timing with the local veterinarian."
     ),
     AnimalGuide("Buffalo", "भैंस", "Buffalo",
-        "मुर्रा, भदावरी, मेहसाणा, जाफराबादी, बन्नी", "Murrah, Bhadawari, Mehsana, Jaffarabadi, Banni",
+        "मुर्रा (हरियाणा), भदावरी (उ.प्र./म.प्र.), मेहसाणा, जाफराबादी, बन्नी (गुजरात)", "Murrah (Haryana), Bhadawari (Uttar Pradesh/Madhya Pradesh), Mehsana, Jaffarabadi and Banni (Gujarat)",
         "गुणवत्तापूर्ण हरा-सूखा चारा और उत्पादन अवस्था के अनुसार संतुलित राशन दें। स्वच्छ और ठंडा पीने का पानी उपलब्ध रखें।", "Offer good-quality green and dry fodder with a balanced ration suited to production stage. Provide clean, cool drinking water.",
         "भैंसों को गर्मी का तनाव अधिक हो सकता है। छायादार, हवादार स्थान और पानी/नहाने की सुरक्षित सुविधा रखें; कीचड़ या गंदे पानी में मजबूर न करें।", "Buffaloes can be sensitive to heat stress. Provide shade, ventilation and safe access to water for cooling; do not force animals into dirty stagnant water.",
         "दूध दुहने से पहले और बाद में स्वच्छता रखें। थन में सूजन, दर्द या दूध में बदलाव हो तो पशु चिकित्सक से जाँच कराएँ।", "Maintain hygiene before and after milking. Seek veterinary examination for udder swelling, pain or changes in milk."
@@ -140,8 +140,13 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
                                 fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF203128))
                             Text(if (open) "−" else "+", fontSize = 21.sp, color = Color(0xFF247A45))
                         }
-                        Text((if (isHindi) "प्रमुख नस्लें: " else "Recognized breeds: ") +
+                        Text((if (isHindi) if (guide.key == "Buffalo") "भारत की मान्यता प्राप्त नस्लें: " else "प्रमुख नस्लें: " else if (guide.key == "Buffalo") "Recognized Indian breeds: " else "Key breeds: ") +
                             if (isHindi) guide.breedsHi else guide.breedsEn, fontSize = 12.sp, color = Color(0xFF247A45), lineHeight = 17.sp)
+                        if (guide.key == "Buffalo") {
+                            Text(if (isHindi) "इन नस्लों के गृह क्षेत्र अलग-अलग राज्यों में हैं; राजस्थान में चयन से पहले स्थानीय पशु विशेषज्ञ से उपयुक्तता जाँचें।" else
+                                "These breeds have home tracts in different states; check local suitability with an animal husbandry expert before selecting one in Rajasthan.",
+                                fontSize = 11.sp, color = Color(0xFF66766B), lineHeight = 15.sp)
+                        }
                         if (open) {
                             AnimalDetail(if (isHindi) "चारा और पानी" else "Feed & water", if (isHindi) guide.feedHi else guide.feedEn)
                             AnimalDetail(if (isHindi) "आवास और आराम" else "Housing & comfort", if (isHindi) guide.housingHi else guide.housingEn)
