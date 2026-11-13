@@ -39,6 +39,7 @@ import com.parihardigitallabs.kisankadost.data.DiaryRecordEntity
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 private val DiaryGreen=Color(0xFF247A45)
 private val DiaryInk=Color(0xFF203128)
@@ -68,6 +69,8 @@ private fun DiaryPhotoThumbnail(context: Context, name: String, isHindi: Boolean
 fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
  val records by viewModel.records.collectAsState()
  val context=LocalContext.current
+ val scope=rememberCoroutineScope()
+ var photoImporting by remember { mutableStateOf(false) }
  var filter by rememberSaveable{mutableStateOf("ALL")}
  var query by rememberSaveable{mutableStateOf("")}
  var showForm by rememberSaveable{mutableStateOf(false)}
@@ -99,19 +102,24 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
  }
  val photoPicker=rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()){uris->
   val room=(5-photoNames(photoPathsRaw).size).coerceAtLeast(0)
-  var added=0
-  var failed=0
-  uris.take(room).forEach{uri->
-   val name=DiaryPhotoStore.copyFromUri(context,uri)
-   if(name!=null){
-    photoPathsRaw=(photoNames(photoPathsRaw)+name).joinToString("\n")
-    newPhotoPathsRaw=(photoNames(newPhotoPathsRaw)+name).joinToString("\n")
-    added++
-   }else failed++
+  scope.launch {
+   photoImporting=true
+   var added=0
+   var failed=0
+   try {
+    uris.take(room).forEach{uri->
+     val name=withContext(Dispatchers.IO){DiaryPhotoStore.copyFromUri(context,uri)}
+     if(name!=null){
+      photoPathsRaw=(photoNames(photoPathsRaw)+name).joinToString("\n")
+      newPhotoPathsRaw=(photoNames(newPhotoPathsRaw)+name).joinToString("\n")
+      added++
+     }else failed++
+    }
+    val skipped=(uris.size-room).coerceAtLeast(0)
+    message=if(isHindi)"$added फोटो जोड़े गए; $failed फोटो पढ़े नहीं जा सके; अधिकतम 5 फोटो।" else "$added photo(s) attached; $failed could not be read; maximum 5 photos."
+    if(skipped>0) message += if(isHindi)" $skipped अतिरिक्त फोटो सीमा के कारण छोड़े गए।" else " $skipped extra photo(s) skipped due to the limit."
+   } finally { photoImporting=false }
   }
-  val skipped=(uris.size-room).coerceAtLeast(0)
-  message=if(isHindi)"$added फोटो जोड़े गए; $failed फोटो पढ़े नहीं जा सके; अधिकतम 5 फोटो।" else "$added photo(s) attached; $failed could not be read; maximum 5 photos."
-  if(skipped>0) message += if(isHindi)" $skipped अतिरिक्त फोटो सीमा के कारण छोड़े गए।" else " $skipped extra photo(s) skipped due to the limit."
  }
  val csvLauncher=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){uri->
   if(uri!=null)runCatching{context.contentResolver.openOutputStream(uri)?.bufferedWriter(Charsets.UTF_8)?.use{it.write(DiaryCsvExporter.export(records))}?:error("No output stream")}
@@ -183,7 +191,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
   Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(5.dp)){
    (listOf("ALL")+diaryTypes).forEach{t->FilterChip(selected=filter==t,onClick={filter=t},label={Text(if(t=="ALL"){if(isHindi)"सभी" else "All"}else diaryLabel(t,isHindi))})}
   }
-  Button(onClick={if(showForm)clearForm() else{editing=null;showForm=true}},modifier=Modifier.fillMaxWidth()){Text(if(showForm){if(isHindi)"फॉर्म बंद करें" else "Close form"}else{if(isHindi)"＋ नया रिकॉर्ड जोड़ें" else "＋ Add a record"})}
+  Button(onClick={if(showForm)clearForm() else{editing=null;showForm=true}},modifier=Modifier.fillMaxWidth(),enabled=!photoImporting){Text(if(showForm){if(isHindi)"फॉर्म बंद करें" else "Close form"}else{if(isHindi)"＋ नया रिकॉर्ड जोड़ें" else "＋ Add a record"})}
   if(showForm)Card(colors=CardDefaults.cardColors(containerColor=Color.White),shape=RoundedCornerShape(16.dp)){
    Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
     Text(if(isHindi)"रिकॉर्ड का प्रकार" else "Record type",fontWeight=FontWeight.SemiBold,color=DiaryGreen)
@@ -200,7 +208,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
     OutlinedTextField(reminder,{reminder=it;error=""},Modifier.fillMaxWidth(),label={Text(if(isHindi)"रिमाइंडर तारीख (YYYY-MM-DD, वैकल्पिक)" else "Reminder date (YYYY-MM-DD, optional)")},singleLine=true)
     Row(verticalAlignment=Alignment.CenterVertically){
      Text(if(isHindi)"फोटो (${photoNames(photoPathsRaw).size}/5)" else "Photos (${photoNames(photoPathsRaw).size}/5)",modifier=Modifier.weight(1f),fontWeight=FontWeight.SemiBold,color=DiaryGreen)
-     OutlinedButton(onClick={photoPicker.launch("image/*")},enabled=photoNames(photoPathsRaw).size<5){Icon(Icons.Default.AddAPhoto,contentDescription=null);Spacer(Modifier.width(5.dp));Text(if(isHindi)"फोटो जोड़ें" else "Attach photos")}
+     OutlinedButton(onClick={photoPicker.launch("image/*")},enabled=photoNames(photoPathsRaw).size<5 && !photoImporting){Icon(Icons.Default.AddAPhoto,contentDescription=null);Spacer(Modifier.width(5.dp));Text(if(isHindi)"फोटो जोड़ें" else "Attach photos")}
     }
     if(photoNames(photoPathsRaw).isNotEmpty())Column(verticalArrangement=Arrangement.spacedBy(3.dp)){
      photoNames(photoPathsRaw).forEach{name->Row(verticalAlignment=Alignment.CenterVertically){
@@ -213,11 +221,11 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
       }){Text(if(isHindi)"हटाएँ" else "Remove")}
      }}
     }
-    Text(if(isHindi)"फोटो केवल फोन में रहती हैं और आपके चुने हुए बैकअप में ही शामिल होंगी। रिमाइंडर लगभग सुबह 9 बजे; Android देरी कर सकता है।" else "Photos stay on this phone and are included only in a backup you choose. Reminders are attempted around 9 AM; Android may delay delivery.",fontSize=11.sp,color=Color(0xFF66766B))
+    Text(if(photoImporting){if(isHindi)"फोटो सुरक्षित की जा रही हैं…" else "Importing photos…"}else{if(isHindi)"फोटो केवल फोन में रहती हैं और आपके चुने हुए बैकअप में ही शामिल होंगी। रिमाइंडर लगभग सुबह 9 बजे; Android देरी कर सकता है।" else "Photos stay on this phone and are included only in a backup you choose. Reminders are attempted around 9 AM; Android may delay delivery."},fontSize=11.sp,color=Color(0xFF66766B))
     if(error.isNotBlank())Text(error,color=MaterialTheme.colorScheme.error,fontSize=12.sp)
     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
-     Button(onClick={save()},modifier=Modifier.weight(1f)){Text(if(editing==null){if(isHindi)"सुरक्षित करें" else "Save"}else{if(isHindi)"अपडेट करें" else "Update"})}
-     TextButton(onClick={clearForm()}){Text(if(isHindi)"रद्द" else "Cancel")}
+     Button(onClick={save()},modifier=Modifier.weight(1f),enabled=!photoImporting){Text(if(editing==null){if(isHindi)"सुरक्षित करें" else "Save"}else{if(isHindi)"अपडेट करें" else "Update"})}
+     TextButton(onClick={clearForm()},enabled=!photoImporting){Text(if(isHindi)"रद्द" else "Cancel")}
     }
    }
   }
