@@ -34,7 +34,7 @@ This tracker is the delivery source of truth. A milestone is not complete merely
 | **M2 – Farmer and farm setup** | **Baseline complete** | Offline Room-backed farmer profile; farmer name, mobile, village, tehsil, district; land area/unit; irrigation source; main crops and livestock; profile loads and saves locally. | Current form is a single basic farm profile. Multiple land parcels/fields, ownership/lease, soil test details, orchard/garden inventory and individual livestock records are not yet implemented. Add those in the milestone where they are operationally needed; do not imply they already exist. |
 | **M3 – Agriculture, horticulture and gardening** | **Implementation complete; device acceptance pending** | Rajasthan bilingual field-crop guide (15 crops); offline Plant Doctor screening for selected leaf classes with confidence/top-three results and cautious care guidance; searchable horticulture/gardening library expanded to 37 bilingual entries; general Kharif/Rabi/Zaid calendar; soil-health, irrigation/water conservation, crop stages, introductory IPM and harvest/post-harvest guides; ten-zone broad crop-pattern reference. Combined app build and APK archive verified in [run 43210956086](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43210956086). Content references are recorded in [CONTENT_SOURCES_M3.md](CONTENT_SOURCES_M3.md). | Physical-device checks for Plant Doctor camera/gallery, image orientation/size, inference performance and install/language/layout regression remain pending. District-specific variety, seed-rate, spacing and exact sowing-window packages are deferred until current district/agro-zone-specific official Packages of Practices can be validated; no unsupported prescriptions are shipped. |
 | **M4 – Animal husbandry** | **Closed for implementation and cloud verification; physical-device acceptance pending** | Bilingual animal-care library for cattle, buffalo, goats, sheep, camels and poultry; ICAR-NBAGR-aligned Rajasthan breed/home-tract references and qualitative breed notes; life-stage feeding, fodder conservation/storage and biosecurity education; offline animal profiles with species, breed, tag, sex, age/date of birth, purpose and notes; per-animal health-event history and veterinarian-confirmed next-date reminders via WorkManager; Android notification permission flow; automatic app-data backup disabled; non-destructive Room v1→v2→v3→v4 migrations preserving farmer and existing animal records. Unit tests and main build/packaging passed in [run 43383362324](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43383362324); APK artifact downloaded and inspected. | Physical-device v1→v4 migration, reminder/permission/reboot/Doze behavior and Hindi/English regression tests. Quantitative breed performance comparisons and individualized ration tables remain deferred until formal veterinary/animal-science review. No diagnosis, drug dosage or universal vaccination/deworming schedule. |
-| **M5 – Farm, garden and livestock diaries** | **In progress – first implementation slice committed; cloud verification pending** | New v5 Room diary table and non-destructive v4→v5 migration; bilingual diary screen wired into bottom navigation; category-based field, garden, animal, expense, labour, input and production entries; add/edit/delete; local 9 AM reminders through WorkManager; user-initiated CSV export. | Run cloud unit tests/build, inspect APK, validate populated v4→v5 migration on a phone, test notifications/permission/offline use and Hindi/English layout. Photo attachments and full backup/restore remain planned follow-up items. |
+| **M5 – Farm, garden and livestock diaries** | **Implementation complete; final cloud verification and phone acceptance pending** | Bilingual searchable offline diary for field, garden, animal, expense, labour, input and production; add/edit/delete/filter; date, related item, quantity/unit, amount, notes; optional local reminders; up to five compressed private photos per entry; CSV export with spreadsheet-formula protection; full user-triggered ZIP backup/restore for farmer profile, animal profiles, animal-health history, diary entries and photos; non-destructive Room v4→v5→v6 migrations; reminder, photo and CSV unit tests. | Complete final cloud unit tests/build, inspect APK, and test populated database migration, photo selection/orientation/deletion, backup→restore (including photos and existing M4 data), notification permission/Doze, CSV, offline and Hindi/English layouts on a physical phone. |
 | **M6 – Rajasthan advisory services** | **Deferred** | Scope defined: verified local calendars, weather and alerts. | Do not start until core M3–M5 foundations are stable and this milestone is explicitly brought forward. Any forecast/advisory needs trusted source, location context, timestamp and offline/stale-data handling. |
 | **M7 – Markets, schemes and services** | **Not started** | Scope defined in product blueprint. | Dated mandi rates with source/freshness; official scheme details and application links; verified KVK, veterinary, extension and service contacts. |
 | **M8 – Farm economics and smart assistance** | **Not started** | Scope defined in product blueprint. | Cost of cultivation, enterprise expenses/revenue, simple profit/loss; bounded search/AI assistance grounded in verified content, with clear limitations. |
@@ -90,19 +90,26 @@ M3 must not be closed until all applicable items below are delivered or explicit
 - [x] UI presents the result as an AI-assisted preliminary indication, flags low confidence/background results and limits supported-class claims.
 - [x] Safe first-step guidance directs users to local expert confirmation; no automatic pesticide prescription.
 
-## 3. M5 – Farm, garden and livestock diaries (active)
+## 3. M5 – Farm, garden and livestock diaries
 
-### First implementation slice
-- [x] Add a separate Room diary table using a non-destructive v4→v5 migration; retain existing farmer, animal and animal-health records.
-- [x] Bilingual diary screen connected to the Farm Diary navigation tab.
-- [x] Record categories: field activity, garden/orchard, animal, expense, labour, input and production.
-- [x] Add, edit, delete, date, related crop/plant/animal name, quantity/unit, amount and notes.
-- [x] Optional local reminder date with notification permission requested only when the user saves a reminder.
-- [x] User-initiated CSV export; no background upload or cloud sync.
-- [x] Cloud unit tests, build and APK packaging passed in [run 43407183023](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43407183023); APK artifact downloaded and inspected.
-- [ ] Real-device v4→v5 migration test with existing farmer and animal data.
-- [ ] Real-device reminder, permission, reboot/Doze, offline and bilingual layout tests.
-- [ ] Photo attachments and user-controlled full backup/restore are follow-up scope; do not enable automatic cloud backup.
+### Delivered implementation
+- [x] Separate Room diary table and non-destructive migrations v4→v5 (diary) and v5→v6 (photo paths).
+- [x] Bilingual offline diary screen connected to the existing navigation.
+- [x] Field, garden/orchard, animal, expense, labour, input and production categories.
+- [x] Add, edit, delete, category filter and local text search.
+- [x] Date, related crop/plant/animal, quantity, unit, amount, notes and optional reminder date.
+- [x] Local WorkManager reminders around 9 AM; notification permission requested only when a reminder is saved. Android may delay delivery.
+- [x] Up to five private photo attachments per diary entry; images are downsampled, EXIF orientation corrected and recompressed to remove original metadata, including embedded GPS.
+- [x] Photo files stored in the app's private files directory; automatic Android app-data backup remains disabled.
+- [x] User-triggered CSV export, including photo counts and protection against spreadsheet formula injection.
+- [x] User-triggered ZIP backup and restore covering farmer profile, animals, animal health history, diary entries and attached photos. Restore validates archive structure and relationships, stages data before changing the database, and applies table replacement in a Room transaction.
+- [x] Backup/restore remains local and user-selected; no account, sync service or background upload.
+- [x] Unit tests for reminder scheduling, image downsampling/path validation and CSV escaping.
+- [ ] Final cloud unit tests, APK build and artifact inspection for the latest commit.
+- [ ] Physical-device v4→v5→v6 migration test with populated M4 data.
+- [ ] Physical-device photo selection, EXIF orientation, photo removal and deletion tests.
+- [ ] Physical-device full backup→restore test, verifying farmer profile, animals, health history, diary entries and photos; test invalid/corrupt backup rejection.
+- [ ] Physical-device notification permission, reboot/Doze, offline, CSV and Hindi/English regression tests.
 
 ## 4. Forward delivery sequence
 
