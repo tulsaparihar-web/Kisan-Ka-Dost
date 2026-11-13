@@ -99,7 +99,7 @@ M3 must not be closed until all applicable items below are delivered or explicit
 - [x] Add, edit, delete, date, related crop/plant/animal name, quantity/unit, amount and notes.
 - [x] Optional local reminder date with notification permission requested only when the user saves a reminder.
 - [x] User-initiated CSV export; no background upload or cloud sync.
-- [ ] Cloud unit tests, build and APK inspection.
+- [x] Cloud unit tests, build and APK packaging passed in [run 43407183023](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43407183023); APK artifact downloaded and inspected.
 - [ ] Real-device v4→v5 migration test with existing farmer and animal data.
 - [ ] Real-device reminder, permission, reboot/Doze, offline and bilingual layout tests.
 - [ ] Photo attachments and user-controlled full backup/restore are follow-up scope; do not enable automatic cloud backup.
