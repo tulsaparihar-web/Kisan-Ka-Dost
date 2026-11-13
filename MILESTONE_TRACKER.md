@@ -86,7 +86,7 @@ M3 must not be closed until all applicable items below are delivered or explicit
 - [x] Camera/gallery image selection flow and offline model integration.
 - [x] Supported-class/score-oriented top-three result presentation and cautious guidance; invalid, non-finite and out-of-range model scores are ignored.
 - [x] Supported model scope documented in the UI: 39 output classes (including background) across 14 crops; it is not a general plant identifier.
-- [x] Private photo-backed diagnosis history stored locally in Room; latest 50 records retained with delete support and compressed metadata-free JPEG copies.
+- [x] Private photo-backed diagnosis history stored locally in Room; latest 50 records retained with delete support and compressed metadata-free JPEG copies. This history is local-only and is not included in the existing Farm Diary ZIP backup.
 - [x] Non-destructive Room v7→v8 migration adds the diagnosis-history table and timestamp index.
 - [ ] Verify migration from a populated v7 database, history persistence, photo thumbnails/deletion and storage behavior on physical Android devices.
 - [ ] Verify camera capture, gallery selection, image orientation/size and inference performance on physical Android devices.
