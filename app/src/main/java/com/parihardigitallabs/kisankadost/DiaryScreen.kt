@@ -143,10 +143,11 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
    else->{
     val old=editing
     val item=DiaryRecordEntity(id=old?.id?:0,recordType=type,title=title.trim(),recordDate=date,subject=subject.trim(),
-     quantity=q?:0.0,unit=unit.trim(),amount=money?:0.0,notes=notes.trim(),reminderDate=reminder,photoPaths=photoNames(photoPathsRaw).joinToString("\n"))
+     quantity=q?:0.0,unit=unit.trim(),amount=money?:0.0,notes=notes.trim(),reminderDate=reminder,photoPaths=photoNames(photoPathsRaw).joinToString("\n"),
+     reminderNotified=old?.let { it.reminderDate==reminder && it.reminderNotified } ?: false)
     val saved:(Long)->Unit={id->
      photoNames(removedPhotoPathsRaw).forEach{DiaryPhotoStore.delete(context,it)}
-     if(reminder.isNotBlank()){
+     if(reminder.isNotBlank() && !item.reminderNotified){
       val allowed=Build.VERSION.SDK_INT<33||ContextCompat.checkSelfPermission(context,Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED
       if(allowed){viewModel.schedule(id,reminder);message=if(isHindi)"रिकॉर्ड और रिमाइंडर सुरक्षित हैं।" else "Record and reminder saved."}
       else{pendingId=id;pendingDate=reminder;permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)}
