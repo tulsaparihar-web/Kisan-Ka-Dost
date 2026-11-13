@@ -178,10 +178,10 @@ object DiaryBackupManager {
         val allowed = Build.VERSION.SDK_INT < 33 ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         if (!allowed) return
-        diaries.filter { it.reminderDate.isNotBlank() }.forEach { record ->
+        diaries.filter { it.reminderDate.isNotBlank() && !it.reminderNotified }.forEach { record ->
             runCatching { DiaryReminderScheduler.schedule(context, record.id, record.reminderDate) }
         }
-        health.filter { it.veterinarianConfirmed && it.nextReminderDate.isNotBlank() }.forEach { record ->
+        health.filter { it.veterinarianConfirmed && it.nextReminderDate.isNotBlank() && !it.reminderNotified }.forEach { record ->
             runCatching { AnimalReminderScheduler.schedule(context, record.id, record.nextReminderDate) }
         }
     }
