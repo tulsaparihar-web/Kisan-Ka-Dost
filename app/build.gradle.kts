@@ -45,4 +45,5 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("org.tensorflow:tensorflow-lite:2.14.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
+    testImplementation("junit:junit:4.13.2")
 }
