@@ -275,8 +275,16 @@ object DiaryBackupManager {
             "Backup contains an invalid Plant Doctor diagnosis"
         }
         require(records.map { it.id }.distinct().size == records.size) { "Backup contains duplicate Plant Doctor diagnosis IDs" }
-        val names = records.map { File(it.imagePath).name }
-        require(names.distinct().size == names.size && names.all(::isSafePlantPhotoName)) { "Backup contains invalid or duplicate Plant Doctor photo references" }
+        val names = records.map { record ->
+            val path = record.imagePath
+            val file = File(path)
+            val name = file.name
+            val hasTraversal = path.split(File.separatorChar).any { it == ".." || it == "." }
+            require(isSafePlantPhotoName(name) && !hasTraversal) { "Backup contains an invalid Plant Doctor photo reference" }
+            require(path == name || file.isAbsolute) { "Plant Doctor photo reference must be a filename or app-private absolute path" }
+            name
+        }
+        require(names.distinct().size == names.size) { "Backup contains duplicate Plant Doctor photo references" }
         return names.toSet()
     }
 
