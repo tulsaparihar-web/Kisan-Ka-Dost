@@ -10,5 +10,6 @@ import kotlinx.coroutines.flow.Flow
  @Delete suspend fun delete(record: DiaryRecordEntity)
  @Query("DELETE FROM diary_records") suspend fun clearAll()
  @Query("SELECT * FROM diary_records WHERE id = :id LIMIT 1") suspend fun getById(id: Long): DiaryRecordEntity?
- @Query("SELECT * FROM diary_records WHERE reminderDate != ''") suspend fun getReminderRecords(): List<DiaryRecordEntity>
+ @Query("SELECT * FROM diary_records WHERE reminderDate != '' AND reminderNotified = 0") suspend fun getReminderRecords(): List<DiaryRecordEntity>
+ @Query("UPDATE diary_records SET reminderNotified = 1 WHERE id = :id") suspend fun markReminderNotified(id: Long)
 }

@@ -9,5 +9,6 @@ data class DiaryRecordEntity(
  val subject: String = "", val quantity: Double = 0.0, val unit: String = "",
  val amount: Double = 0.0, val notes: String = "", val reminderDate: String = "",
  @ColumnInfo(defaultValue = "''") val photoPaths: String = "",
- val createdAt: Long = System.currentTimeMillis(), val updatedAt: Long = System.currentTimeMillis()
+ val createdAt: Long = System.currentTimeMillis(), val updatedAt: Long = System.currentTimeMillis(),
+ @ColumnInfo(defaultValue = "0") val reminderNotified: Boolean = false
 )

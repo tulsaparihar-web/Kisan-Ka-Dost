@@ -63,7 +63,7 @@ class AnimalRegistryViewModel(application: Application) : AndroidViewModel(appli
     fun rescheduleReminders() {
         viewModelScope.launch {
             healthRepository.confirmedReminders().forEach { record ->
-                if (record.nextReminderDate.isNotBlank()) {
+                if (record.nextReminderDate.isNotBlank() && !record.reminderNotified) {
                     runCatching {
                         AnimalReminderScheduler.schedule(getApplication(), record.id, record.nextReminderDate)
                     }
