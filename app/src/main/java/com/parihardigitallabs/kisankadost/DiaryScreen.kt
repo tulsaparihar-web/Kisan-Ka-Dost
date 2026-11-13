@@ -1,0 +1,169 @@
+package com.parihardigitallabs.kisankadost
+
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import com.parihardigitallabs.kisankadost.data.DiaryRecordEntity
+import java.time.LocalDate
+
+private val DiaryGreen = Color(0xFF247A45)
+private val DiaryInk = Color(0xFF203128)
+private val diaryTypes = listOf("FIELD","GARDEN","ANIMAL","EXPENSE","LABOUR","INPUT","PRODUCTION")
+private fun diaryLabel(t:String,hi:Boolean)=when(t){
+ "FIELD"->if(hi)"खेती" else "Field"
+ "GARDEN"->if(hi)"बागवानी" else "Garden"
+ "ANIMAL"->if(hi)"पशुपालन" else "Animal"
+ "EXPENSE"->if(hi)"खर्च" else "Expense"
+ "LABOUR"->if(hi)"मजदूरी" else "Labour"
+ "INPUT"->if(hi)"कृषि सामग्री" else "Input"
+ "PRODUCTION"->if(hi)"उत्पादन" else "Production"
+ else->t
+}
+
+@Composable
+fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
+ val records by viewModel.records.collectAsState()
+ val context=LocalContext.current
+ var filter by rememberSaveable { mutableStateOf("ALL") }
+ var showForm by rememberSaveable { mutableStateOf(false) }
+ var editing by remember { mutableStateOf<DiaryRecordEntity?>(null) }
+ var deleting by remember { mutableStateOf<DiaryRecordEntity?>(null) }
+ var type by rememberSaveable { mutableStateOf("FIELD") }
+ var title by rememberSaveable { mutableStateOf("") }
+ var date by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
+ var subject by rememberSaveable { mutableStateOf("") }
+ var quantity by rememberSaveable { mutableStateOf("") }
+ var unit by rememberSaveable { mutableStateOf("") }
+ var amount by rememberSaveable { mutableStateOf("") }
+ var notes by rememberSaveable { mutableStateOf("") }
+ var reminder by rememberSaveable { mutableStateOf("") }
+ var error by remember { mutableStateOf("") }
+ var message by remember { mutableStateOf("") }
+ var pendingId by remember { mutableStateOf<Long?>(null) }
+ var pendingDate by remember { mutableStateOf("") }
+
+ val permissionLauncher=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){granted->
+  val id=pendingId
+  if(granted && id!=null && pendingDate.isNotBlank()) viewModel.schedule(id,pendingDate)
+  message=if(granted){if(isHindi)"रिमाइंडर सेट हो गया।" else "Reminder scheduled."}else{if(isHindi)"रिकॉर्ड सुरक्षित है, सूचना अनुमति बंद है।" else "Record saved; notifications are disabled."}
+  pendingId=null;pendingDate=""
+ }
+ val exportLauncher=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")){uri->
+  if(uri!=null) runCatching {
+   context.contentResolver.openOutputStream(uri)?.bufferedWriter(Charsets.UTF_8)?.use { it.write(DiaryCsvExporter.export(records)) } ?: error("No output stream")
+  }.onSuccess { message=if(isHindi)"CSV फाइल सुरक्षित हो गई।" else "CSV file exported." }
+   .onFailure { message=if(isHindi)"CSV निर्यात विफल रहा।" else "CSV export failed." }
+ }
+ LaunchedEffect(Unit){
+  val allowed=Build.VERSION.SDK_INT<33 || ContextCompat.checkSelfPermission(context,Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED
+  if(allowed)viewModel.reschedule()
+ }
+ fun clearForm(){
+  editing=null;type="FIELD";title="";date=LocalDate.now().toString();subject="";quantity="";unit="";amount="";notes="";reminder="";error="";showForm=false
+ }
+ fun save(){
+  val d=runCatching{LocalDate.parse(date)}.getOrNull()
+  val rd=if(reminder.isBlank())null else runCatching{LocalDate.parse(reminder)}.getOrNull()
+  val q=quantity.toDoubleOrNull();val a=amount.toDoubleOrNull()
+  when{
+   title.isBlank()->error=if(isHindi)"गतिविधि का नाम भरें।" else "Enter an activity title."
+   d==null->error=if(isHindi)"तारीख YYYY-MM-DD में सही भरें।" else "Enter a valid date (YYYY-MM-DD)."
+   reminder.isNotBlank() && rd==null->error=if(isHindi)"रिमाइंडर की तारीख सही भरें।" else "Enter a valid reminder date."
+   rd!=null && rd.isBefore(LocalDate.now())->error=if(isHindi)"रिमाइंडर आज या भविष्य में होना चाहिए।" else "Reminder must be today or later."
+   quantity.isNotBlank() && (q==null || q<0)->error=if(isHindi)"मात्रा सही संख्या होनी चाहिए।" else "Enter a valid non-negative quantity."
+   amount.isNotBlank() && (a==null || a<0)->error=if(isHindi)"राशि सही संख्या होनी चाहिए।" else "Enter a valid non-negative amount."
+   else->{
+    val old=editing
+    val item=DiaryRecordEntity(id=old?.id?:0,recordType=type,title=title.trim(),recordDate=date,subject=subject.trim(),quantity=q?:0.0,unit=unit.trim(),amount=a?:0.0,notes=notes.trim(),reminderDate=reminder)
+    val done:(Long)->Unit={id->
+     if(reminder.isNotBlank()){
+      val allowed=Build.VERSION.SDK_INT<33 || ContextCompat.checkSelfPermission(context,Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED
+      if(allowed){viewModel.schedule(id,reminder);message=if(isHindi)"रिकॉर्ड और रिमाइंडर सुरक्षित हैं।" else "Record and reminder saved."}
+      else{pendingId=id;pendingDate=reminder;permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)}
+     }else message=if(isHindi)"डायरी रिकॉर्ड सुरक्षित है।" else "Diary record saved."
+     clearForm()
+    }
+    if(old==null)viewModel.add(item,done,{error=if(isHindi)"रिकॉर्ड सुरक्षित नहीं हो सका।" else "Could not save record."})
+    else viewModel.update(item,{done(old.id)},{error=if(isHindi)"रिकॉर्ड अपडेट नहीं हो सका।" else "Could not update record."})
+   }
+  }
+ }
+ Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+  Row(verticalAlignment=Alignment.CenterVertically){
+   Column(Modifier.weight(1f)){
+    Text(if(isHindi)"खेत डायरी" else "Farm Diary",fontSize=23.sp,fontWeight=FontWeight.Bold,color=DiaryInk)
+    Text(if(isHindi)"खेत, बगीचे और पशुओं के रिकॉर्ड — ऑफलाइन" else "Field, garden and livestock records — offline",fontSize=12.sp,color=Color(0xFF66766B))
+   }
+   IconButton(onClick={exportLauncher.launch("Kisan-Ka-Dost-Diary.csv")},enabled=records.isNotEmpty()){Icon(Icons.Default.FileDownload,contentDescription=if(isHindi)"CSV निर्यात" else "Export CSV",tint=DiaryGreen)}
+  }
+  Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(5.dp)){
+   (listOf("ALL")+diaryTypes).forEach{t->FilterChip(selected=filter==t,onClick={filter=t},label={Text(if(t=="ALL"){if(isHindi)"सभी" else "All"}else diaryLabel(t,isHindi))})}
+  }
+  Button(onClick={showForm=!showForm;if(!showForm)editing=null},modifier=Modifier.fillMaxWidth()){
+   Text(if(showForm){if(isHindi)"फॉर्म बंद करें" else "Close form"}else{if(isHindi)"＋ नया रिकॉर्ड जोड़ें" else "＋ Add a record"})
+  }
+  if(showForm) Card(colors=CardDefaults.cardColors(containerColor=Color.White),shape=RoundedCornerShape(16.dp)){
+   Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+    Text(if(isHindi)"रिकॉर्ड का प्रकार" else "Record type",fontWeight=FontWeight.SemiBold,color=DiaryGreen)
+    Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(5.dp)){diaryTypes.forEach{t->FilterChip(selected=type==t,onClick={type=t},label={Text(diaryLabel(t,isHindi))})}}
+    OutlinedTextField(title,{title=it;error=""},Modifier.fillMaxWidth(),label={Text(if(isHindi)"गतिविधि / विवरण *" else "Activity / description *")},singleLine=true)
+    OutlinedTextField(date,{date=it;error=""},Modifier.fillMaxWidth(),label={Text(if(isHindi)"तारीख (YYYY-MM-DD)" else "Date (YYYY-MM-DD)")},singleLine=true)
+    OutlinedTextField(subject,{subject=it},Modifier.fillMaxWidth(),label={Text(if(isHindi)"फसल / पौधा / पशु / संबंधित नाम" else "Crop / plant / animal / related item")},singleLine=true)
+    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+     OutlinedTextField(quantity,{quantity=it;error=""},Modifier.weight(1f),label={Text(if(isHindi)"मात्रा" else "Quantity")},singleLine=true)
+     OutlinedTextField(unit,{unit=it},Modifier.weight(1f),label={Text(if(isHindi)"इकाई" else "Unit")},singleLine=true)
+    }
+    OutlinedTextField(amount,{amount=it;error=""},Modifier.fillMaxWidth(),label={Text(if(isHindi)"राशि / खर्च (₹)" else "Amount / expense (₹)")},singleLine=true)
+    OutlinedTextField(notes,{notes=it},Modifier.fillMaxWidth(),label={Text(if(isHindi)"नोट" else "Notes")},minLines=2)
+    OutlinedTextField(reminder,{reminder=it;error=""},Modifier.fillMaxWidth(),label={Text(if(isHindi)"रिमाइंडर तारीख (YYYY-MM-DD, वैकल्पिक)" else "Reminder date (YYYY-MM-DD, optional)")},singleLine=true)
+    Text(if(isHindi)"रिमाइंडर लगभग सुबह 9 बजे भेजने का प्रयास होगा; Android बैटरी प्रबंधन या सूचना अनुमति से देरी हो सकती है। पशु-चिकित्सा तारीखें पशु चिकित्सक की सलाह से ही दर्ज करें।" else "Reminders are attempted around 9 AM and may be delayed by Android battery management or notification settings. Enter animal-care dates only on veterinary advice.",fontSize=11.sp,color=Color(0xFF66766B))
+    if(error.isNotBlank())Text(error,color=MaterialTheme.colorScheme.error,fontSize=12.sp)
+    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+     Button(onClick={save()},modifier=Modifier.weight(1f)){Text(if(editing==null){if(isHindi)"सुरक्षित करें" else "Save"}else{if(isHindi)"अपडेट करें" else "Update"})}
+     TextButton(onClick={clearForm}){Text(if(isHindi)"रद्द" else "Cancel")}
+    }
+   }
+  }
+  val visible=records.filter{filter=="ALL"||it.recordType==filter}
+  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text(if(isHindi)"डायरी रिकॉर्ड" else "Diary entries",fontWeight=FontWeight.Bold,color=DiaryInk);Text(if(isHindi)"कुल ${visible.size}" else "${visible.size} total",color=DiaryGreen,fontSize=12.sp)}
+  if(visible.isEmpty())Text(if(isHindi)"अभी कोई रिकॉर्ड नहीं है। पहला रिकॉर्ड जोड़ें।" else "No entries yet. Add your first record.",color=Color(0xFF66766B),fontSize=13.sp)
+  visible.forEach{r->Card(colors=CardDefaults.cardColors(containerColor=Color.White),shape=RoundedCornerShape(14.dp)){
+   Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)){
+    Row(verticalAlignment=Alignment.CenterVertically){
+     Column(Modifier.weight(1f)){Text(r.title,fontWeight=FontWeight.Bold,color=DiaryInk);Text("${diaryLabel(r.recordType,isHindi)} • ${r.recordDate}",fontSize=11.sp,color=DiaryGreen)}
+     IconButton(onClick={editing=r;type=r.recordType;title=r.title;date=r.recordDate;subject=r.subject;quantity=if(r.quantity==0.0)"" else r.quantity.toString();unit=r.unit;amount=if(r.amount==0.0)"" else r.amount.toString();notes=r.notes;reminder=r.reminderDate;showForm=true;error=""}){Icon(Icons.Default.Edit,contentDescription=if(isHindi)"बदलें" else "Edit",tint=DiaryGreen)}
+     IconButton(onClick={deleting=r}){Icon(Icons.Default.DeleteOutline,contentDescription=if(isHindi)"हटाएँ" else "Delete",tint=Color(0xFF9B3D32))}
+    }
+    if(r.subject.isNotBlank())Text((if(isHindi)"संबंधित: " else "Related: ")+r.subject,fontSize=12.sp,color=DiaryInk)
+    val details=listOf(if(r.quantity!=0.0)"${r.quantity} ${r.unit}".trim() else "",if(r.amount!=0.0)"₹${r.amount}" else "").filter{it.isNotBlank()}.joinToString(" • ")
+    if(details.isNotBlank())Text(details,fontSize=12.sp,color=DiaryInk)
+    if(r.notes.isNotBlank())Text(r.notes,fontSize=12.sp,color=Color(0xFF66766B))
+    if(r.reminderDate.isNotBlank())Text((if(isHindi)"रिमाइंडर: " else "Reminder: ")+r.reminderDate,fontSize=11.sp,color=DiaryGreen)
+   }
+  }}
+  if(message.isNotBlank())Text(message,color=DiaryGreen,fontSize=12.sp)
+ }
+ deleting?.let{r->AlertDialog(onDismissRequest={deleting=null},title={Text(if(isHindi)"रिकॉर्ड हटाएँ?" else "Delete entry?")},text={Text(if(isHindi)"यह रिकॉर्ड इस फोन से हट जाएगा।" else "This entry will be removed from this phone.")},confirmButton={TextButton(onClick={viewModel.delete(r);deleting=null}){Text(if(isHindi)"हटाएँ" else "Delete",color=MaterialTheme.colorScheme.error)}},dismissButton={TextButton(onClick={deleting=null}){Text(if(isHindi)"रद्द" else "Cancel")}})}
+}
