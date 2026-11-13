@@ -9,6 +9,13 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class DiaryBackupValidationTest {
+    @Test fun acceptsCurrentAndPreviousBackupVersions() {
+        org.junit.Assert.assertTrue(isSupportedDiaryBackupVersion(1))
+        org.junit.Assert.assertTrue(isSupportedDiaryBackupVersion(2))
+        org.junit.Assert.assertFalse(isSupportedDiaryBackupVersion(0))
+        org.junit.Assert.assertFalse(isSupportedDiaryBackupVersion(3))
+    }
+
     @Test fun acceptsExactPhotoManifest() {
         val entry = DiaryRecordEntity(
             id = 1, recordType = "FIELD", title = "Irrigation", recordDate = "2026-11-13",
@@ -44,6 +51,20 @@ class DiaryBackupValidationTest {
         }
         assertThrows(IllegalArgumentException::class.java) {
             DiaryBackupManager.validateBackupPhotoReferences(listOf(duplicate), setOf("same.jpg"))
+        }
+    }
+
+    @Test fun rejectsInvalidAmountsAndDuplicateDiaryIds() {
+        val invalidAmount = DiaryRecordEntity(
+            id = 1, recordType = "EXPENSE", title = "Feed", recordDate = "2026-11-13", amount = Double.NaN
+        )
+        val first = DiaryRecordEntity(id = 2, recordType = "FIELD", title = "Sowing", recordDate = "2026-11-13")
+        val duplicate = first.copy(title = "Irrigation")
+        assertThrows(IllegalArgumentException::class.java) {
+            DiaryBackupManager.validateBackupRecords(emptyList(), emptyList(), emptyList(), listOf(invalidAmount))
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            DiaryBackupManager.validateBackupRecords(emptyList(), emptyList(), emptyList(), listOf(first, duplicate))
         }
     }
 
