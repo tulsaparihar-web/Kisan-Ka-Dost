@@ -51,9 +51,8 @@ private val PlantMuted = Color(0xFF66766B)
 /** Decode gallery images at a bounded size and apply the orientation stored by the camera. */
 private fun decodePlantBitmap(context: Context, uri: Uri): Bitmap? {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    context.contentResolver.openInputStream(uri)?.use {
-        BitmapFactory.decodeStream(it, null, bounds)
-    } ?: return null
+    val boundsStream = context.contentResolver.openInputStream(uri) ?: return null
+    boundsStream.use { BitmapFactory.decodeStream(it, null, bounds) }
     if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
 
     val maxDimension = 1600
