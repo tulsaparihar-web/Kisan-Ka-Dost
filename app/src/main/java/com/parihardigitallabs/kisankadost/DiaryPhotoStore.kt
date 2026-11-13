@@ -54,6 +54,12 @@ object DiaryPhotoStore {
         }
     }.getOrNull()
 
+    fun pruneUnused(context: Context, referencedNames: Set<String>) {
+        directory(context).listFiles()?.forEach { file ->
+            if (isSafeName(file.name) && file.name !in referencedNames) file.delete()
+        }
+    }
+
     fun delete(context: Context, fileName: String) {
         if (isSafeName(fileName)) File(directory(context), fileName).delete()
     }
