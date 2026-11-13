@@ -14,7 +14,7 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
  private val repo = DiaryRecordRepository(AppDatabase.getInstance(application).diaryRecordDao())
  val records = repo.records.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
  fun add(record: DiaryRecordEntity, saved:(Long)->Unit, failed:()->Unit) { viewModelScope.launch { runCatching { repo.add(record) }.onSuccess(saved).onFailure { failed() } } }
- fun update(record: DiaryRecordEntity, saved:()->Unit, failed:()->Unit) { viewModelScope.launch { runCatching { repo.update(record) }.onSuccess { saved() }.onFailure { failed() } } }
+ fun update(record: DiaryRecordEntity, saved:()->Unit, failed:()->Unit) { viewModelScope.launch { runCatching { repo.update(record) }.onSuccess { if(record.reminderDate.isBlank()) DiaryReminderScheduler.cancel(getApplication(),record.id); saved() }.onFailure { failed() } } }
  fun delete(record: DiaryRecordEntity) { viewModelScope.launch { repo.delete(record); DiaryReminderScheduler.cancel(getApplication(),record.id) } }
  fun schedule(id:Long,date:String) = DiaryReminderScheduler.schedule(getApplication(),id,date)
  fun reschedule() { viewModelScope.launch {
