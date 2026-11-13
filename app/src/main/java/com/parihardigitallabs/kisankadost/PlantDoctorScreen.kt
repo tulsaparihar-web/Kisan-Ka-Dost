@@ -1,9 +1,12 @@
 package com.parihardigitallabs.kisankadost
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
+import androidx.exifinterface.media.ExifInterface
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,6 +47,36 @@ import java.nio.ByteOrder
 private val PlantGreen = Color(0xFF247A45)
 private val PlantInk = Color(0xFF203128)
 private val PlantMuted = Color(0xFF66766B)
+
+/** Decode gallery images at a bounded size and apply the orientation stored by the camera. */
+private fun decodePlantBitmap(context: Context, uri: Uri): Bitmap? {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    context.contentResolver.openInputStream(uri)?.use {
+        BitmapFactory.decodeStream(it, null, bounds)
+    } ?: return null
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+
+    val maxDimension = 1600
+    var sampleSize = 1
+    while (maxOf(bounds.outWidth / sampleSize, bounds.outHeight / sampleSize) > maxDimension) {
+        sampleSize *= 2
+    }
+    val decoded = context.contentResolver.openInputStream(uri)?.use { stream ->
+        BitmapFactory.decodeStream(stream, null, BitmapFactory.Options().apply {
+            inSampleSize = sampleSize
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+        })
+    } ?: return null
+
+    val rotation = context.contentResolver.openInputStream(uri)?.use { ExifInterface(it).rotationDegrees } ?: 0
+    if (rotation == 0) return decoded
+    val rotated = Bitmap.createBitmap(
+        decoded, 0, 0, decoded.width, decoded.height,
+        Matrix().apply { postRotate(rotation.toFloat()) }, true
+    )
+    if (rotated !== decoded) decoded.recycle()
+    return rotated
+}
 
 private data class PlantGuide(
     val en: String, val hi: String, val category: String, val categoryHi: String,
@@ -99,7 +132,8 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
                 val model = interpreter ?: loadModel().also { interpreter = it }
                 val inputShape = model.getInputTensor(0).shape()
                 val outputShape = model.getOutputTensor(0).shape()
-                require(inputShape.size == 4 && inputShape[0] == 1 && inputShape[3] == 3) { "Unsupported model input shape" }
+                require(inputShape.size == 4 && inputShape[0] == 1 && inputShape[3] == 3 && inputShape[1] > 0 && inputShape[2] > 0) { "Unsupported model input shape" }
+                require(outputShape.size == 2 && outputShape[0] == 1 && outputShape[1] > 0) { "Unsupported model output shape" }
                 require(model.getInputTensor(0).dataType() == org.tensorflow.lite.DataType.FLOAT32) { "Unsupported model input type" }
                 require(model.getOutputTensor(0).dataType() == org.tensorflow.lite.DataType.FLOAT32) { "Unsupported model output type" }
                 val height = inputShape[1]
@@ -111,20 +145,32 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
                 }
                 require(labels.size == outputCount) { "Model labels do not match model output." }
 
-                val resized = Bitmap.createScaledBitmap(bitmap, width, height, true)
-                val pixels = IntArray(width * height)
-                resized.getPixels(pixels, 0, width, 0, 0, width, height)
-                val input = ByteBuffer.allocateDirect(4 * width * height * 3).order(ByteOrder.nativeOrder())
-                pixels.forEach { pixel ->
-                    input.putFloat(((pixel shr 16) and 0xFF) / 255f)
-                    input.putFloat(((pixel shr 8) and 0xFF) / 255f)
-                    input.putFloat((pixel and 0xFF) / 255f)
-                }
-                input.rewind()
+                // Center-crop to the model's square input while preserving the leaf's proportions.
+                val cropSide = minOf(bitmap.width, bitmap.height)
+                require(cropSide > 0) { "The selected image is empty." }
+                val square = Bitmap.createBitmap(
+                    bitmap, (bitmap.width - cropSide) / 2, (bitmap.height - cropSide) / 2,
+                    cropSide, cropSide
+                )
+                val resized = Bitmap.createScaledBitmap(square, width, height, true)
                 val output = Array(1) { FloatArray(outputCount) }
-                model.run(input, output)
-                if (resized !== bitmap) resized.recycle()
+                try {
+                    val pixels = IntArray(width * height)
+                    resized.getPixels(pixels, 0, width, 0, 0, width, height)
+                    val input = ByteBuffer.allocateDirect(4 * width * height * 3).order(ByteOrder.nativeOrder())
+                    pixels.forEach { pixel ->
+                        input.putFloat(((pixel shr 16) and 0xFF) / 255f)
+                        input.putFloat(((pixel shr 8) and 0xFF) / 255f)
+                        input.putFloat((pixel and 0xFF) / 255f)
+                    }
+                    input.rewind()
+                    model.run(input, output)
+                } finally {
+                    if (resized !== square && resized !== bitmap) resized.recycle()
+                    if (square !== bitmap) square.recycle()
+                }
                 val results = output[0].mapIndexed { index, score -> PlantPrediction(labels[index], score) }
+                    .filter { it.confidence.isFinite() }
                     .sortedByDescending { it.confidence }.take(3)
                 withContext(Dispatchers.Main) { _state.value = PlantDoctorState(bitmap = bitmap, predictions = results) }
             } catch (error: Exception) {
@@ -164,9 +210,7 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
     }
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         if (uri != null) scope.launch(Dispatchers.IO) {
-            val bitmap = runCatching {
-                context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = 2 }) }
-            }.getOrNull()
+            val bitmap = runCatching { decodePlantBitmap(context, uri) }.getOrNull()
             withContext(Dispatchers.Main) {
                 if (bitmap != null) viewModel.analyze(bitmap)
                 else viewModel.showError(if (isHindi) "फोटो नहीं खुल सकी। दूसरी फोटो चुनें।" else "Could not open this photo. Please choose another image.")
@@ -200,12 +244,12 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(9.dp), modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = { camera.launch(null) }, modifier = Modifier.weight(1f)) {
+                Button(onClick = { camera.launch(null) }, enabled = !state.analyzing, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null)
                     Spacer(Modifier.width(5.dp))
                     Text(if (isHindi) "फोटो लें" else "Take photo")
                 }
-                OutlinedButton(onClick = { gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }, modifier = Modifier.weight(1f)) {
+                OutlinedButton(onClick = { gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }, enabled = !state.analyzing, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.PhotoLibrary, contentDescription = null)
                     Spacer(Modifier.width(5.dp))
                     Text(if (isHindi) "गैलरी" else "Gallery")
