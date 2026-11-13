@@ -45,7 +45,7 @@ object DiaryBackupManager {
             zip.write(json)
             zip.closeEntry()
             snapshot.diaries.flatMap { it.photoPaths.toPhotoNames() }.distinct().forEach { name ->
-                val photo = DiaryPhotoStore.file(context, name) ?: return@forEach
+                val photo = DiaryPhotoStore.file(context, name) ?: throw IOException("An attached diary photo is missing")
                 zip.putNextEntry(ZipEntry("photos/$name"))
                 photo.inputStream().buffered().use { it.copyTo(zip) }
                 zip.closeEntry()
@@ -57,6 +57,7 @@ object DiaryBackupManager {
     suspend fun restoreBackup(context: Context, uri: Uri, db: AppDatabase) = withContext(Dispatchers.IO) {
         val staging = File(context.cacheDir, "diary_restore_${UUID.randomUUID()}").apply { mkdirs() }
         val copiedPhotos = mutableListOf<File>()
+        var restoreCommitted = false
         try {
             var totalBytes = 0L
             var entries = 0
@@ -129,10 +130,12 @@ object DiaryBackupManager {
                 copiedPhotos.forEach { it.delete() }
                 throw failure
             }
+            restoreCommitted = true
             photoDirectory.listFiles()?.filter { it !in copiedPhotos }?.forEach { it.delete() }
             rescheduleReminders(context, db)
             RestoreSummary(farmers.size, animals.size, health.size, diaries.size, requiredPhotos.size)
         } finally {
+            if (!restoreCommitted) copiedPhotos.forEach { it.delete() }
             staging.deleteRecursively()
         }
     }
