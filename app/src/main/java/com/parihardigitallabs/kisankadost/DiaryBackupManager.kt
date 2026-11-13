@@ -204,10 +204,8 @@ object DiaryBackupManager {
             }
             restoreCommitted = true
             photoDirectory.listFiles()?.filter { it !in copiedPhotos }?.forEach { it.delete() }
-            val copiedDiagnosisPaths = copiedPhotos.map { it.canonicalFile }.toSet()
-            previousDiagnoses.map { File(it.imagePath).canonicalFile }.forEach { old ->
-                if (old.parentFile == plantPhotoDirectory.canonicalFile && old !in copiedDiagnosisPaths) old.delete()
-            }
+            val copiedDiagnosisPaths = copiedPhotos.map { it.canonicalFile }.filter { it.parentFile == plantPhotoDirectory.canonicalFile }.toSet()
+            plantPhotoDirectory.listFiles()?.filter { it !in copiedDiagnosisPaths }?.forEach { it.delete() }
             rescheduleReminders(context, db)
             RestoreSummary(farmers.size, animals.size, health.size, diaries.size, requiredPhotos.size, restoredDiagnoses.size)
         } finally {
