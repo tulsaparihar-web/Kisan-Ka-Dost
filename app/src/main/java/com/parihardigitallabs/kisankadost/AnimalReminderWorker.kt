@@ -13,7 +13,6 @@ import com.parihardigitallabs.kisankadost.data.AppDatabase
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.ZoneId
 
 class AnimalReminderWorker(
     appContext: Context,
@@ -33,8 +32,7 @@ class AnimalReminderWorker(
             ?: return Result.failure()
         val target = LocalDateTime.of(targetDate, LocalTime.of(9, 0))
         if (LocalDateTime.now() < target) {
-            AnimalReminderScheduler.schedule(applicationContext, recordId, event.nextReminderDate)
-            return Result.success()
+            return Result.retry()
         }
 
         createNotificationChannel()
