@@ -4,6 +4,7 @@ import com.parihardigitallabs.kisankadost.data.AnimalHealthRecordEntity
 import com.parihardigitallabs.kisankadost.data.AnimalRecordEntity
 import com.parihardigitallabs.kisankadost.data.DiaryRecordEntity
 import com.parihardigitallabs.kisankadost.data.FarmerProfileEntity
+import com.parihardigitallabs.kisankadost.data.PlantDiagnosisEntity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -12,8 +13,50 @@ class DiaryBackupValidationTest {
     @Test fun acceptsCurrentAndPreviousBackupVersions() {
         org.junit.Assert.assertTrue(isSupportedDiaryBackupVersion(1))
         org.junit.Assert.assertTrue(isSupportedDiaryBackupVersion(2))
+        org.junit.Assert.assertTrue(isSupportedDiaryBackupVersion(3))
         org.junit.Assert.assertFalse(isSupportedDiaryBackupVersion(0))
-        org.junit.Assert.assertFalse(isSupportedDiaryBackupVersion(3))
+        org.junit.Assert.assertFalse(isSupportedDiaryBackupVersion(4))
+    }
+
+    @Test fun validatesPlantDiagnosisHistoryAndPhotoManifest() {
+        val valid = PlantDiagnosisEntity(
+            id = 1, imagePath = "/private/plant_diagnoses/diagnosis_one.jpg",
+            predictedLabel = "Tomato___Early_blight", confidence = 0.82f, createdAt = 1_700_000_000_000
+        )
+        assertEquals(
+            setOf("diagnosis_one.jpg"),
+            DiaryBackupManager.validatePlantDiagnosisRecords(listOf(valid))
+        )
+        assertEquals(
+            setOf("diagnosis_one.jpg"),
+            DiaryBackupManager.validatePlantDiagnosisPhotoReferences(listOf(valid), setOf("diagnosis_one.jpg"))
+        )
+    }
+
+    @Test fun rejectsInvalidPlantDiagnosisHistory() {
+        val valid = PlantDiagnosisEntity(
+            id = 1, imagePath = "/private/plant_diagnoses/diagnosis_one.jpg",
+            predictedLabel = "Tomato___Early_blight", confidence = 0.82f, createdAt = 1_700_000_000_000
+        )
+        val invalidScore = valid.copy(confidence = Float.NaN)
+        val outOfRangeScore = valid.copy(confidence = 1.2f)
+        val duplicateId = valid.copy(imagePath = "/private/plant_diagnoses/diagnosis_two.jpg")
+        val unsafePath = valid.copy(imagePath = "/private/plant_diagnoses/../private.jpg")
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            DiaryBackupManager.validatePlantDiagnosisRecords(listOf(invalidScore))
+        }
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            DiaryBackupManager.validatePlantDiagnosisRecords(listOf(outOfRangeScore))
+        }
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            DiaryBackupManager.validatePlantDiagnosisRecords(listOf(valid, duplicateId))
+        }
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            DiaryBackupManager.validatePlantDiagnosisRecords(listOf(unsafePath))
+        }
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            DiaryBackupManager.validatePlantDiagnosisPhotoReferences(listOf(valid), emptySet())
+        }
     }
 
     @Test fun acceptsExactPhotoManifest() {
