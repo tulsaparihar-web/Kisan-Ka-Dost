@@ -33,10 +33,8 @@ class AnimalReminderWorker(
             ?: return Result.failure()
         val target = LocalDateTime.of(targetDate, LocalTime.of(9, 0))
         if (LocalDateTime.now() < target) {
-            val delay = java.time.Duration.between(LocalDateTime.now(), target).toMillis().coerceAtLeast(60_000L)
-            return Result.retry().also {
-                // WorkManager retry backoff is not a date scheduler; a future date is scheduled by the UI.
-            }
+            AnimalReminderScheduler.schedule(applicationContext, recordId, event.nextReminderDate)
+            return Result.success()
         }
 
         createNotificationChannel()
