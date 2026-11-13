@@ -11,4 +11,6 @@ class AnimalHealthRecordRepository(private val dao: AnimalHealthRecordDao) {
     suspend fun delete(record: AnimalHealthRecordEntity) {
         dao.delete(record)
     }
+
+    suspend fun confirmedReminders(): List<AnimalHealthRecordEntity> = dao.getConfirmedReminders()
 }
