@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -27,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -40,9 +42,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.parihardigitallabs.kisankadost.data.AppDatabase
+import com.parihardigitallabs.kisankadost.data.PlantDiagnosisEntity
 import org.tensorflow.lite.Interpreter
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 private val PlantGreen = Color(0xFF247A45)
 private val PlantInk = Color(0xFF203128)
@@ -117,12 +125,44 @@ data class PlantPrediction(val label: String, val confidence: Float)
 data class PlantDoctorState(val bitmap: Bitmap? = null, val predictions: List<PlantPrediction> = emptyList(), val analyzing: Boolean = false, val error: String? = null)
 
 class PlantDoctorViewModel(application: Application) : AndroidViewModel(application) {
+    private val diagnosisDao = AppDatabase.getInstance(application).plantDiagnosisDao()
+    val history = diagnosisDao.observeAll()
     private val _state = MutableStateFlow(PlantDoctorState())
     val state = _state.asStateFlow()
     private var interpreter: Interpreter? = null
     private var labels: List<String> = emptyList()
 
     fun showError(message: String) { _state.value = _state.value.copy(analyzing = false, error = message) }
+
+    fun deleteHistory(record: PlantDiagnosisEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { diagnosisDao.delete(record); File(record.imagePath).delete() }
+        }
+    }
+
+    private suspend fun saveHistory(bitmap: Bitmap, prediction: PlantPrediction) {
+        val imagePath = withContext(Dispatchers.IO) {
+            val directory = File(getApplication<Application>().filesDir, "plant_diagnoses")
+            if (!directory.exists() && !directory.mkdirs()) error("Unable to create diagnosis photo folder")
+            val target = File.createTempFile("diagnosis_", ".jpg", directory)
+            val maxSide = 1024
+            val scale = minOf(1f, maxSide.toFloat() / maxOf(bitmap.width, bitmap.height).coerceAtLeast(1))
+            val savedBitmap = if (scale < 1f) Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale).toInt().coerceAtLeast(1), (bitmap.height * scale).toInt().coerceAtLeast(1), true) else bitmap
+            try {
+                target.outputStream().use { output -> check(savedBitmap.compress(Bitmap.CompressFormat.JPEG, 78, output)) { "Unable to save diagnosis photo" } }
+            } catch (error: Exception) {
+                target.delete(); throw error
+            } finally {
+                if (savedBitmap !== bitmap) savedBitmap.recycle()
+            }
+            target.absolutePath
+        }
+        try {
+            diagnosisDao.insert(PlantDiagnosisEntity(imagePath = imagePath, predictedLabel = prediction.label, confidence = prediction.confidence))
+        } catch (error: Exception) {
+            File(imagePath).delete(); throw error
+        }
+    }
 
     fun analyze(bitmap: Bitmap) {
         _state.value = PlantDoctorState(bitmap = bitmap, analyzing = true)
@@ -169,8 +209,9 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
                     if (square !== bitmap) square.recycle()
                 }
                 val results = output[0].mapIndexed { index, score -> PlantPrediction(labels[index], score) }
-                    .filter { it.confidence.isFinite() }
+                    .filter { it.confidence.isFinite() && it.confidence in 0f..1f }
                     .sortedByDescending { it.confidence }.take(3)
+                results.firstOrNull()?.let { prediction -> runCatching { saveHistory(bitmap, prediction) } }
                 withContext(Dispatchers.Main) { _state.value = PlantDoctorState(bitmap = bitmap, predictions = results) }
             } catch (error: Exception) {
                 withContext(Dispatchers.Main) {
@@ -199,6 +240,7 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
 fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewModel()) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
+    val history by viewModel.history.collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
     var selectedTab by remember { mutableIntStateOf(0) }
     var search by remember { mutableStateOf("") }
@@ -228,6 +270,7 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
         TabRow(selectedTabIndex = selectedTab) {
             Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text(if (isHindi) "फोटो जाँच" else "Photo Doctor") })
             Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text(if (isHindi) "पौधा गाइड" else "Plant Guide") })
+            Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text(if (isHindi) "पुरानी जाँच" else "History") })
         }
 
         if (selectedTab == 0) {
@@ -236,8 +279,8 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     Icon(Icons.Default.Info, contentDescription = null, tint = PlantGreen)
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        if (isHindi) "ऑफलाइन AI जाँच केवल कुछ फसलों—जैसे टमाटर, आलू, मक्का, अंगूर, सेब और शिमला मिर्च—की 39 श्रेणियों तक सीमित है। अन्य पौधों की फोटो गलत वर्गीकृत हो सकती है। परिणाम को अंतिम निदान न मानें।"
-                        else "Offline AI checking is limited to 39 classes across selected crops such as tomato, potato, maize, grape, apple and bell pepper. Other plants may be misclassified. Do not treat the result as a confirmed diagnosis.",
+                        if (isHindi) "ऑफलाइन AI मॉडल 14 फसलों की 39 श्रेणियों तक सीमित है—सेब, ब्लूबेरी, चेरी, मक्का, अंगूर, संतरा, आड़ू, शिमला मिर्च, आलू, रास्पबेरी, सोयाबीन, स्क्वैश, स्ट्रॉबेरी और टमाटर। अन्य पौधों पर भरोसेमंद पहचान का दावा नहीं किया जाता। परिणाम अंतिम निदान नहीं है।"
+                        else "The offline AI model is limited to 39 output classes across 14 crops: apple, blueberry, cherry, maize, grape, orange, peach, bell pepper, potato, raspberry, soybean, squash, strawberry and tomato. It does not reliably identify other plants. Results are not a confirmed diagnosis.",
                         color = PlantInk, fontSize = 12.sp, lineHeight = 17.sp
                     )
                 }
@@ -274,12 +317,12 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
             if (state.predictions.isNotEmpty()) {
                 val top = state.predictions.first()
                 val background = top.label.contains("background", true)
-                val low = top.confidence < 0.50f
+                val low = top.confidence < 0.60f
                 Card(shape = RoundedCornerShape(17.dp)) {
                     Column(Modifier.fillMaxWidth().padding(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                         Text(if (isHindi) "AI जाँच का परिणाम" else "AI scan result", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = PlantInk)
                         Text(if (background) (if (isHindi) "स्पष्ट पत्ती नहीं मिली" else "No supported leaf detected") else displayDiseaseLabel(top.label, isHindi), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = PlantGreen)
-                        Text((if (isHindi) "मॉडल का अनुमान: " else "Model confidence: ") + (top.confidence * 100).toInt().toString() + "%", color = PlantMuted, fontSize = 13.sp)
+                        Text((if (isHindi) "मॉडल स्कोर: " else "Model score: ") + (top.confidence * 100).toInt().toString() + "%", color = PlantMuted, fontSize = 13.sp)
                         LinearProgressIndicator(progress = { top.confidence.coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth(), color = PlantGreen)
                         if (low || background) {
                             Text(if (isHindi) "विश्वास कम है। इसे पक्की बीमारी न मानें। एक साफ, पास से ली गई पत्ती की फोटो दोबारा लें।" else "Confidence is low. Do not treat this as a confirmed diagnosis. Retake a clear close-up photo of one leaf.", color = Color(0xFF8A5A16), fontSize = 13.sp)
@@ -302,7 +345,7 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                 }
             }
             Text(if (isHindi) "बेहतर परिणाम के लिए एक पत्ती को पास से, साफ रोशनी में और बिना धुंधलेपन के फोटो लें।" else "For best results, photograph one leaf close-up in good light and in focus.", color = PlantMuted, fontSize = 12.sp)
-        } else {
+        } else if (selectedTab == 1) {
             OutlinedTextField(value = search, onValueChange = { search = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, leadingIcon = { Icon(Icons.Default.Search, null) }, label = { Text(if (isHindi) "पौधे का नाम खोजें" else "Search plants") })
             val categories = listOf("All", "Field crop", "Vegetable", "Fruit tree", "Indoor plant", "Ornamental flower", "Medicinal / aromatic", "Herb")
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -329,8 +372,34 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     }
                 }
             }
+        } else {
+            if (history.isEmpty()) {
+                Text(if (isHindi) "अभी तक कोई फोटो जाँच सहेजी नहीं गई है। जाँच पूरी होने पर उसका फोटो और परिणाम यहाँ दिखेगा।" else "No saved photo checks yet. Completed scans will appear here with their photo and result.", color = PlantMuted, fontSize = 13.sp)
+            } else {
+                Text(if (isHindi) "आपकी पिछली जाँचें इस फोन पर निजी रूप से सहेजी जाती हैं।" else "Your previous checks are stored privately on this phone.", color = PlantMuted, fontSize = 12.sp)
+                history.forEach { record -> PlantDiagnosisHistoryCard(record = record, isHindi = isHindi, onDelete = { viewModel.deleteHistory(record) }) }
+            }
         }
         Spacer(Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun PlantDiagnosisHistoryCard(record: PlantDiagnosisEntity, isHindi: Boolean, onDelete: () -> Unit) {
+    val thumbnail by produceState<Bitmap?>(initialValue = null, key1 = record.imagePath) {
+        value = withContext(Dispatchers.IO) { BitmapFactory.decodeFile(record.imagePath) }
+    }
+    Card(shape = RoundedCornerShape(15.dp)) {
+        Row(Modifier.fillMaxWidth().padding(11.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            thumbnail?.let { Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(76.dp), contentScale = ContentScale.Crop) }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(displayDiseaseLabel(record.predictedLabel, isHindi), color = PlantInk, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Text(SimpleDateFormat("dd MMM yyyy, hh:mm a", if (isHindi) Locale("hi", "IN") else Locale.getDefault()).format(Date(record.createdAt)), color = PlantMuted, fontSize = 11.sp)
+                Text((if (isHindi) "मॉडल स्कोर: " else "Model score: ") + (record.confidence * 100).toInt().toString() + "%", color = PlantMuted, fontSize = 11.sp)
+                Text(if (isHindi) "प्रारंभिक AI संकेत — अंतिम निदान नहीं" else "Preliminary AI indication — not a diagnosis", color = PlantMuted, fontSize = 10.sp)
+            }
+            IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, contentDescription = if (isHindi) "हटाएँ" else "Delete", tint = PlantMuted) }
+        }
     }
 }
 
