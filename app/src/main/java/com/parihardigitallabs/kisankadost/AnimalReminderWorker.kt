@@ -56,8 +56,10 @@ class AnimalReminderWorker(
             .apply { if (contentIntent != null) setContentIntent(contentIntent) }
             .build()
 
+        val notifications = NotificationManagerCompat.from(applicationContext)
+        if (!notifications.areNotificationsEnabled()) return Result.success()
         return try {
-            NotificationManagerCompat.from(applicationContext).notify(recordId.toInt(), notification)
+            notifications.notify(recordId.toInt(), notification)
             database.animalHealthRecordDao().markReminderNotified(recordId)
             Result.success()
         } catch (_: SecurityException) {
