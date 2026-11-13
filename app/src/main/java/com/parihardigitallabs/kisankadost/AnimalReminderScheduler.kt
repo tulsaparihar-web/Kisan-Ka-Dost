@@ -1,6 +1,7 @@
 package com.parihardigitallabs.kisankadost
 
 import android.content.Context
+import androidx.work.BackoffPolicy
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -15,6 +16,7 @@ object AnimalReminderScheduler {
         val request = OneTimeWorkRequestBuilder<AnimalReminderWorker>()
             .setInputData(Data.Builder().putLong(AnimalReminderWorker.KEY_RECORD_ID, recordId).build())
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.MINUTES)
             .build()
         WorkManager.getInstance(context.applicationContext)
             .enqueueUniqueWork("animal_health_reminder_$recordId", androidx.work.ExistingWorkPolicy.REPLACE, request)
