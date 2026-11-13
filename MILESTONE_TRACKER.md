@@ -69,16 +69,18 @@ M3 must not be closed until all applicable items below are delivered or explicit
 
 ### M4 – Animal husbandry foundation
 - [x] Bilingual searchable starter library for cattle, buffalo, goats, sheep, camels and poultry.
-- [x] Rajasthan-relevant recognized breed names included with clear expert-verification caveat.
-- [x] General feed/water, housing/comfort and preventive-care education included.
-- [x] Urgent warning signs direct owners to a qualified veterinarian; no diagnosis or drug dosage.
-- [x] M4 source register created from ICAR-NBAGR, Government of Rajasthan, DAHD, NDDB and ICAR references.
-- [x] First animal husbandry screen cloud-build verified in [run 43211738560](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43211738560); APK archive downloaded and inspected.
-- [ ] Detailed breed profiles and production-system comparisons reviewed by animal husbandry experts.\n- [x] Expanded qualitative age-/production-stage feeding and biosecurity starter guidance; no unverified quantities or treatment instructions are provided.\n- [x] Breed list wording distinguishes nationally registered buffalo examples from Rajasthan home-tract breeds and displays buffalo home-tract context.\n- [x] Refreshed goat/sheep breed names against current ICAR-NBAGR registers, including Totapuri, Battisi, Kheri and Avishaan (explicitly labelled synthetic).
-- [ ] Species- and life-stage-specific fodder/ration guides validated by veterinary nutrition sources.
-- [x] Offline health-event log per animal, with event date, optional veterinarian-confirmed next date, notes and delete; invalid dates are rejected and next dates cannot precede the event. This stores/displays dates but does not yet schedule Android notifications.\n- [x] Persistent Android reminder scheduling for veterinarian-confirmed next dates, using WorkManager at 9:00 AM local time; notification permission is requested only when the user saves a reminder; pending reminders are re-enqueued when notification permission is later granted.\n- [x] Android automatic app-data backup disabled so farmer and animal records remain local by default; explicit export/backup is a separate future user-controlled feature.\n- [ ] Verify notifications, reboot/Doze behavior and permission-denied/re-enabled flow on physical devices.
-- [x] Offline animal registry (add/list/edit/delete), health-event records and non-destructive Room 1→2→3 migrations implemented; main build passed in [run 43381264104](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43381264104); physical-device migration verification remains pending.\n- [ ] Edit animal records; health/production history and veterinarian-confirmed reminders.
-- [ ] Physical-device and bilingual regression testing.
+- [x] Rajasthan-relevant breed names and concise home-tract/profile notes based on ICAR-NBAGR, KVK and Government of Rajasthan references.
+- [x] Qualitative feeding and water education, including newborn colostrum, life-stage considerations, safe fodder conservation/storage and biosecurity.
+- [x] Urgent warning signs direct owners to a qualified veterinarian; no diagnosis, medicine or drug dosage.
+- [x] Offline animal profiles support add/list/edit/delete, including species, breed, tag, sex, age/date of birth, purpose and notes.
+- [x] Per-animal offline health-event history with event date, notes and optional veterinarian-confirmed next date.
+- [x] Veterinarian-confirmed next-date reminders scheduled through WorkManager around 9:00 AM local time; notification permission is requested only when a reminder is saved, and reminders can be re-enqueued after permission is later granted. Android battery management may delay delivery.
+- [x] Non-destructive Room migrations v1→v2→v3→v4 preserve existing farmer profiles and animal records.
+- [x] Android automatic app-data backup disabled so farm and animal records remain local by default; explicit export/backup is a separate future user-controlled feature.
+- [x] Unit tests for reminder time calculation and cloud build/APK packaging passed in [run 43383362324](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43383362324); APK artifact downloaded and inspected.
+- [ ] Physical-device upgrade test from a populated M3 database through Room v1→v4.
+- [ ] Physical-device reminder permission, reboot/Doze, delivery and Hindi/English regression tests.
+- [ ] Quantitative breed performance comparisons and individualized ration tables remain deferred until formal animal-science/veterinary review.
 
 ### Plant Doctor and quality
 - [x] Camera/gallery image selection flow and offline model integration.
