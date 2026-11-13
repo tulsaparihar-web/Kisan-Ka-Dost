@@ -16,6 +16,7 @@
 - Android automatic app-data backup remains disabled.
 - No background upload, cloud sync, user account or data sale.
 - Backup is written only to the location selected by the user.
+- ZIP backups are not password-encrypted; they may contain personal/contact and farm records. Store and share them carefully.
 - Restore replaces the current local farmer, animal, animal-health and diary data. The UI warns the user to create a backup first.
 - Archive structure, referenced photo files and animal-health foreign-key relationships are validated before database replacement; table replacement occurs in a Room transaction.
 - A backup archive should be kept in a safe personal location. It may contain private farm and contact information.
@@ -26,6 +27,7 @@
 3. Create a full ZIP backup, restore it on a test installation and verify all data and photos.
 4. Try an invalid/corrupt ZIP; verify it is rejected without replacing current records.
 5. Test notification permission, scheduled reminders, reboot and battery optimization behavior.
+6. Confirm a backup ZIP can be opened as an archive and remind users that it is not encrypted.
 6. Test CSV export, offline use, Hindi/English layouts and long-text/small-screen layout.
 7. Verify no farm data or photos are uploaded automatically.
 
