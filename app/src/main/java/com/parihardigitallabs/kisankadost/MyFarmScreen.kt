@@ -232,8 +232,10 @@ fun MyFarmScreen(
                     district.isBlank() -> saveMessage = if (isHindi) "कृपया जिला भरें।" else "Please enter the district."
                     mobileNumber.isNotBlank() && mobileNumber.length != 10 ->
                         saveMessage = if (isHindi) "मोबाइल नंबर 10 अंकों का होना चाहिए।" else "Mobile number must contain 10 digits."
+                    landArea.isNotBlank() && (landArea.toDoubleOrNull()?.let { it.isFinite() && it > 0.0 } != true) ->
+                        saveMessage = if (isHindi) "भूमि क्षेत्र शून्य से अधिक सही संख्या में भरें।" else "Enter a valid land area greater than zero."
                     else -> viewModel.save(
-                        FarmerProfileEntity(
+                        profile = FarmerProfileEntity(
                             farmerName = farmerName.trim(),
                             mobileNumber = mobileNumber,
                             village = village.trim(),
@@ -244,10 +246,14 @@ fun MyFarmScreen(
                             irrigationSource = irrigationSource,
                             mainCrops = mainCrops.trim(),
                             livestock = livestock.trim()
-                        )
-                    ) {
-                        saveMessage = if (isHindi) "जानकारी इस फोन में सुरक्षित कर दी गई है।" else "Your farm details have been saved on this phone."
-                    }
+                        ),
+                        onSaved = {
+                            saveMessage = if (isHindi) "जानकारी इस फोन में सुरक्षित कर दी गई है।" else "Your farm details have been saved on this phone."
+                        },
+                        onError = {
+                            saveMessage = if (isHindi) "जानकारी सुरक्षित नहीं हो सकी। कृपया दोबारा प्रयास करें।" else "Could not save your details. Please try again."
+                        }
+                    )
                 }
             },
             modifier = Modifier.fillMaxWidth()
