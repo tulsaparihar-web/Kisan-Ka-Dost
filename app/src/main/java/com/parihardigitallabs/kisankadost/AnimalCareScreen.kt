@@ -50,7 +50,7 @@ private data class AnimalGuide(
 
 private val animalGuides = listOf(
     AnimalGuide("Cattle", "गाय / बैल", "Cattle",
-        "राठी, थारपारकर, कांकरेज, नागौरी, मेवाती", "Rathi, Tharparkar, Kankrej, Nagori, Mewati",
+        "राठी, थारपारकर, कांकरेज, नागौरी, मेवाती, नारी, सांचोरी", "Rathi, Tharparkar, Kankrej, Nagori, Mewati, Nari, Sanchori",
         "हरा चारा, सूखा चारा और संतुलित पशु आहार का संयोजन रखें। स्वच्छ पानी हर समय उपलब्ध हो। आहार में बदलाव धीरे-धीरे करें और फफूंद लगा चारा न दें।", "Combine green fodder, dry roughage and a balanced ration. Keep clean water available at all times. Change feed gradually and never offer mouldy fodder.",
         "गर्मी में छाया और हवा का अच्छा प्रवाह रखें। फर्श सूखा, साफ और फिसलन-रहित हो। बछड़ों के लिए अलग सुरक्षित जगह रखें।", "Provide shade and good airflow in hot weather. Keep floors dry, clean and non-slip. Provide a separate safe area for calves.",
         "दूध, प्रजनन, टीकाकरण और स्वास्थ्य का रिकॉर्ड रखें। टीकाकरण/कृमिनाशन का समय स्थानीय पशु चिकित्सक से तय करें।", "Keep milk, breeding, vaccination and health records. Set vaccination and deworming timing with the local veterinarian."
@@ -62,7 +62,7 @@ private val animalGuides = listOf(
         "दूध दुहने से पहले और बाद में स्वच्छता रखें। थन में सूजन, दर्द या दूध में बदलाव हो तो पशु चिकित्सक से जाँच कराएँ।", "Maintain hygiene before and after milking. Seek veterinary examination for udder swelling, pain or changes in milk."
     ),
     AnimalGuide("Goat", "बकरी", "Goat",
-        "सिरोही, जखराना, मारवाड़ी, सोजत, करौली", "Sirohi, Jakhrana, Marwari, Sojat, Karauli",
+        "सिरोही, जखराना, मारवाड़ी, सोजत, करौली, गुजरी", "Sirohi, Jakhrana, Marwari, Sojat, Karauli, Gujari",
         "पत्तेदार चारा/ब्राउज़िंग, सूखा चारा और जरूरत अनुसार संतुलित पूरक आहार दें। साफ पानी और उपयुक्त खनिज स्रोत उपलब्ध रखें।", "Provide browse/leafy fodder, dry roughage and suitable balanced supplements when needed. Keep clean water and an appropriate mineral source available.",
         "सूखा, हवादार और सुरक्षित शेड रखें। फर्श फिसलन-रहित हो और बच्चों के लिए अलग साफ कोना हो।", "Use a dry, ventilated and secure shelter. Keep floors non-slip and provide a clean separate area for kids.",
         "नए पशु को झुंड में मिलाने से पहले अलग रखें और निरीक्षण करें। भूख बंद होना, दस्त, खाँसी या अचानक कमजोरी पर पशु चिकित्सक से संपर्क करें।", "Isolate and observe new animals before mixing with the flock. Contact a veterinarian for loss of appetite, diarrhoea, cough or sudden weakness."
@@ -146,6 +146,8 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
                             AnimalDetail(if (isHindi) "चारा और पानी" else "Feed & water", if (isHindi) guide.feedHi else guide.feedEn)
                             AnimalDetail(if (isHindi) "आवास और आराम" else "Housing & comfort", if (isHindi) guide.housingHi else guide.housingEn)
                             AnimalDetail(if (isHindi) "स्वास्थ्य और देखभाल" else "Health & care", if (isHindi) guide.careHi else guide.careEn)
+                            AnimalDetail(if (isHindi) "आयु और उत्पादन अवस्था के अनुसार" else "By age and production stage", animalStageGuidance(guide.key, isHindi))
+                            AnimalDetail(if (isHindi) "जैव-सुरक्षा" else "Biosecurity", animalBiosecurityGuidance(guide.key, isHindi))
                         } else {
                             Text(if (isHindi) "विस्तार देखने के लिए टैप करें" else "Tap for care details",
                                 fontSize = 12.sp, color = Color(0xFF66766B))
@@ -170,6 +172,31 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
             }
         }
     }
+}
+
+
+private fun animalStageGuidance(key: String, isHindi: Boolean): String = when (key) {
+    "Cattle", "Buffalo" -> if (isHindi)
+        "नवजात बछड़े को जन्म के तुरंत बाद खीस/पहला दूध पिलाने की व्यवस्था करें। बढ़ते बछड़े को उम्र के अनुसार स्वच्छ पानी, अच्छा रेशा और उपयुक्त calf starter धीरे-धीरे दें। गर्भित, दूध देने वाले और सूखे पशुओं का राशन अलग-अलग जरूरत के अनुसार पशु पोषण विशेषज्ञ से बनवाएँ।"
+    else "Ensure the newborn calf receives colostrum promptly after birth. Introduce clean water, good-quality roughage and suitable calf starter gradually as it grows. Have separate rations formulated for pregnant, lactating and dry animals by an animal nutritionist."
+    "Goat", "Sheep" -> if (isHindi)
+        "नवजात मेमने/बच्चे को खीस अवश्य मिले और उसे सूखे, साफ स्थान पर रखें। बढ़ते बच्चों के लिए अच्छी गुणवत्ता का पत्तेदार चारा/ब्राउज़िंग और उम्र के अनुसार पूरक आहार दें। गर्भावस्था और दूध पिलाने के समय पोषण जरूरत बढ़ सकती है; स्थानीय विशेषज्ञ से राशन तय करें।"
+    else "Ensure newborn lambs/kids receive colostrum and remain in a clean, dry area. Growing young stock needs good-quality browse/roughage and age-appropriate supplementary feed. Nutrient needs can rise during pregnancy and lactation; seek local ration advice."
+    "Camel" -> if (isHindi)
+        "बछड़े को माँ का दूध और स्वच्छ, सुरक्षित पालन स्थान दें। बढ़ते और काम करने वाले ऊँटों की जरूरतें अलग होती हैं; मौसम, काम, गर्भावस्था और उपलब्ध चारे के अनुसार पानी व आहार की योजना स्थानीय ऊँट/पशु विशेषज्ञ से बनवाएँ।"
+    else "Provide nursing calves with access to the dam and a clean, safe rearing area. Growing and working camels have different needs; plan feed and water with a local camel/livestock specialist based on season, workload, pregnancy and available browse."
+    else -> if (isHindi)
+        "चूजों के लिए chick starter, बढ़ते पक्षियों के लिए grower और अंडा देने वाली मुर्गियों के लिए layer feed जैसे उम्र/उत्पादन-अनुकूल पूर्ण आहार का उपयोग करें। आहार बदलना धीरे-धीरे करें और स्वच्छ पानी लगातार दें।"
+    else "Use complete age- and purpose-appropriate feed: chick starter for chicks, grower feed for growing birds and layer feed for laying hens. Change diets gradually and provide clean water continuously."
+}
+
+private fun animalBiosecurityGuidance(key: String, isHindi: Boolean): String = when (key) {
+    "Poultry" -> if (isHindi)
+        "आने-जाने वालों और जंगली पक्षियों का संपर्क सीमित रखें। नए पक्षियों को अलग रखकर निरीक्षण करें; बीमार या मृत पक्षियों को सुरक्षित तरीके से संभालें और स्थानीय पशुपालन विभाग को असामान्य मृत्यु की सूचना दें।"
+    else "Limit visitor and wild-bird contact. Keep new birds separate for observation; handle sick or dead birds safely and report unusual mortality to the local Animal Husbandry Department."
+    else -> if (isHindi)
+        "नए पशुओं को झुंड में मिलाने से पहले अलग रखकर निरीक्षण करें। पानी/चारे के बर्तन और शेड साफ रखें; बीमार पशु को अलग रखें और उपकरण साझा करने पर सफाई करें। बीमारी फैलने की आशंका पर पशु चिकित्सक से संपर्क करें।"
+    else "Keep newly acquired animals separate for observation before mixing with the herd. Clean feed/water containers and housing; separate sick animals and clean shared equipment. Contact a veterinarian if disease spread is suspected."
 }
 
 @Composable
