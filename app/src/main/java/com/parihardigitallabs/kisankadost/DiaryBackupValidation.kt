@@ -25,10 +25,15 @@ object DiaryBackupValidation {
         require(health.map { it.id }.all { it > 0 } && health.map { it.id }.distinct().size == health.size) { "Health record IDs are invalid or duplicated" }
         require(diaries.map { it.id }.all { it > 0 } && diaries.map { it.id }.distinct().size == diaries.size) { "Diary record IDs are invalid or duplicated" }
 
+        require(animals.all { it.name.isNotBlank() && it.species.isNotBlank() && it.name.length <= 120 && it.species.length <= 80 }) {
+            "An animal profile has invalid details"
+        }
         val animalIds = animals.map { it.id }.toSet()
         require(health.all { it.animalId in animalIds }) { "Backup has animal health records without a matching animal" }
         health.forEach {
-            require(it.eventTitle.isNotBlank() && isDate(it.eventDate)) { "A health record has an invalid title or date" }
+            require(it.eventTitle.isNotBlank() && it.eventTitle.length <= 160 && it.notes.length <= 3000 && isDate(it.eventDate)) {
+                "A health record has invalid details or date"
+            }
             require(it.nextReminderDate.isBlank() || (it.veterinarianConfirmed && isDate(it.nextReminderDate))) {
                 "A health reminder must have a valid veterinarian-confirmed date"
             }
