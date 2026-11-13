@@ -4,11 +4,11 @@
 - Bilingual offline diary for field, garden/orchard, animal, expense, labour, input and production activities.
 - Add, edit, delete, category filtering and text search.
 - Record date, related crop/plant/animal, quantity, unit, amount, notes and optional reminder date.
-- Local reminders attempted around 9:00 AM; Android WorkManager/battery management can delay delivery. Notification permission is requested only when the user saves a reminder.
+- Local one-time reminders attempted around 9:00 AM; delivery state is stored to prevent repeats when users reopen the diary. Android WorkManager/battery management can delay delivery. Notification permission is requested only when the user saves a reminder.
 - Up to five private photo attachments per entry. Photos are resized, orientation-corrected and recompressed to strip original image metadata.
 - CSV export initiated by the user. CSV values are quoted and formula-like text is neutralized to reduce spreadsheet injection risk.
 - Full ZIP backup and restore initiated by the user. Backup includes farmer profile, animal profiles, animal-health history, diary records and attached photos.
-- Room migrations v4→v5→v6 preserve existing records and add diary/photo storage without destructive migration.
+- Room migrations v4→v5→v6→v7 preserve existing records and add diary/photo storage plus persisted one-time reminder delivery state without destructive migration.
 
 ## Privacy and data safety
 - All farm and diary records remain in the app's local database by default.
