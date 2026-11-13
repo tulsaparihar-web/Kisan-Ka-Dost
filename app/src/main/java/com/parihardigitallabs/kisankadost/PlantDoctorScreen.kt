@@ -159,6 +159,11 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
         }
         try {
             diagnosisDao.insert(PlantDiagnosisEntity(imagePath = imagePath, predictedLabel = prediction.label, confidence = prediction.confidence))
+            val expired = diagnosisDao.getBeyondLimit(50)
+            if (expired.isNotEmpty()) {
+                diagnosisDao.deleteAll(expired)
+                expired.forEach { File(it.imagePath).delete() }
+            }
         } catch (error: Exception) {
             File(imagePath).delete(); throw error
         }
