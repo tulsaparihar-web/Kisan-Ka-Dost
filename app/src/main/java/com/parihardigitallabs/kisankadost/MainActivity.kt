@@ -279,13 +279,31 @@ private fun SettingsScreen(c: Copy, isHindi: Boolean, onLanguageChange: (Boolean
         Card(shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
             Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(c.language, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("हिन्दी", Modifier.weight(1f))
-                    Switch(checked = !isHindi, onCheckedChange = { onLanguageChange(!it) })
-                    Text("English", Modifier.padding(start = 10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilterChip(
+                        selected = isHindi,
+                        onClick = { if (!isHindi) onLanguageChange(true) },
+                        label = { Text("हिन्दी (डिफ़ॉल्ट)") },
+                        leadingIcon = if (isHindi) {
+                            { Icon(Icons.Default.Check, contentDescription = null) }
+                        } else null
+                    )
+                    FilterChip(
+                        selected = !isHindi,
+                        onClick = { if (isHindi) onLanguageChange(false) },
+                        label = { Text("English") },
+                        leadingIcon = if (!isHindi) {
+                            { Icon(Icons.Default.Check, contentDescription = null) }
+                        } else null
+                    )
                 }
                 Text(
-                    if (isHindi) "भाषा बदलने के लिए स्विच का उपयोग करें।" else "Use the switch to change the app language.",
+                    if (isHindi) "ऐप पहली बार हिन्दी में खुलेगा। आप यहाँ से कभी भी English चुन सकते हैं।"
+                    else "The app starts in Hindi on a fresh install. You can switch back to Hindi anytime.",
                     color = Color(0xFF66766B), fontSize = 12.sp
                 )
             }
