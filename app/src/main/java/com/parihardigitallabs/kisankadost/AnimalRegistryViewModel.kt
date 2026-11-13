@@ -42,11 +42,11 @@ class AnimalRegistryViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
-    fun addHealthRecord(record: AnimalHealthRecordEntity, onSaved: () -> Unit, onError: () -> Unit) {
+    fun addHealthRecord(record: AnimalHealthRecordEntity, onSaved: (Long) -> Unit, onError: () -> Unit) {
         viewModelScope.launch {
             try {
-                healthRepository.add(record)
-                onSaved()
+                val id = healthRepository.add(record)
+                onSaved(id)
             } catch (_: Exception) {
                 onError()
             }
@@ -54,7 +54,10 @@ class AnimalRegistryViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun deleteHealthRecord(record: AnimalHealthRecordEntity) {
-        viewModelScope.launch { healthRepository.delete(record) }
+        viewModelScope.launch {
+            healthRepository.delete(record)
+            AnimalReminderScheduler.cancel(getApplication(), record.id)
+        }
     }
 
     fun delete(record: AnimalRecordEntity) {
