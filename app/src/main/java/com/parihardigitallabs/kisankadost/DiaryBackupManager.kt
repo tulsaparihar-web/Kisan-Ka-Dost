@@ -24,7 +24,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 object DiaryBackupManager {
-    private const val BACKUP_VERSION = 1
+    private const val BACKUP_VERSION = 2
     private const val MAX_ARCHIVE_BYTES = 100L * 1024L * 1024L
     private const val MAX_JSON_BYTES = 8L * 1024L * 1024L
     private const val MAX_PHOTO_BYTES = 12L * 1024L * 1024L
@@ -112,7 +112,7 @@ object DiaryBackupManager {
                 }
             }
             val root = JSONObject(String(jsonBytes ?: throw IOException("Backup data is missing"), Charsets.UTF_8))
-            require(root.optInt("backupVersion", -1) == BACKUP_VERSION) { "Unsupported backup version" }
+            require(root.optInt("backupVersion", -1) in 1..BACKUP_VERSION) { "Unsupported backup version" }
             val farmers = root.getJSONArray("farmers").toFarmers()
             val animals = root.getJSONArray("animals").toAnimals()
             val health = root.getJSONArray("animalHealth").toHealth()
@@ -263,12 +263,13 @@ object DiaryBackupManager {
         root.put("animalHealth", JSONArray().apply { data.health.forEach { put(JSONObject()
             .put("id", it.id).put("animalId", it.animalId).put("eventTitle", it.eventTitle)
             .put("eventDate", it.eventDate).put("nextReminderDate", it.nextReminderDate)
-            .put("veterinarianConfirmed", it.veterinarianConfirmed).put("notes", it.notes).put("createdAt", it.createdAt)) } })
+            .put("veterinarianConfirmed", it.veterinarianConfirmed).put("notes", it.notes).put("createdAt", it.createdAt)
+            .put("reminderNotified", it.reminderNotified)) } })
         root.put("diaries", JSONArray().apply { data.diaries.forEach { put(JSONObject()
             .put("id", it.id).put("recordType", it.recordType).put("title", it.title).put("recordDate", it.recordDate)
             .put("subject", it.subject).put("quantity", it.quantity).put("unit", it.unit).put("amount", it.amount)
             .put("notes", it.notes).put("reminderDate", it.reminderDate).put("photoPaths", it.photoPaths)
-            .put("createdAt", it.createdAt).put("updatedAt", it.updatedAt)) } })
+            .put("createdAt", it.createdAt).put("updatedAt", it.updatedAt).put("reminderNotified", it.reminderNotified)) } })
         return root.toString()
     }
 
@@ -286,13 +287,13 @@ object DiaryBackupManager {
     private fun JSONArray.toHealth() = (0 until length()).map { i -> getJSONObject(i).let {
         AnimalHealthRecordEntity(it.getLong("id"), it.getLong("animalId"), it.getString("eventTitle"),
             it.getString("eventDate"), it.optString("nextReminderDate"), it.optBoolean("veterinarianConfirmed"),
-            it.optString("notes"), it.optLong("createdAt"))
+            it.optString("notes"), it.optLong("createdAt"), it.optBoolean("reminderNotified", false))
     } }
     private fun JSONArray.toDiaries() = (0 until length()).map { i -> getJSONObject(i).let {
         DiaryRecordEntity(it.getLong("id"), it.getString("recordType"), it.getString("title"), it.getString("recordDate"),
             it.optString("subject"), it.optDouble("quantity"), it.optString("unit"), it.optDouble("amount"),
             it.optString("notes"), it.optString("reminderDate"), it.optString("photoPaths"),
-            it.optLong("createdAt"), it.optLong("updatedAt"))
+            it.optLong("createdAt"), it.optLong("updatedAt"), it.optBoolean("reminderNotified", false))
     } }
     private fun String.toPhotoNames(): List<String> = lineSequence().filter { it.isNotBlank() }.map {
         require(DiaryPhotoStore.isSafeName(it)) { "Invalid photo reference in backup" }
