@@ -8,8 +8,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [FarmerProfileEntity::class, AnimalRecordEntity::class, AnimalHealthRecordEntity::class, DiaryRecordEntity::class],
-    version = 7,
+    entities = [FarmerProfileEntity::class, AnimalRecordEntity::class, AnimalHealthRecordEntity::class, DiaryRecordEntity::class, PlantDiagnosisEntity::class],
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -17,6 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun animalRecordDao(): AnimalRecordDao
     abstract fun animalHealthRecordDao(): AnimalHealthRecordDao
     abstract fun diaryRecordDao(): DiaryRecordDao
+    abstract fun plantDiagnosisDao(): PlantDiagnosisDao
 
     companion object {
         private val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -101,6 +102,21 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS plant_diagnosis_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        imagePath TEXT NOT NULL,
+                        predictedLabel TEXT NOT NULL,
+                        confidence REAL NOT NULL,
+                        createdAt INTEGER NOT NULL
+                    )
+                """.trimIndent())
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_plant_diagnosis_history_createdAt ON plant_diagnosis_history(createdAt)")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -110,7 +126,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "kisan_ka_dost.db"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                     .build().also { INSTANCE = it }
             }
     }
