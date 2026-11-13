@@ -142,7 +142,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
     if(error.isNotBlank())Text(error,color=MaterialTheme.colorScheme.error,fontSize=12.sp)
     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
      Button(onClick={save()},modifier=Modifier.weight(1f)){Text(if(editing==null){if(isHindi)"सुरक्षित करें" else "Save"}else{if(isHindi)"अपडेट करें" else "Update"})}
-     TextButton(onClick={clearForm}){Text(if(isHindi)"रद्द" else "Cancel")}
+     TextButton(onClick={clearForm()}){Text(if(isHindi)"रद्द" else "Cancel")}
     }
    }
   }
