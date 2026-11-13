@@ -86,9 +86,9 @@ M3 must not be closed until all applicable items below are delivered or explicit
 - [x] Camera/gallery image selection flow and offline model integration.
 - [x] Supported-class/score-oriented top-three result presentation and cautious guidance; invalid, non-finite and out-of-range model scores are ignored.
 - [x] Supported model scope documented in the UI: 39 output classes (including background) across 14 crops; it is not a general plant identifier.
-- [x] Private photo-backed diagnosis history stored locally in Room; latest 50 records retained with delete support and compressed metadata-free JPEG copies. This history is local-only and is not included in the existing Farm Diary ZIP backup.
+- [x] Private photo-backed diagnosis history stored locally in Room; latest 50 records retained with delete support and compressed metadata-free JPEG copies. Diagnosis history and its photos are included in user-controlled full ZIP backup v3; older v1/v2 backups remain importable and restore without Plant Doctor history.
 - [x] Non-destructive Room v7→v8 migration adds the diagnosis-history table and timestamp index.
-- [ ] Verify migration from a populated v7 database, history persistence, photo thumbnails/deletion and storage behavior on physical Android devices.
+- [ ] Verify migration from a populated v7 database, history persistence, photo thumbnails/deletion, v3 full backup→restore with Plant Doctor history/photos and legacy v1/v2 restore behavior on physical Android devices.
 - [ ] Verify camera capture, gallery selection, image orientation/size and inference performance on physical Android devices.
 - [ ] Test supported examples, unsupported plants, low-score images and unclear photos against real field photographs; model scores are not calibrated diagnostic probabilities.
 - [x] UI presents the result as an AI-assisted preliminary indication, flags low scores/background results and limits supported-class claims.
@@ -110,9 +110,9 @@ M3 must not be closed until all applicable items below are delivered or explicit
 - [x] Backup/restore remains local and user-selected; no account, sync service or background upload.
 - [x] Unit tests for reminder scheduling, image downsampling/path validation, CSV escaping, backup-version compatibility, record relationships, duplicate IDs, and exact photo-manifest validation.
 - [x] Latest hardening unit tests, APK build and artifact upload passed in [run 43411964102](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43411964102); APK downloaded and archive integrity inspected.
-- [ ] Physical-device v4→v5→v6→v7 migration test with populated M4 data.
+- [ ] Physical-device v4→v5→v6→v7→v8 migration test with populated M4/M5 data.
 - [ ] Physical-device photo selection, EXIF orientation, photo removal and deletion tests.
-- [ ] Physical-device full backup→restore test, verifying farmer profile, animals, health history, diary entries and photos; test invalid/corrupt backup rejection.
+- [ ] Physical-device full backup v3→restore test, verifying farmer profile, animals, health history, diary entries, Plant Doctor history and both sets of photos; test legacy v1/v2 restore and invalid/corrupt backup rejection.
 - [ ] Physical-device notification permission, reboot/Doze, offline, CSV and Hindi/English regression tests.
 
 ## 4. Forward delivery sequence
