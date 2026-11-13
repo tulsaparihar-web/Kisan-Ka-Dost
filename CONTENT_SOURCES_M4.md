@@ -20,6 +20,14 @@ The initial M4 screen is general education and a breed-discovery starter library
 | ICAR-NBAGR, Breed Registration Cell | National registration process and species-wise registered breed lists | Used to distinguish formally registered breeds from generic/local poultry strains and to avoid implying visual breed purity. https://nbagr.res.in/brc |
 | ICAR-Central Institute of Women in Agriculture, Livestock Management | Newborn calf/kid care, hygiene, housing and general stage-based management topics | Used only for broad learning prompts. The page includes old, context-specific and potentially outdated quantities, drug/vaccine details and procedures; these are intentionally excluded from the app. https://www.ciwa.icar.gov.in/gks/livestock-management |
 
+| ICAR-NBAGR, Goat Breeds of India (live species register) | Registered goat breeds and home tracts | Rechecked for current Rajasthan names, including Sojat, Karauli, Gujari, Totapuri and Battisi. Registration/home tract does not establish individual animal purity or guarantee farm performance. https://nbagr.res.in/goat-breed |
+| ICAR-NBAGR, Sheep Breeds of India (live species register) | Registered sheep breeds and home tracts | Rechecked for Rajasthan breeds including Kheri, Pugal and Sonadi; Avishaan is listed separately as a synthetic sheep breed. https://nbagr.res.in/sheep-breed |
+| ICAR-NBAGR, Camel, Yak and Mithun Breeds of India | Camel breed names and home tracts | Confirms Rajasthan camel home tracts including Bikaneri, Jaisalmeri, Jalori, Marwari, Mewari and Mewati. https://nbagr.res.in/camel-yak-Mithun |
+| ICAR-NBAGR, Cattle Breeds of India | Cattle breed names and home tracts | Current register identifies Rajasthan-associated cattle including Rathi, Tharparkar, Kankrej, Nagori, Mewati, Nari and Sanchori. https://nbagr.res.in/cattle-breed |
+| ICAR, 12 November 2025 breed-registration announcement | Newly registered livestock breeds | Used to refresh the national list; the Rajasthan-specific entries include Avishaan synthetic sheep (Rajasthan) and other breeds are not described as Rajasthan-native. https://icar.gov.in/index.php/en/icar-nbagr-registers-16-new-livestock-and-poultry-breeds-strengthening-indias-animal-genetic |
+| ICAR-NBAGR, 2026 breed registration update | New breed registration announcements | Used only to verify recently added national breed names and not to infer unlisted Rajasthan production traits. https://nbagr.res.in/new-breed-registered |
+| Government of India Gazette, February 2026 | Gazette notification for registered synthetic breeds | Confirms Avishaan as a synthetic sheep breed with Rajasthan state attribution; app labels it synthetic rather than indigenous. https://nbagr.res.in/sites/default/files/2026-02/GazetteNotificationFeb26.pdf |
+
 ## Editorial and safety rules
 
 - Keep Hindi and English guidance equivalent.
