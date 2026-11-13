@@ -28,6 +28,6 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
  } }
  fun reschedule() { viewModelScope.launch {
   val allowed=Build.VERSION.SDK_INT<33 || ContextCompat.checkSelfPermission(app,Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED
-  if(allowed) repo.reminderRecords().forEach { r -> if(r.reminderDate.isNotBlank()) runCatching { DiaryReminderScheduler.schedule(app,r.id,r.reminderDate) } }
+  if(allowed) repo.reminderRecords().forEach { r -> if(r.reminderDate.isNotBlank() && !r.reminderNotified) runCatching { DiaryReminderScheduler.schedule(app,r.id,r.reminderDate) } }
  } }
 }
