@@ -18,6 +18,12 @@ interface PlantDiagnosisDao {
     @Delete
     suspend fun delete(record: PlantDiagnosisEntity)
 
+    @Delete
+    suspend fun deleteAll(records: List<PlantDiagnosisEntity>)
+
+    @Query("SELECT * FROM plant_diagnosis_history ORDER BY createdAt DESC, id DESC LIMIT -1 OFFSET :keepCount")
+    suspend fun getBeyondLimit(keepCount: Int): List<PlantDiagnosisEntity>
+
     @Query("DELETE FROM plant_diagnosis_history")
     suspend fun clearAll()
 }
