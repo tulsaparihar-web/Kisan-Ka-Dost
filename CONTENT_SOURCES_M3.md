@@ -11,6 +11,14 @@ This register records reference material used to shape general educational conte
 | ICAR – Kharif Agro-Advisories for Farmers | Seasonal crop and horticulture advisories | Seasonal advisories are time- and region-sensitive. The app's current content uses only general safe-handling and crop-management concepts, not unverified pesticide rates from an advisory. https://icar.gov.in/sites/default/files/Circulars/ICAR-En-Kharif-Agro-Advisories-for-Farmers-2025.pdf |
 | National Horticulture Board – Horticulture Experiential Learning | Nursery operations, propagation, protected cultivation and plant hardening | Used as a general nursery workflow reference, not as a crop-specific prescription. https://nhb.gov.in/guideline/Horticulture_Experiential_Learning.pdf |
 
+## Plant Doctor model provenance and limits
+
+- The bundled TensorFlow Lite model is fetched by the pinned Android build workflow from the AgroVision-AI repository at commit `150bf1c847cba7e70adc595d3685ed01e366434b`, file `FarmerFriendApp/src/main/assets/model.tflite`. The workflow verifies the downloaded Git blob hash before building.
+- The bundled label file contains 39 output labels: 38 named crop/health/disease classes plus one `background` class. These outputs cover 14 crop types (apple, blueberry, cherry, maize, grape, orange, peach, bell pepper, potato, raspberry, soybean, squash, strawberry and tomato).
+- The model is a bounded leaf-image classifier, not a general plant-identification system. It has not been established as a definitive diagnostic model for Rajasthan field conditions or local cultivars. A high model score is not a calibrated probability of disease.
+- Results are screening hints only. The app must not prescribe a pesticide, dose or treatment product from the model output; confirm symptoms with a local KVK/agriculture/horticulture expert before taking crop-protection action.
+- The included `PLANT_MODEL_LICENSE.txt` records the upstream MIT license notice. Keep this notice with redistributed builds.
+
 ## Editorial rules applied
 
 - Keep Hindi and English guidance equivalent in meaning.
