@@ -19,6 +19,13 @@ This register records reference material used to shape general educational conte
 - Results are screening hints only. The app must not prescribe a pesticide, dose or treatment product from the model output; confirm symptoms with a local KVK/agriculture/horticulture expert before taking crop-protection action.
 - The included `PLANT_MODEL_LICENSE.txt` records the upstream MIT license notice. Keep this notice with redistributed builds.
 
+## Plant Doctor history and backup behavior
+
+- Diagnosis history is stored in the app-private Room database with compressed JPEG copies in the app-private `plant_diagnoses` directory. The app retains the latest 50 records and provides individual deletion.
+- Full user-selected ZIP backup version 3 includes Plant Doctor history and its photos alongside farmer, animal, animal-health and diary data. Versions 1 and 2 remain supported; older backups contain no Plant Doctor history, so restoring them replaces the current local history with an empty history.
+- Restore validates record IDs, model-score ranges, safe photo names and exact photo manifests; it stages image files before the database transaction and removes replaced private photos only after a successful commit.
+- The ZIP is not password-protected. Users should save it only to a trusted private location. No automatic cloud upload or background sync occurs.
+
 ## Editorial rules applied
 
 - Keep Hindi and English guidance equivalent in meaning.
