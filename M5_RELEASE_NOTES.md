@@ -37,5 +37,5 @@
 - PDF report generation, multi-farm parcel management and cloud synchronization are not part of M5.
 
 ## Cloud verification
-- Release-hardening unit tests, debug APK build and artifact upload succeeded in [GitHub Actions run 43411964102](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43411964102). The tested code was merged to main in [PR #4](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/4).
+- M5 release-hardening unit tests, debug APK build and artifact upload succeeded in [GitHub Actions run 43411964102](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43411964102), and the follow-up Sales/photo/backup validation polish passed in [run 43415378775](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43415378775). Core M5, release hardening and completion polish are tracked in [PR #3](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/3), [PR #4](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/4) and [PR #5](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/5).
 - APK artifact downloaded and inspected. Physical-device acceptance remains outstanding and is not claimed as complete.
