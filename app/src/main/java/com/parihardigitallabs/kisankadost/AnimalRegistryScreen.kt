@@ -86,6 +86,7 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
         val id = pendingReminderId
         if (granted && id != null && pendingReminderDate.isNotBlank()) {
             AnimalReminderScheduler.schedule(context, id, pendingReminderDate)
+            viewModel.rescheduleReminders()
             message = if (isHindi) "अगली तारीख के लिए सूचना सेट हो गई।" else "Notification reminder scheduled."
         } else if (!granted) {
             message = if (isHindi) "रिकॉर्ड सुरक्षित है, लेकिन सूचना अनुमति बंद है। सेटिंग्स में अनुमति दें।" else "Record saved, but notifications are disabled. Allow them in app settings."
