@@ -84,6 +84,7 @@ private fun KisanKaDostApp() {
     val navController = rememberNavController()
     val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
     val animalRegistryViewModel: AnimalRegistryViewModel = viewModel()
+    val diaryViewModel: DiaryViewModel = viewModel()
 
     MaterialTheme(
         colorScheme = lightColorScheme(
@@ -127,7 +128,7 @@ private fun KisanKaDostApp() {
                 composable("home") {
                     HomeScreen(c, isHindi, onFeature = { navController.navigate(it) })
                 }
-                composable("diary") { PlaceholderScreen(if (isHindi) "खेत डायरी" else "Farm Diary", c.coming, Icons.Default.EditNote) }
+                composable("diary") { DiaryScreen(isHindi = isHindi, viewModel = diaryViewModel) }
                 composable("learn") { PlaceholderScreen(if (isHindi) "किसान ज्ञान" else "Farmer Knowledge", c.coming, Icons.Default.MenuBook) }
                 composable("myfarm") { MyFarmScreen(isHindi = isHindi, viewModel = farmerSetupViewModel) }
                 composable("animal-records") { AnimalRegistryScreen(isHindi = isHindi, viewModel = animalRegistryViewModel) }
