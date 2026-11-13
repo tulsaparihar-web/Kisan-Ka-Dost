@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -87,7 +88,7 @@ private val animalGuides = listOf(
 )
 
 @Composable
-fun AnimalCareScreen(isHindi: Boolean) {
+fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
     var search by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf("All") }
     var expanded by remember { mutableStateOf<String?>(null) }
@@ -111,6 +112,9 @@ fun AnimalCareScreen(isHindi: Boolean) {
             Text(if (isHindi) "यह सामान्य शैक्षिक जानकारी है। पशु की उम्र, वजन, नस्ल, गर्भावस्था, दूध/काम और स्थानीय चारे के अनुसार राशन व स्वास्थ्य योजना पशु चिकित्सक/पशु पोषण विशेषज्ञ से तय करें।" else
                 "This is general educational information. Set rations and health plans with a veterinarian/animal nutritionist based on age, weight, breed, pregnancy, milk/work and locally available feed.",
                 Modifier.padding(13.dp), fontSize = 12.sp, color = Color(0xFF203128), lineHeight = 17.sp)
+        }
+        Button(onClick = onManageRecords, modifier = Modifier.fillMaxWidth()) {
+            Text(if (isHindi) "मेरे पशुओं के रिकॉर्ड" else "My Animal Records")
         }
         OutlinedTextField(value = search, onValueChange = { search = it }, modifier = Modifier.fillMaxWidth(),
             singleLine = true, leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
