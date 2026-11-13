@@ -24,7 +24,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 object DiaryBackupManager {
-    private const val BACKUP_VERSION = 2
+    private const val BACKUP_VERSION = 3
     private const val MAX_ARCHIVE_BYTES = 100L * 1024L * 1024L
     private const val MAX_JSON_BYTES = 8L * 1024L * 1024L
     private const val MAX_PHOTO_BYTES = 12L * 1024L * 1024L
@@ -36,7 +36,8 @@ object DiaryBackupManager {
                 farmers = db.farmerProfileDao().getAllForBackup(),
                 animals = db.animalRecordDao().getAllForBackup(),
                 health = db.animalHealthRecordDao().getAllForBackup(),
-                diaries = db.diaryRecordDao().getAllForBackup()
+                diaries = db.diaryRecordDao().getAllForBackup(),
+                plantDiagnoses = db.plantDiagnosisDao().getAllForBackup()
             )
         }
         validateBackupRecords(snapshot.farmers, snapshot.animals, snapshot.health, snapshot.diaries)
@@ -44,15 +45,23 @@ object DiaryBackupManager {
             snapshot.diaries,
             snapshot.diaries.flatMap { it.photoPaths.toPhotoNames() }.toSet()
         )
+        val diagnosisPhotoNames = validatePlantDiagnosisRecords(snapshot.plantDiagnoses)
         val json = encode(snapshot).toByteArray(Charsets.UTF_8)
         require(json.size <= MAX_JSON_BYTES) { "Backup data is too large" }
-        require(photoNames.size + 1 <= MAX_ENTRIES) { "Backup contains too many photo files" }
+        require(photoNames.size + diagnosisPhotoNames.size + 1 <= MAX_ENTRIES) { "Backup contains too many photo files" }
         val photos = photoNames.map { name ->
             val photo = DiaryPhotoStore.file(context, name) ?: throw IOException("An attached diary photo is missing")
             require(photo.length() in 1..MAX_PHOTO_BYTES) { "An attached diary photo is too large or empty" }
             name to photo
         }
-        val uncompressedBytes = json.size.toLong() + photos.sumOf { it.second.length() }
+        val diagnosisPhotos = snapshot.plantDiagnoses.map { record ->
+            val file = File(record.imagePath).canonicalFile
+            val expectedDirectory = File(context.filesDir, "plant_diagnoses").canonicalFile
+            require(file.parentFile == expectedDirectory && file.isFile) { "A saved Plant Doctor photo is missing or outside app storage" }
+            require(file.length() in 1..MAX_PHOTO_BYTES && DiaryPhotoStore.isValidStoredPhoto(file)) { "A Plant Doctor photo is invalid or too large" }
+            file.name to file
+        }
+        val uncompressedBytes = json.size.toLong() + photos.sumOf { it.second.length() } + diagnosisPhotos.sumOf { it.second.length() }
         require(uncompressedBytes <= MAX_ARCHIVE_BYTES) { "Backup is larger than the supported 100 MB limit" }
         val output = context.contentResolver.openOutputStream(uri) ?: throw IOException("Cannot open backup destination")
         ZipOutputStream(BufferedOutputStream(output)).use { zip ->
@@ -61,6 +70,11 @@ object DiaryBackupManager {
             zip.closeEntry()
             photos.forEach { (name, photo) ->
                 zip.putNextEntry(ZipEntry("photos/$name"))
+                photo.inputStream().buffered().use { it.copyTo(zip) }
+                zip.closeEntry()
+            }
+            diagnosisPhotos.forEach { (name, photo) ->
+                zip.putNextEntry(ZipEntry("plant_photos/$name"))
                 photo.inputStream().buffered().use { it.copyTo(zip) }
                 zip.closeEntry()
             }
@@ -78,6 +92,7 @@ object DiaryBackupManager {
             var jsonBytes: ByteArray? = null
             var backupJsonSeen = false
             val stagedPhotos = linkedMapOf<String, File>()
+            val stagedPlantPhotos = linkedMapOf<String, File>()
             val input = context.contentResolver.openInputStream(uri) ?: throw IOException("Cannot open selected backup")
             ZipInputStream(BufferedInputStream(input)).use { zip ->
                 while (true) {
@@ -92,6 +107,19 @@ object DiaryBackupManager {
                             val bytes = readLimited(zip, MAX_JSON_BYTES)
                             totalBytes += bytes.size
                             jsonBytes = bytes
+                        }
+                        entry.name.startsWith("plant_photos/") -> {
+                            require(entry.name.count { it == '/' } == 1) { "Invalid Plant Doctor photo archive path" }
+                            val name = entry.name.removePrefix("plant_photos/")
+                            require(isSafePlantPhotoName(name)) { "Invalid Plant Doctor photo filename" }
+                            require(!stagedPlantPhotos.containsKey(name)) { "Duplicate Plant Doctor photo filename" }
+                            val bytes = readLimited(zip, MAX_PHOTO_BYTES)
+                            require(bytes.isNotEmpty()) { "Backup contains an empty Plant Doctor photo" }
+                            totalBytes += bytes.size
+                            val file = File(staging, "plant_" + name)
+                            file.writeBytes(bytes)
+                            require(DiaryPhotoStore.isValidStoredPhoto(file)) { "Backup contains an invalid Plant Doctor photo" }
+                            stagedPlantPhotos[name] = file
                         }
                         entry.name.startsWith("photos/") -> {
                             require(entry.name.count { it == '/' } == 1) { "Invalid photo archive path" }
@@ -118,12 +146,26 @@ object DiaryBackupManager {
             val animals = root.getJSONArray("animals").toAnimals()
             val health = root.getJSONArray("animalHealth").toHealth()
             val diaries = root.getJSONArray("diaries").toDiaries()
+            val plantDiagnoses = root.optJSONArray("plantDiagnoses")?.toPlantDiagnoses() ?: emptyList()
             validateBackupRecords(farmers, animals, health, diaries)
+            validatePlantDiagnosisRecords(plantDiagnoses)
             val requiredPhotos = validateBackupPhotoReferences(
                 diaries,
                 stagedPhotos.keys
             )
 
+            val requiredPlantPhotos = validatePlantDiagnosisPhotoReferences(plantDiagnoses, stagedPlantPhotos.keys)
+            val plantPhotoMap = mutableMapOf<String, String>()
+            val plantPhotoDirectory = File(context.filesDir, "plant_diagnoses").apply { mkdirs() }
+            requiredPlantPhotos.forEach { original ->
+                val destination = File(plantPhotoDirectory, "restored_" + UUID.randomUUID() + ".jpg")
+                stagedPlantPhotos.getValue(original).copyTo(destination, overwrite = false)
+                copiedPhotos += destination
+                plantPhotoMap[original] = destination.absolutePath
+            }
+            val restoredDiagnoses = plantDiagnoses.map { record ->
+                record.copy(imagePath = plantPhotoMap.getValue(File(record.imagePath).name))
+            }
             val photoMap = mutableMapOf<String, String>()
             val photoDirectory = File(context.filesDir, "diary_photos").apply { mkdirs() }
             requiredPhotos.forEach { original ->
@@ -138,11 +180,13 @@ object DiaryBackupManager {
                 record.copy(photoPaths = record.photoPaths.toPhotoNames().mapNotNull { photoMap[it] }.joinToString("\n"))
             }
             val previousDiaries = db.diaryRecordDao().getAllForBackup()
+            val previousDiagnoses = db.plantDiagnosisDao().getAllForBackup()
             val previousHealth = db.animalHealthRecordDao().getAllForBackup()
             previousDiaries.forEach { DiaryReminderScheduler.cancel(context, it.id) }
             previousHealth.forEach { AnimalReminderScheduler.cancel(context, it.id) }
             try {
                 db.withTransaction {
+                    db.plantDiagnosisDao().clearAll()
                     db.animalHealthRecordDao().clearAll()
                     db.diaryRecordDao().clearAll()
                     db.animalRecordDao().clearAll()
@@ -151,6 +195,7 @@ object DiaryBackupManager {
                     if (animals.isNotEmpty()) db.animalRecordDao().insertAll(animals)
                     if (health.isNotEmpty()) db.animalHealthRecordDao().insertAll(health)
                     if (restoredDiaries.isNotEmpty()) db.diaryRecordDao().insertAll(restoredDiaries)
+                    if (restoredDiagnoses.isNotEmpty()) db.plantDiagnosisDao().insertAll(restoredDiagnoses)
                 }
             } catch (failure: Throwable) {
                 copiedPhotos.forEach { it.delete() }
@@ -159,8 +204,12 @@ object DiaryBackupManager {
             }
             restoreCommitted = true
             photoDirectory.listFiles()?.filter { it !in copiedPhotos }?.forEach { it.delete() }
+            val copiedDiagnosisPaths = copiedPhotos.map { it.canonicalFile }.toSet()
+            previousDiagnoses.map { File(it.imagePath).canonicalFile }.forEach { old ->
+                if (old.parentFile == plantPhotoDirectory.canonicalFile && old !in copiedDiagnosisPaths) old.delete()
+            }
             rescheduleReminders(context, db)
-            RestoreSummary(farmers.size, animals.size, health.size, diaries.size, requiredPhotos.size)
+            RestoreSummary(farmers.size, animals.size, health.size, diaries.size, requiredPhotos.size, restoredDiagnoses.size)
         } finally {
             if (!restoreCommitted) copiedPhotos.forEach { it.delete() }
             staging.deleteRecursively()
@@ -222,6 +271,26 @@ object DiaryBackupManager {
         }
     }
 
+    internal fun validatePlantDiagnosisRecords(records: List<PlantDiagnosisEntity>): Set<String> {
+        require(records.size <= 50) { "Backup contains too many Plant Doctor history records" }
+        require(records.all { it.id > 0 && it.predictedLabel.isNotBlank() && it.predictedLabel.length <= 160 && it.confidence.isFinite() && it.confidence in 0f..1f && it.createdAt > 0 }) {
+            "Backup contains an invalid Plant Doctor diagnosis"
+        }
+        require(records.map { it.id }.distinct().size == records.size) { "Backup contains duplicate Plant Doctor diagnosis IDs" }
+        val names = records.map { File(it.imagePath).name }
+        require(names.distinct().size == names.size && names.all(::isSafePlantPhotoName)) { "Backup contains invalid or duplicate Plant Doctor photo references" }
+        return names.toSet()
+    }
+
+    internal fun validatePlantDiagnosisPhotoReferences(records: List<PlantDiagnosisEntity>, stagedNames: Set<String>): Set<String> {
+        val required = validatePlantDiagnosisRecords(records)
+        require(required == stagedNames) { "Plant Doctor photos do not match the photos referenced by diagnosis history" }
+        return required
+    }
+
+    private fun isSafePlantPhotoName(name: String): Boolean =
+        name.isNotBlank() && name.length <= 120 && name.matches(Regex("[A-Za-z0-9._-]+")) && !name.contains("..")
+
     internal fun validateBackupPhotoReferences(
         diaries: List<DiaryRecordEntity>,
         stagedPhotoNames: Set<String>
@@ -271,6 +340,9 @@ object DiaryBackupManager {
             .put("eventDate", it.eventDate).put("nextReminderDate", it.nextReminderDate)
             .put("veterinarianConfirmed", it.veterinarianConfirmed).put("notes", it.notes).put("createdAt", it.createdAt)
             .put("reminderNotified", it.reminderNotified)) } })
+        root.put("plantDiagnoses", JSONArray().apply { data.plantDiagnoses.forEach { put(JSONObject()
+            .put("id", it.id).put("predictedLabel", it.predictedLabel).put("confidence", it.confidence)
+            .put("createdAt", it.createdAt).put("photoName", File(it.imagePath).name)) } })
         root.put("diaries", JSONArray().apply { data.diaries.forEach { put(JSONObject()
             .put("id", it.id).put("recordType", it.recordType).put("title", it.title).put("recordDate", it.recordDate)
             .put("subject", it.subject).put("quantity", it.quantity).put("unit", it.unit).put("amount", it.amount)
@@ -301,6 +373,13 @@ object DiaryBackupManager {
             it.optString("notes"), it.optString("reminderDate"), it.optString("photoPaths"),
             it.optLong("createdAt"), it.optLong("updatedAt"), it.optBoolean("reminderNotified", false))
     } }
+    private fun JSONArray.toPlantDiagnoses() = (0 until length()).map { i -> getJSONObject(i).let { json ->
+        PlantDiagnosisEntity(
+            id = json.getLong("id"), imagePath = json.getString("photoName"),
+            predictedLabel = json.getString("predictedLabel"), confidence = json.getDouble("confidence").toFloat(),
+            createdAt = json.getLong("createdAt")
+        )
+    } }
     private fun String.toPhotoNames(): List<String> = lineSequence().filter { it.isNotBlank() }.map {
         require(DiaryPhotoStore.isSafeName(it)) { "Invalid photo reference in backup" }
         it
@@ -308,9 +387,10 @@ object DiaryBackupManager {
 
     private data class BackupSnapshot(
         val farmers: List<FarmerProfileEntity>, val animals: List<AnimalRecordEntity>,
-        val health: List<AnimalHealthRecordEntity>, val diaries: List<DiaryRecordEntity>
+        val health: List<AnimalHealthRecordEntity>, val diaries: List<DiaryRecordEntity>,
+        val plantDiagnoses: List<PlantDiagnosisEntity>
     )
-    data class RestoreSummary(val farmers: Int, val animals: Int, val healthRecords: Int, val diaryEntries: Int, val photos: Int)
+    data class RestoreSummary(val farmers: Int, val animals: Int, val healthRecords: Int, val diaryEntries: Int, val photos: Int, val plantDiagnoses: Int)
 }
 
-internal fun isSupportedDiaryBackupVersion(version: Int): Boolean = version in 1..2
+internal fun isSupportedDiaryBackupVersion(version: Int): Boolean = version in 1..3
