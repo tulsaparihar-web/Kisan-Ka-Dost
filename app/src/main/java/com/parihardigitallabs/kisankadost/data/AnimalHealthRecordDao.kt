@@ -13,7 +13,10 @@ interface AnimalHealthRecordDao {
     fun observeAll(): Flow<List<AnimalHealthRecordEntity>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(record: AnimalHealthRecordEntity)
+    suspend fun insert(record: AnimalHealthRecordEntity): Long
+
+    @Query("SELECT * FROM animal_health_records WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Long): AnimalHealthRecordEntity?
 
     @Delete
     suspend fun delete(record: AnimalHealthRecordEntity)
