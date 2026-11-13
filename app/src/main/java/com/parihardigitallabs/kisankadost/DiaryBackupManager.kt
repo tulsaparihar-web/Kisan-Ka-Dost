@@ -112,7 +112,7 @@ object DiaryBackupManager {
                 }
             }
             val root = JSONObject(String(jsonBytes ?: throw IOException("Backup data is missing"), Charsets.UTF_8))
-            require(root.optInt("backupVersion", -1) in 1..BACKUP_VERSION) { "Unsupported backup version" }
+            require(isSupportedDiaryBackupVersion(root.optInt("backupVersion", -1))) { "Unsupported backup version" }
             val farmers = root.getJSONArray("farmers").toFarmers()
             val animals = root.getJSONArray("animals").toAnimals()
             val health = root.getJSONArray("animalHealth").toHealth()
@@ -306,3 +306,5 @@ object DiaryBackupManager {
     )
     data class RestoreSummary(val farmers: Int, val animals: Int, val healthRecords: Int, val diaryEntries: Int, val photos: Int)
 }
+
+internal fun isSupportedDiaryBackupVersion(version: Int): Boolean = version in 1..2
