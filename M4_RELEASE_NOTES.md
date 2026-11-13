@@ -5,11 +5,11 @@
 - Rajasthan breed names and home-tract context refreshed against current ICAR-NBAGR registers.
 - Short qualitative breed notes sourced to ICAR-NBAGR, KVK and Government of Rajasthan references.
 - Age-/production-stage feeding education, newborn colostrum basics, safe fodder storage/conservation and biosecurity.
-- Offline animal registry: add, list, edit and delete.
+- Offline animal registry: add, list, edit and delete individual profiles including species, breed, tag, sex, age/date of birth, purpose and notes.
 - Per-animal health-event history: event date, notes and optional next date.
 - Next-date reminders only when marked veterinarian-confirmed; WorkManager attempts a local notification around 9:00 AM on the selected date.
 - Runtime notification permission request; pending reminders can be re-enqueued after permission is later granted.
-- Non-destructive Room migrations from v1 to v2 to v3.
+- Non-destructive Room migrations from v1 to v2 to v3 to v4; the v3→v4 migration adds the breed field without deleting existing animal records.
 - Android automatic app-data backup disabled so farm and animal records remain on-device by default.
 - Unit tests for reminder delay calculation.
 
