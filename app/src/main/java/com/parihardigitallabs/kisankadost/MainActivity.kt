@@ -83,6 +83,7 @@ private fun KisanKaDostApp() {
     val c = if (isHindi) hi else en
     val navController = rememberNavController()
     val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
+    val animalRegistryViewModel: AnimalRegistryViewModel = viewModel()
 
     MaterialTheme(
         colorScheme = lightColorScheme(
@@ -129,6 +130,7 @@ private fun KisanKaDostApp() {
                 composable("diary") { PlaceholderScreen(if (isHindi) "खेत डायरी" else "Farm Diary", c.coming, Icons.Default.EditNote) }
                 composable("learn") { PlaceholderScreen(if (isHindi) "किसान ज्ञान" else "Farmer Knowledge", c.coming, Icons.Default.MenuBook) }
                 composable("myfarm") { MyFarmScreen(isHindi = isHindi, viewModel = farmerSetupViewModel) }
+                composable("animal-records") { AnimalRegistryScreen(isHindi = isHindi, viewModel = animalRegistryViewModel) }
                 composable("settings") {
                     SettingsScreen(c, isHindi, onLanguageChange = {
                         isHindi = it
@@ -138,7 +140,7 @@ private fun KisanKaDostApp() {
                 listOf("crops", "calendar", "plants", "animals", "trees", "soil", "water", "protection", "harvest", "schemes").forEach { route ->
                     composable(route) {
                         when (route) {
-                            "animals" -> AnimalCareScreen(isHindi = isHindi)
+                            "animals" -> AnimalCareScreen(isHindi = isHindi, onManageRecords = { navController.navigate("animal-records") })
                             "crops" -> CropCareScreen(isHindi = isHindi)
                             "calendar" -> CropCalendarScreen(isHindi = isHindi)
                             "soil" -> SoilHealthScreen(isHindi = isHindi)

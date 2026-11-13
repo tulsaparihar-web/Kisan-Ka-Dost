@@ -16,6 +16,10 @@ The initial M4 screen is general education and a breed-discovery starter library
 | ICAR – Kharif Agro-Advisories for Farmers 2025 | Seasonal heat-stress, fodder, water and housing care topics for livestock | Used only for broad educational themes. It is a dated seasonal advisory and is not presented as a current local prescription. https://icar.gov.in/sites/default/files/Circulars/ICAR-En-Kharif-Agro-Advisories-for-Farmers-2025.pdf |
 | ICAR-Central Institute of Women in Agriculture – Livestock Management | Basic livestock and poultry management education | Used as a general learning reference; species/age-specific practices require local expert validation. https://www.ciwa.icar.gov.in/gks/livestock-management |
 
+| ICAR-NBAGR, current species-wise breed registers | Registered cattle, buffalo and chicken breeds and home tracts | Rechecked during M4 expansion. Rajasthan entries include cattle such as Rathi, Tharparkar, Kankrej, Mewati, Nagori, Nari and Sanchori, and Mewari chicken. Buffalo names shown in the app are national registered examples with their home tracts outside Rajasthan; they are not labelled Rajasthan-native. https://nbagr.res.in/cattle-breed ; https://nbagr.res.in/buffalo-breed ; https://nbagr.res.in/chicken-breeds |
+| ICAR-NBAGR, Breed Registration Cell | National registration process and species-wise registered breed lists | Used to distinguish formally registered breeds from generic/local poultry strains and to avoid implying visual breed purity. https://nbagr.res.in/brc |
+| ICAR-Central Institute of Women in Agriculture, Livestock Management | Newborn calf/kid care, hygiene, housing and general stage-based management topics | Used only for broad learning prompts. The page includes old, context-specific and potentially outdated quantities, drug/vaccine details and procedures; these are intentionally excluded from the app. https://www.ciwa.icar.gov.in/gks/livestock-management |
+
 ## Editorial and safety rules
 
 - Keep Hindi and English guidance equivalent.
