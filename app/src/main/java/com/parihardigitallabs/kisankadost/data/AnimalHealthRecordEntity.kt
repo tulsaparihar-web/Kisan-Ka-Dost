@@ -1,5 +1,6 @@
 package com.parihardigitallabs.kisankadost.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -25,5 +26,6 @@ data class AnimalHealthRecordEntity(
     val nextReminderDate: String = "",
     val veterinarianConfirmed: Boolean = false,
     val notes: String = "",
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    @ColumnInfo(defaultValue = "0") val reminderNotified: Boolean = false
 )
