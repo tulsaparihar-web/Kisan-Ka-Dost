@@ -28,6 +28,10 @@ The initial M4 screen is general education and a breed-discovery starter library
 | ICAR-NBAGR, 2026 breed registration update | New breed registration announcements | Used only to verify recently added national breed names and not to infer unlisted Rajasthan production traits. https://nbagr.res.in/new-breed-registered |
 | Government of India Gazette, February 2026 | Gazette notification for registered synthetic breeds | Confirms Avishaan as a synthetic sheep breed with Rajasthan state attribution; app labels it synthetic rather than indigenous. https://nbagr.res.in/sites/default/files/2026-02/GazetteNotificationFeb26.pdf |
 
+| Krishi Vigyan Kendra, Kanauj – Goat Breeds | Sirohi, Marwari and Jakhrana goat distribution and visible breed descriptors | Used only for short, qualitative descriptors and home-tract context; body-weight samples and performance data are not copied into the app. https://kvkanjaw.nic.in/pages/package/Animal/goatbreed.html |
+| Government of Rajasthan – Sheep Breeds in Rajasthan (breed monograph) | Chokla, Nali and Marwari sheep distribution and wool characteristics | Used for concise historical breed descriptors (e.g. carpet-wool context), not for current population, production or flock-performance estimates. https://jankalyanfile.rajasthan.gov.in/Content/UploadFolder/DepartmentMaster/187/2022/Dec/30409/172935.pdf |
+| ICAR – Camel breed documentation (2018) | Bikaneri and Jaisalmeri camel descriptions | Used for broad descriptive traits only; not treated as a current performance benchmark or a guarantee of work capacity. https://icar.org.in/sites/default/files/2022-09/ICARNewsApril-June2018.pdf |
+
 ## Editorial and safety rules
 
 - Keep Hindi and English guidance equivalent.
