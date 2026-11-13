@@ -18,6 +18,9 @@ interface AnimalHealthRecordDao {
     @Query("SELECT * FROM animal_health_records WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): AnimalHealthRecordEntity?
 
+    @Query("SELECT * FROM animal_health_records WHERE veterinarianConfirmed = 1 AND nextReminderDate != ''")
+    suspend fun getConfirmedReminders(): List<AnimalHealthRecordEntity>
+
     @Delete
     suspend fun delete(record: AnimalHealthRecordEntity)
 }
