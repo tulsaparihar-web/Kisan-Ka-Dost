@@ -1,26 +1,13 @@
 package com.parihardigitallabs.kisankadost.data
-
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-
-@Dao
-interface AnimalHealthRecordDao {
-    @Query("SELECT * FROM animal_health_records ORDER BY eventDate DESC, id DESC")
-    fun observeAll(): Flow<List<AnimalHealthRecordEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(record: AnimalHealthRecordEntity): Long
-
-    @Query("SELECT * FROM animal_health_records WHERE id = :id LIMIT 1")
-    suspend fun getById(id: Long): AnimalHealthRecordEntity?
-
-    @Query("SELECT * FROM animal_health_records WHERE veterinarianConfirmed = 1 AND nextReminderDate != ''")
-    suspend fun getConfirmedReminders(): List<AnimalHealthRecordEntity>
-
-    @Delete
-    suspend fun delete(record: AnimalHealthRecordEntity)
+@Dao interface AnimalHealthRecordDao {
+ @Query("SELECT * FROM animal_health_records ORDER BY eventDate DESC, id DESC") fun observeAll(): Flow<List<AnimalHealthRecordEntity>>
+ @Query("SELECT * FROM animal_health_records ORDER BY id") suspend fun getAllForBackup(): List<AnimalHealthRecordEntity>
+ @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insert(record: AnimalHealthRecordEntity): Long
+ @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insertAll(records: List<AnimalHealthRecordEntity>)
+ @Query("DELETE FROM animal_health_records") suspend fun clearAll()
+ @Query("SELECT * FROM animal_health_records WHERE id = :id LIMIT 1") suspend fun getById(id: Long): AnimalHealthRecordEntity?
+ @Query("SELECT * FROM animal_health_records WHERE veterinarianConfirmed = 1 AND nextReminderDate != ''") suspend fun getConfirmedReminders(): List<AnimalHealthRecordEntity>
+ @Delete suspend fun delete(record: AnimalHealthRecordEntity)
 }

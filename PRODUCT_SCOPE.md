@@ -160,8 +160,11 @@ Supporting services (farm diary, soil, water, weather, markets, schemes, machine
 - Orchard, kitchen-garden and nursery diary.
 - Animal and herd diary.
 - Expense, labour, input and sales records.
-- Attach photos and notes; work offline.
-- Optional export to PDF/CSV and user-controlled backup in a later milestone.
+- Attach up to five compressed private photos and notes per entry; work offline.
+- Search and filter diary records by category and text.
+- Export diary records to CSV on user request.
+- Create/restore a user-selected ZIP backup containing farmer profile, animal profiles, animal-health history, diary records and attached photos. Restore replaces current local farm data after validation; advise the user to back up current data first.
+- Keep farm records and photos on-device by default. No automatic cloud backup, sync or upload.
 
 ### 4.3 Weather and alerts
 - Location-aware current weather and forecast when a reliable service is connected.
@@ -234,14 +237,14 @@ Do not assume that a single recommendation applies to every district. Recommenda
 | M2 | Farmer and farm profile | Offline profile and farm details saved and restored |
 | M3 | Agriculture, horticulture and gardening foundation | Field crop guides, Plant Doctor, fruit/vegetable/flower/home-garden knowledge, soil/water basics and seasonal care content; verified APK and device checks for camera/gallery |
 | M4 | Animal husbandry foundation | Bilingual species/breed starter library, feeding and housing education, offline animal profiles and health-event history, veterinarian-confirmed local reminders, non-destructive Room migrations, verified APK and device acceptance |
-| M5 | Farm, garden and livestock diaries | Activity logs, expenses, production records and reminders; verified APK |
+| M5 | Farm, garden and livestock diaries | Offline bilingual activity/expense/production diaries; photo attachments; local reminders; CSV export; user-controlled full backup/restore; verified APK and device acceptance |
 | M6 | Rajasthan advisory services (deferred) | Start only after M3–M5 core foundations are stable and the milestone is explicitly reactivated; verified local calendars, soil testing, weather and alerts where reliable sources/APIs exist |
 | M7 | Markets, schemes and services | Dated mandi prices, official schemes and verified service directory |
 | M8 | Farm economics and smart assistance | Cost/profit tools and carefully bounded AI/search assistance |
 
 Milestones can overlap only when a shared foundation is ready and the user-approved sequence is preserved. M6 is currently deferred. Each milestone must be implemented, cloud-compiled, checked, packaged and device-tested where applicable before being called complete. See [MILESTONE_TRACKER.md](MILESTONE_TRACKER.md) for the live audit and acceptance checklist.
 
-## 9. M3/M4 immediate implementation priorities
+## 9. M3–M5 delivery priorities
 
 1. Replace generic placeholders with three clear pillars: **खेती**, **बागवानी**, **पशुपालन**.
 2. Expand My Farm to capture multiple fields/crops, horticulture plants/orchards and individual or herd-level livestock basics.

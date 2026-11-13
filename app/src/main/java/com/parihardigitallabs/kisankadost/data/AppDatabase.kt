@@ -8,14 +8,15 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [FarmerProfileEntity::class, AnimalRecordEntity::class, AnimalHealthRecordEntity::class],
-    version = 4,
+    entities = [FarmerProfileEntity::class, AnimalRecordEntity::class, AnimalHealthRecordEntity::class, DiaryRecordEntity::class],
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun farmerProfileDao(): FarmerProfileDao
     abstract fun animalRecordDao(): AnimalRecordDao
     abstract fun animalHealthRecordDao(): AnimalHealthRecordDao
+    abstract fun diaryRecordDao(): DiaryRecordDao
 
     companion object {
         private val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -66,6 +67,33 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS diary_records (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        recordType TEXT NOT NULL,
+                        title TEXT NOT NULL,
+                        recordDate TEXT NOT NULL,
+                        subject TEXT NOT NULL,
+                        quantity REAL NOT NULL,
+                        unit TEXT NOT NULL,
+                        amount REAL NOT NULL,
+                        notes TEXT NOT NULL,
+                        reminderDate TEXT NOT NULL,
+                        createdAt INTEGER NOT NULL,
+                        updatedAt INTEGER NOT NULL
+                    )
+                """.trimIndent())
+            }
+        }
+
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE diary_records ADD COLUMN photoPaths TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -75,7 +103,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "kisan_ka_dost.db"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .build().also { INSTANCE = it }
             }
     }
