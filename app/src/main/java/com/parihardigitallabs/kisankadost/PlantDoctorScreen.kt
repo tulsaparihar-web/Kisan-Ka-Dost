@@ -236,8 +236,8 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     Icon(Icons.Default.Info, contentDescription = null, tint = PlantGreen)
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        if (isHindi) "ऑफलाइन AI जाँच अभी 39 श्रेणियों वाले चुनिंदा फसल समूहों तक सीमित है। इनडोर और सजावटी पौधों के लिए पौधा गाइड उपलब्ध है। सभी प्रजातियों की फोटो पहचान अगली M3 उप-चरण में जोड़ी जाएगी।"
-                        else "Offline AI checking currently covers 39 classes across selected crop groups. Indoor and ornamental plants are covered by the guide; broader photo-based species identification will follow in M3.",
+                        if (isHindi) "ऑफलाइन AI जाँच केवल कुछ फसलों—जैसे टमाटर, आलू, मक्का, अंगूर, सेब और शिमला मिर्च—की 39 श्रेणियों तक सीमित है। अन्य पौधों की फोटो गलत वर्गीकृत हो सकती है। परिणाम को अंतिम निदान न मानें।"
+                        else "Offline AI checking is limited to 39 classes across selected crops such as tomato, potato, maize, grape, apple and bell pepper. Other plants may be misclassified. Do not treat the result as a confirmed diagnosis.",
                         color = PlantInk, fontSize = 12.sp, lineHeight = 17.sp
                     )
                 }
