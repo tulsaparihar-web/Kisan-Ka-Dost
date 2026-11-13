@@ -132,6 +132,8 @@ object DiaryBackupManager {
             val restoredDiaries = diaries.map { record ->
                 record.copy(photoPaths = record.photoPaths.toPhotoNames().mapNotNull { photoMap[it] }.joinToString("\n"))
             }
+            val oldDiaryIds = db.diaryRecordDao().getAllForBackup().map { it.id }
+            val oldHealthIds = db.animalHealthRecordDao().getAllForBackup().map { it.id }
             try {
                 db.withTransaction {
                     db.animalHealthRecordDao().clearAll()
@@ -148,6 +150,8 @@ object DiaryBackupManager {
                 throw failure
             }
             restoreCommitted = true
+            oldDiaryIds.forEach { DiaryReminderScheduler.cancel(context, it) }
+            oldHealthIds.forEach { AnimalReminderScheduler.cancel(context, it) }
             photoDirectory.listFiles()?.filter { it !in copiedPhotos }?.forEach { it.delete() }
             rescheduleReminders(context, db)
             RestoreSummary(farmers.size, animals.size, health.size, diaries.size, requiredPhotos.size)
