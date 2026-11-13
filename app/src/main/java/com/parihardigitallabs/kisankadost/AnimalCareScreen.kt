@@ -149,6 +149,7 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
                         }
                         if (open) {
                             AnimalDetail(if (isHindi) "चारा और पानी" else "Feed & water", if (isHindi) guide.feedHi else guide.feedEn)
+                            AnimalDetail(if (isHindi) "चारा संरक्षण और भंडारण" else "Fodder conservation & storage", animalFodderGuidance(guide.key, isHindi))
                             AnimalDetail(if (isHindi) "आवास और आराम" else "Housing & comfort", if (isHindi) guide.housingHi else guide.housingEn)
                             AnimalDetail(if (isHindi) "स्वास्थ्य और देखभाल" else "Health & care", if (isHindi) guide.careHi else guide.careEn)
                             AnimalDetail(if (isHindi) "नस्ल संदर्भ" else "Breed context", animalBreedNotes(guide.key, isHindi))
@@ -200,6 +201,21 @@ private fun animalBreedNotes(key: String, isHindi: Boolean): String = when (key)
     else -> if (isHindi)
         "मेवाड़ी मुर्गी ICAR-NBAGR में पंजीकृत नाम है। स्थानीय backyard poultry के लिए चूजों का स्रोत, रोग-स्थिति और क्षेत्रानुकूलता पशुपालन विभाग/KVK से जाँचें।"
     else "Mewari chicken is a registered breed name in ICAR-NBAGR. For backyard poultry, verify chick source, health status and local suitability with the Animal Husbandry Department/KVK."
+}
+
+private fun animalFodderGuidance(key: String, isHindi: Boolean): String = when (key) {
+    "Cattle", "Buffalo" -> if (isHindi)
+        "अतिरिक्त हरे चारे को सही तरीके से हे/साइलेज बनाकर कमी के मौसम के लिए बचाएँ। चारा काटकर खिलाने से बर्बादी घट सकती है। आहार अचानक न बदलें; फफूंद, सड़न या मिट्टी से दूषित चारा न दें। क्षेत्रानुकूल mineral mixture और संतुलित राशन की सलाह NDDB/पशु पोषण विशेषज्ञ से लें।"
+    else "Conserve surplus green fodder as properly prepared hay or silage for lean seasons. Chaffing can reduce wastage. Avoid sudden diet changes and never feed mouldy, rotten or soil-contaminated fodder. Seek NDDB/local nutritionist advice on area-specific mineral mixture and balanced rations."
+    "Goat", "Sheep" -> if (isHindi)
+        "मौसमी पत्तेदार चारे और सुरक्षित फसल-अवशेष की उपलब्धता पहले से देखें। साफ, सूखे स्थान पर सूखा चारा/हे सुरक्षित रखें; गीला या फफूंद लगा चारा न दें। गर्भित, दूध पिलाने वाले और बढ़ते पशुओं के लिए अलग राशन विशेषज्ञ से तय करें।"
+    else "Plan seasonal browse and safe crop-residue availability ahead. Store dry fodder/hay in a clean, dry place; do not feed damp or mouldy material. Have separate rations assessed for pregnant, lactating and growing animals."
+    "Poultry" -> if (isHindi)
+        "दाना सूखे, हवादार, चूहे/कीट से सुरक्षित डिब्बे में रखें। पुराना और नया feed धीरे-धीरे बदलें; गीला, बदबूदार या फफूंद लगा दाना हटाएँ। उम्र और उत्पादन के लिए उपयुक्त पूर्ण poultry feed चुनें।"
+    else "Store feed in a dry, ventilated, rodent- and pest-proof container. Transition between feeds gradually; discard damp, foul-smelling or mouldy feed. Choose complete poultry feed suited to age and production."
+    else -> if (isHindi)
+        "स्थानीय ब्राउज़िंग और उपलब्ध सुरक्षित चारे का मौसम के अनुसार प्रबंधन करें। सूखा चारा साफ जगह रखें, अचानक आहार न बदलें और फफूंद/सड़े चारे से बचें।"
+    else "Plan local browsing and safe available fodder seasonally. Store dry fodder cleanly, avoid abrupt diet changes and keep mouldy or spoiled feed away."
 }
 
 private fun animalStageGuidance(key: String, isHindi: Boolean): String = when (key) {
