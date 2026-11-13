@@ -172,8 +172,8 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
   Row(verticalAlignment=Alignment.CenterVertically){
    Column(Modifier.weight(1f)){Text(if(isHindi)"खेत डायरी" else "Farm Diary",fontSize=23.sp,fontWeight=FontWeight.Bold,color=DiaryInk);Text(if(isHindi)"खेत, बगीचे और पशुओं के रिकॉर्ड — ऑफलाइन" else "Field, garden and livestock records — offline",fontSize=12.sp,color=Color(0xFF66766B))}
    IconButton(onClick={csvLauncher.launch("Kisan-Ka-Dost-Diary.csv")},enabled=records.isNotEmpty()){Icon(Icons.Default.FileDownload,contentDescription="CSV",tint=DiaryGreen)}
-   IconButton(onClick={backupLauncher.launch("Kisan-Ka-Dost-Full-Backup.zip")}){Icon(Icons.Default.Backup,contentDescription=if(isHindi)"बैकअप" else "Backup",tint=DiaryGreen)}
-   IconButton(onClick={restoreLauncher.launch(arrayOf("application/zip","application/octet-stream"))}){Icon(Icons.Default.Restore,contentDescription=if(isHindi)"बहाली" else "Restore",tint=DiaryGreen)}
+   IconButton(onClick={backupLauncher.launch("Kisan-Ka-Dost-Full-Backup.zip")},enabled=!photoImporting){Icon(Icons.Default.Backup,contentDescription=if(isHindi)"बैकअप" else "Backup",tint=DiaryGreen)}
+   IconButton(onClick={restoreLauncher.launch(arrayOf("application/zip","application/octet-stream"))},enabled=!photoImporting){Icon(Icons.Default.Restore,contentDescription=if(isHindi)"बहाली" else "Restore",tint=DiaryGreen)}
   }
   Card(colors=CardDefaults.cardColors(containerColor=Color(0xFFEFF6F0)),shape=RoundedCornerShape(12.dp)){
    Text(if(isHindi)"बैकअप में किसान प्रोफाइल, पशु, स्वास्थ्य रिकॉर्ड, डायरी और फोटो शामिल हैं। ZIP पासवर्ड से सुरक्षित नहीं है; सुरक्षित स्थान पर रखें। बहाली मौजूदा स्थानीय डेटा को बदल देगी।" else "Backup includes farmer profile, animals, health records, diary entries and photos. The ZIP is not password-protected; store it securely. Restoring replaces current local data.",modifier=Modifier.padding(10.dp),fontSize=11.sp,color=DiaryInk)
@@ -228,8 +228,8 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
    Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)){
     Row(verticalAlignment=Alignment.CenterVertically){
      Column(Modifier.weight(1f)){Text(r.title,fontWeight=FontWeight.Bold,color=DiaryInk);Text("${diaryLabel(r.recordType,isHindi)} • ${r.recordDate}",fontSize=11.sp,color=DiaryGreen)}
-     IconButton(onClick={editing=r;type=r.recordType;title=r.title;date=r.recordDate;subject=r.subject;quantity=if(r.quantity==0.0)"" else r.quantity.toString();unit=r.unit;amount=if(r.amount==0.0)"" else r.amount.toString();notes=r.notes;reminder=r.reminderDate;photoPathsRaw=r.photoPaths;newPhotoPathsRaw="";removedPhotoPathsRaw="";showForm=true;error=""}){Icon(Icons.Default.Edit,contentDescription=if(isHindi)"बदलें" else "Edit",tint=DiaryGreen)}
-     IconButton(onClick={deleting=r}){Icon(Icons.Default.DeleteOutline,contentDescription=if(isHindi)"हटाएँ" else "Delete",tint=Color(0xFF9B3D32))}
+     IconButton(onClick={editing=r;type=r.recordType;title=r.title;date=r.recordDate;subject=r.subject;quantity=if(r.quantity==0.0)"" else r.quantity.toString();unit=r.unit;amount=if(r.amount==0.0)"" else r.amount.toString();notes=r.notes;reminder=r.reminderDate;photoPathsRaw=r.photoPaths;newPhotoPathsRaw="";removedPhotoPathsRaw="";showForm=true;error=""},enabled=!photoImporting){Icon(Icons.Default.Edit,contentDescription=if(isHindi)"बदलें" else "Edit",tint=DiaryGreen)}
+     IconButton(onClick={deleting=r},enabled=!photoImporting){Icon(Icons.Default.DeleteOutline,contentDescription=if(isHindi)"हटाएँ" else "Delete",tint=Color(0xFF9B3D32))}
     }
     if(r.subject.isNotBlank())Text((if(isHindi)"संबंधित: " else "Related: ")+r.subject,fontSize=12.sp,color=DiaryInk)
     val details=listOf(if(r.quantity!=0.0)"${r.quantity} ${r.unit}".trim() else "",if(r.amount!=0.0)"₹${r.amount}" else "").filter{it.isNotBlank()}.joinToString(" • ")
