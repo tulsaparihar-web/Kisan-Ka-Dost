@@ -15,6 +15,15 @@ class DiaryPhotoStoreTest {
         assertEquals(1, DiaryPhotoStore.calculateSampleSize(1200, 900, 1600))
     }
 
+    @Test fun invalidImageDimensionsAreRejected() {
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            DiaryPhotoStore.calculateSampleSize(0, 1200, 1600)
+        }
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            DiaryPhotoStore.calculateSampleSize(1200, 900, 0)
+        }
+    }
+
     @Test fun photoNamesRejectTraversalAndPathSeparators() {
         assertTrue(DiaryPhotoStore.isSafeName("diary_abc-123.jpg"))
         assertFalse(DiaryPhotoStore.isSafeName("../private.jpg"))
