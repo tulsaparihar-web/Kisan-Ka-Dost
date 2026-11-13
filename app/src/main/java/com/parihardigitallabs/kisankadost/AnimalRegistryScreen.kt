@@ -8,12 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -56,6 +57,7 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
     var notes by rememberSaveable { mutableStateOf("") }
     var message by rememberSaveable { mutableStateOf("") }
     var pendingDelete by remember { mutableStateOf<AnimalRecordEntity?>(null) }
+    var editingRecord by remember { mutableStateOf<AnimalRecordEntity?>(null) }
 
     val speciesOptions = listOf(
         "Cattle" to "गाय/बैल", "Buffalo" to "भैंस", "Goat" to "बकरी",
@@ -66,7 +68,7 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
     }
 
     Column(
-        Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(if (isHindi) "मेरे पशु" else "My Animals", fontSize = 23.sp, fontWeight = FontWeight.Bold, color = RegistryInk)
@@ -125,21 +127,34 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                 if (name.isBlank()) {
                     message = if (isHindi) "कृपया पशु का नाम भरें।" else "Please enter an animal name."
                 } else {
-                    viewModel.add(
-                        AnimalRecordEntity(
-                            name = name.trim(), species = species, tagNumber = tag.trim(),
-                            sex = sex, ageOrDob = age.trim(), purpose = purpose.trim(), notes = notes.trim()
-                        ),
-                        onSaved = {
-                            name = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
-                            message = if (isHindi) "पशु का रिकॉर्ड सुरक्षित है।" else "Animal record saved."
-                        },
-                        onError = { message = if (isHindi) "रिकॉर्ड सुरक्षित नहीं हो सका। दोबारा प्रयास करें।" else "Could not save the record. Please try again." }
+                    val existing = editingRecord
+                    val draft = AnimalRecordEntity(
+                        id = existing?.id ?: 0L,
+                        name = name.trim(), species = species, tagNumber = tag.trim(),
+                        sex = sex, ageOrDob = age.trim(), purpose = purpose.trim(), notes = notes.trim(),
+                        createdAt = existing?.createdAt ?: System.currentTimeMillis()
                     )
+                    val saved: () -> Unit = {
+                        name = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
+                        editingRecord = null
+                        message = if (isHindi) "पशु का रिकॉर्ड सुरक्षित है।" else "Animal record saved."
+                    }
+                    val failed: (String) -> Unit = {
+                        message = if (isHindi) "रिकॉर्ड सुरक्षित नहीं हो सका। दोबारा प्रयास करें।" else "Could not save the record. Please try again."
+                    }
+                    if (existing == null) viewModel.add(draft, onSaved = saved, onError = failed)
+                    else viewModel.update(draft, onSaved = saved, onError = failed)
                 }
             },
             modifier = Modifier.fillMaxWidth()
-        ) { Icon(Icons.Default.Pets, contentDescription = null); Spacer(Modifier.padding(3.dp)); Text(if (isHindi) "पशु सुरक्षित करें" else "Save animal") }
+        ) { Icon(Icons.Default.Pets, contentDescription = null); Spacer(Modifier.padding(3.dp)); Text(if (editingRecord != null) { if (isHindi) "बदलाव सुरक्षित करें" else "Save changes" } else { if (isHindi) "पशु सुरक्षित करें" else "Save animal" }) }
+        if (editingRecord != null) {
+            TextButton(onClick = {
+                editingRecord = null
+                name = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
+                message = ""
+            }) { Text(if (isHindi) "संपादन रद्द करें" else "Cancel editing") }
+        }
         if (message.isNotBlank()) Text(message, color = if (message.contains("saved", true) || message.contains("सुरक्षित")) RegistryGreen else MaterialTheme.colorScheme.error, fontSize = 12.sp)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(if (isHindi) "मेरे पशुओं की सूची" else "Animal list", fontWeight = FontWeight.Bold, color = RegistryInk)
@@ -148,8 +163,8 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
         if (records.isEmpty()) {
             Text(if (isHindi) "अभी कोई पशु दर्ज नहीं है। ऊपर से पहला रिकॉर्ड जोड़ें।" else "No animals recorded yet. Add your first animal above.", color = Color(0xFF66766B), fontSize = 13.sp)
         } else {
-            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(records, key = { it.id }) { record ->
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                records.forEach { record ->
                     Card(colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(14.dp)) {
                         Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
@@ -158,6 +173,14 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                                 val details = listOf(record.sex.takeIf { it.isNotBlank() }?.let { if (isHindi) if (it == "Female") "मादा" else if (it == "Male") "नर" else "अज्ञात" else it }, record.ageOrDob, record.purpose).filterNotNull().filter { it.isNotBlank() }
                                 if (details.isNotEmpty()) Text(details.joinToString(" • "), fontSize = 12.sp, color = Color(0xFF66766B))
                                 if (record.notes.isNotBlank()) Text(record.notes, fontSize = 12.sp, color = RegistryInk)
+                            }
+                            IconButton(onClick = {
+                                editingRecord = record
+                                name = record.name; species = record.species; tag = record.tagNumber
+                                sex = record.sex; age = record.ageOrDob; purpose = record.purpose; notes = record.notes
+                                message = if (isHindi) "रिकॉर्ड संपादित किया जा रहा है।" else "Editing this record."
+                            }) {
+                                Icon(Icons.Default.Edit, contentDescription = if (isHindi) "बदलें" else "Edit", tint = RegistryGreen)
                             }
                             IconButton(onClick = { pendingDelete = record }) {
                                 Icon(Icons.Default.DeleteOutline, contentDescription = if (isHindi) "हटाएँ" else "Delete", tint = Color(0xFF9B3D32))
