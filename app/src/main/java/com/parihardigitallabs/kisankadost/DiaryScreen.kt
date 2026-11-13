@@ -38,12 +38,12 @@ import java.time.LocalDate
 
 private val DiaryGreen=Color(0xFF247A45)
 private val DiaryInk=Color(0xFF203128)
-private val diaryTypes=listOf("FIELD","GARDEN","ANIMAL","EXPENSE","LABOUR","INPUT","PRODUCTION")
+private val diaryTypes=listOf("FIELD","GARDEN","ANIMAL","EXPENSE","LABOUR","INPUT","PRODUCTION","SALES")
 private fun diaryLabel(t:String,hi:Boolean)=when(t){
  "FIELD"->if(hi)"खेती" else "Field";"GARDEN"->if(hi)"बागवानी" else "Garden"
  "ANIMAL"->if(hi)"पशुपालन" else "Animal";"EXPENSE"->if(hi)"खर्च" else "Expense"
  "LABOUR"->if(hi)"मजदूरी" else "Labour";"INPUT"->if(hi)"कृषि सामग्री" else "Input"
- "PRODUCTION"->if(hi)"उत्पादन" else "Production";else->t
+ "PRODUCTION"->if(hi)"उत्पादन" else "Production";"SALES"->if(hi)"बिक्री" else "Sales";else->t
 }
 private fun photoNames(value:String)=value.lineSequence().filter{it.isNotBlank()}.toList()
 
@@ -163,7 +163,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
      OutlinedTextField(quantity,{quantity=it;error=""},Modifier.weight(1f),label={Text(if(isHindi)"मात्रा" else "Quantity")},singleLine=true)
      OutlinedTextField(unit,{unit=it},Modifier.weight(1f),label={Text(if(isHindi)"इकाई" else "Unit")},singleLine=true)
     }
-    OutlinedTextField(amount,{amount=it;error=""},Modifier.fillMaxWidth(),label={Text(if(isHindi)"राशि / खर्च (₹)" else "Amount / expense (₹)")},singleLine=true)
+    OutlinedTextField(amount,{amount=it;error=""},Modifier.fillMaxWidth(),label={Text(when(type){"SALES"->if(isHindi)"प्राप्त राशि / बिक्री (₹)" else "Sale amount / income (₹)";"EXPENSE"->if(isHindi)"खर्च की राशि (₹)" else "Expense amount (₹)";else->if(isHindi)"राशि (₹)" else "Amount (₹)"})},singleLine=true)
     OutlinedTextField(notes,{notes=it},Modifier.fillMaxWidth(),label={Text(if(isHindi)"नोट" else "Notes")},minLines=2)
     OutlinedTextField(reminder,{reminder=it;error=""},Modifier.fillMaxWidth(),label={Text(if(isHindi)"रिमाइंडर तारीख (YYYY-MM-DD, वैकल्पिक)" else "Reminder date (YYYY-MM-DD, optional)")},singleLine=true)
     Row(verticalAlignment=Alignment.CenterVertically){
