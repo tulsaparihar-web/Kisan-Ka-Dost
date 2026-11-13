@@ -62,13 +62,13 @@ private val animalGuides = listOf(
         "दूध दुहने से पहले और बाद में स्वच्छता रखें। थन में सूजन, दर्द या दूध में बदलाव हो तो पशु चिकित्सक से जाँच कराएँ।", "Maintain hygiene before and after milking. Seek veterinary examination for udder swelling, pain or changes in milk."
     ),
     AnimalGuide("Goat", "बकरी", "Goat",
-        "सिरोही, जखराना, मारवाड़ी, सोजत, करौली, गुजरी", "Sirohi, Jakhrana, Marwari, Sojat, Karauli, Gujari",
+        "सिरोही, जखराना, मारवाड़ी, सोजत, करौली, गुजरी, टोटापुरी, बत्तीसी", "Sirohi, Jakhrana, Marwari, Sojat, Karauli, Gujari, Totapuri, Battisi",
         "पत्तेदार चारा/ब्राउज़िंग, सूखा चारा और जरूरत अनुसार संतुलित पूरक आहार दें। साफ पानी और उपयुक्त खनिज स्रोत उपलब्ध रखें।", "Provide browse/leafy fodder, dry roughage and suitable balanced supplements when needed. Keep clean water and an appropriate mineral source available.",
         "सूखा, हवादार और सुरक्षित शेड रखें। फर्श फिसलन-रहित हो और बच्चों के लिए अलग साफ कोना हो।", "Use a dry, ventilated and secure shelter. Keep floors non-slip and provide a clean separate area for kids.",
         "नए पशु को झुंड में मिलाने से पहले अलग रखें और निरीक्षण करें। भूख बंद होना, दस्त, खाँसी या अचानक कमजोरी पर पशु चिकित्सक से संपर्क करें।", "Isolate and observe new animals before mixing with the flock. Contact a veterinarian for loss of appetite, diarrhoea, cough or sudden weakness."
     ),
     AnimalGuide("Sheep", "भेड़", "Sheep",
-        "चोकला, मगरा, मालपुरा, मारवाड़ी, नाली, जैसलमेरी", "Chokla, Magra, Malpura, Marwari, Nali, Jaisalmeri",
+        "चोकला, मगरा, मालपुरा, मारवाड़ी, नाली, जैसलमेरी, पूगल, सोनाड़ी, खेरी; अविशान (सिंथेटिक)", "Chokla, Magra, Malpura, Marwari, Nali, Jaisalmeri, Pugal, Sonadi, Kheri; Avishaan (synthetic)",
         "चराई के साथ उपलब्ध हरा/सूखा चारा दें। गर्भित और दूध पिलाने वाली भेड़ों की पोषण जरूरत अलग हो सकती है; स्थानीय विशेषज्ञ से राशन तय करें।", "Use grazing with available green/dry fodder. Pregnant and lactating ewes may have different needs; plan rations with a local expert.",
         "रात में सुरक्षित, सूखा और हवादार बाड़ा रखें। भीड़, गीली बिछावन और तेज हवा/बारिश से बचाएँ।", "Provide a secure, dry and ventilated night shelter. Avoid overcrowding, wet bedding and exposure to harsh wind or rain.",
         "झुंड की नियमित जाँच करें। खुर, त्वचा, ऊन और शरीर की स्थिति देखें; टीकाकरण व कृमिनाशन पशु चिकित्सक की सलाह से करें।", "Inspect the flock regularly. Check hooves, skin, fleece and body condition; follow veterinary advice for vaccination and parasite control."
@@ -184,6 +184,12 @@ private fun animalStageGuidance(key: String, isHindi: Boolean): String = when (k
     "Cattle", "Buffalo" -> if (isHindi)
         "नवजात बछड़े को जन्म के तुरंत बाद खीस/पहला दूध पिलाने की व्यवस्था करें। बढ़ते बछड़े को उम्र के अनुसार स्वच्छ पानी, अच्छा रेशा और उपयुक्त calf starter धीरे-धीरे दें। गर्भित, दूध देने वाले और सूखे पशुओं का राशन अलग-अलग जरूरत के अनुसार पशु पोषण विशेषज्ञ से बनवाएँ।"
     else "Ensure the newborn calf receives colostrum promptly after birth. Introduce clean water, good-quality roughage and suitable calf starter gradually as it grows. Have separate rations formulated for pregnant, lactating and dry animals by an animal nutritionist."
+    "Goat" -> if (isHindi)
+        "ICAR-NBAGR की सूची में सोजत, करौली, गुजरी, टोटापुरी और बत्तीसी राजस्थान से जुड़े पंजीकृत नाम हैं। टोटापुरी का गृह क्षेत्र राजस्थान और बत्तीसी का राजस्थान/उत्तर प्रदेश दर्ज है। नस्ल चयन में स्थानीय अनुकूलता और उपलब्ध प्रजनन रिकॉर्ड देखें।"
+    else "ICAR-NBAGR lists Sojat, Karauli, Gujari and Totapuri as Rajasthan breeds; Battisi has a Rajasthan/Uttar Pradesh home tract. Check local suitability and breeding records before selection."
+    "Sheep" -> if (isHindi)
+        "अविशान राजस्थान की पंजीकृत सिंथेटिक भेड़ नस्ल है; इसे देशी नस्लों से अलग श्रेणी में समझें। चोकला, मगरा, मालपुरा, मारवाड़ी, नाली, जैसलमेरी, पूगल, सोनाड़ी और खेरी के गृह क्षेत्र/पंजीकरण ICAR-NBAGR सूची से देखें।"
+    else "Avishaan is a registered synthetic sheep breed associated with Rajasthan and is distinguished from indigenous breeds. Check ICAR-NBAGR for the home tracts/registration of Chokla, Magra, Malpura, Marwari, Nali, Jaisalmeri, Pugal, Sonadi and Kheri."
     "Goat", "Sheep" -> if (isHindi)
         "नवजात मेमने/बच्चे को खीस अवश्य मिले और उसे सूखे, साफ स्थान पर रखें। बढ़ते बच्चों के लिए अच्छी गुणवत्ता का पत्तेदार चारा/ब्राउज़िंग और उम्र के अनुसार पूरक आहार दें। गर्भावस्था और दूध पिलाने के समय पोषण जरूरत बढ़ सकती है; स्थानीय विशेषज्ञ से राशन तय करें।"
     else "Ensure newborn lambs/kids receive colostrum and remain in a clean, dry area. Growing young stock needs good-quality browse/roughage and age-appropriate supplementary feed. Nutrient needs can rise during pregnancy and lactation; seek local ration advice."
