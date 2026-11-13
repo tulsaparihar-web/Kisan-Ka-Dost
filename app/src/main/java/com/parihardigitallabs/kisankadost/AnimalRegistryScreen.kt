@@ -275,8 +275,8 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                     }
                     OutlinedTextField(value = healthNotes, onValueChange = { healthNotes = it },
                         label = { Text(if (isHindi) "नोट (वैकल्पिक)" else "Notes (optional)") }, minLines = 2)
-                    Text(if (isHindi) "अगली तारीख केवल पशु चिकित्सक से पुष्टि के बाद भरें। सूचना स्थानीय समयानुसार सुबह 9 बजे भेजने का प्रयास होगा; फोन की अनुमति और बैटरी सेटिंग्स लागू होंगी।" else
-                        "Enter a next date only after veterinary confirmation. A notification is scheduled for 9:00 AM local time; phone permission and battery settings apply.", fontSize = 11.sp, color = Color(0xFF66766B))
+                    Text(if (isHindi) "अगली तारीख केवल पशु चिकित्सक से पुष्टि के बाद भरें। सूचना स्थानीय समयानुसार सुबह 9 बजे के बाद भेजने का प्रयास होगा; Android बैटरी प्रबंधन के कारण देर हो सकती है और सूचना अनुमति जरूरी है।" else
+                        "Enter a next date only after veterinary confirmation. A notification is scheduled for around 9:00 AM local time; Android battery management may delay it, and notification permission is required.", fontSize = 11.sp, color = Color(0xFF66766B))
                     if (healthError.isNotBlank()) Text(healthError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
                 }
             },
