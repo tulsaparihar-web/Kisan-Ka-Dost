@@ -15,8 +15,8 @@ object DiaryPhotoStore {
     fun copyFromUri(context: Context, uri: Uri): String? = runCatching {
         val resolver = context.contentResolver
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
-            ?: error("Cannot read selected image")
+        val boundsStream = resolver.openInputStream(uri) ?: error("Cannot read selected image")
+        boundsStream.use { BitmapFactory.decodeStream(it, null, bounds) }
         require(bounds.outWidth > 0 && bounds.outHeight > 0) { "Unsupported image" }
         val sample = calculateSampleSize(bounds.outWidth, bounds.outHeight, 1600)
         val bitmap = resolver.openInputStream(uri)?.use {
