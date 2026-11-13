@@ -151,6 +151,7 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
                             AnimalDetail(if (isHindi) "चारा और पानी" else "Feed & water", if (isHindi) guide.feedHi else guide.feedEn)
                             AnimalDetail(if (isHindi) "आवास और आराम" else "Housing & comfort", if (isHindi) guide.housingHi else guide.housingEn)
                             AnimalDetail(if (isHindi) "स्वास्थ्य और देखभाल" else "Health & care", if (isHindi) guide.careHi else guide.careEn)
+                            AnimalDetail(if (isHindi) "नस्ल संदर्भ" else "Breed context", animalBreedNotes(guide.key, isHindi))
                             AnimalDetail(if (isHindi) "आयु और उत्पादन अवस्था के अनुसार" else "By age and production stage", animalStageGuidance(guide.key, isHindi))
                             AnimalDetail(if (isHindi) "जैव-सुरक्षा" else "Biosecurity", animalBiosecurityGuidance(guide.key, isHindi))
                         } else {
@@ -180,16 +181,20 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
 }
 
 
-private fun animalStageGuidance(key: String, isHindi: Boolean): String = when (key) {
-    "Cattle", "Buffalo" -> if (isHindi)
-        "नवजात बछड़े को जन्म के तुरंत बाद खीस/पहला दूध पिलाने की व्यवस्था करें। बढ़ते बछड़े को उम्र के अनुसार स्वच्छ पानी, अच्छा रेशा और उपयुक्त calf starter धीरे-धीरे दें। गर्भित, दूध देने वाले और सूखे पशुओं का राशन अलग-अलग जरूरत के अनुसार पशु पोषण विशेषज्ञ से बनवाएँ।"
-    else "Ensure the newborn calf receives colostrum promptly after birth. Introduce clean water, good-quality roughage and suitable calf starter gradually as it grows. Have separate rations formulated for pregnant, lactating and dry animals by an animal nutritionist."
+private fun animalBreedNotes(key: String, isHindi: Boolean): String = when (key) {
     "Goat" -> if (isHindi)
         "ICAR-NBAGR की सूची में सोजत, करौली, गुजरी, टोटापुरी और बत्तीसी राजस्थान से जुड़े पंजीकृत नाम हैं। टोटापुरी का गृह क्षेत्र राजस्थान और बत्तीसी का राजस्थान/उत्तर प्रदेश दर्ज है। नस्ल चयन में स्थानीय अनुकूलता और उपलब्ध प्रजनन रिकॉर्ड देखें।"
     else "ICAR-NBAGR lists Sojat, Karauli, Gujari and Totapuri as Rajasthan breeds; Battisi has a Rajasthan/Uttar Pradesh home tract. Check local suitability and breeding records before selection."
     "Sheep" -> if (isHindi)
         "अविशान राजस्थान की पंजीकृत सिंथेटिक भेड़ नस्ल है; इसे देशी नस्लों से अलग श्रेणी में समझें। चोकला, मगरा, मालपुरा, मारवाड़ी, नाली, जैसलमेरी, पूगल, सोनाड़ी और खेरी के गृह क्षेत्र/पंजीकरण ICAR-NBAGR सूची से देखें।"
     else "Avishaan is a registered synthetic sheep breed associated with Rajasthan and is distinguished from indigenous breeds. Check ICAR-NBAGR for the home tracts/registration of Chokla, Magra, Malpura, Marwari, Nali, Jaisalmeri, Pugal, Sonadi and Kheri."
+    else -> if (isHindi) "गृह क्षेत्र और पंजीकरण की जानकारी ICAR-NBAGR के प्रकाशित नस्ल रजिस्टर में देखें।" else "Refer to ICAR-NBAGR's published breed registers for home-tract and registration details."
+}
+
+private fun animalStageGuidance(key: String, isHindi: Boolean): String = when (key) {
+    "Cattle", "Buffalo" -> if (isHindi)
+        "नवजात बछड़े को जन्म के तुरंत बाद खीस/पहला दूध पिलाने की व्यवस्था करें। बढ़ते बछड़े को उम्र के अनुसार स्वच्छ पानी, अच्छा रेशा और उपयुक्त calf starter धीरे-धीरे दें। गर्भित, दूध देने वाले और सूखे पशुओं का राशन अलग-अलग जरूरत के अनुसार पशु पोषण विशेषज्ञ से बनवाएँ।"
+    else "Ensure the newborn calf receives colostrum promptly after birth. Introduce clean water, good-quality roughage and suitable calf starter gradually as it grows. Have separate rations formulated for pregnant, lactating and dry animals by an animal nutritionist."
     "Goat", "Sheep" -> if (isHindi)
         "नवजात मेमने/बच्चे को खीस अवश्य मिले और उसे सूखे, साफ स्थान पर रखें। बढ़ते बच्चों के लिए अच्छी गुणवत्ता का पत्तेदार चारा/ब्राउज़िंग और उम्र के अनुसार पूरक आहार दें। गर्भावस्था और दूध पिलाने के समय पोषण जरूरत बढ़ सकती है; स्थानीय विशेषज्ञ से राशन तय करें।"
     else "Ensure newborn lambs/kids receive colostrum and remain in a clean, dry area. Growing young stock needs good-quality browse/roughage and age-appropriate supplementary feed. Nutrient needs can rise during pregnancy and lactation; seek local ration advice."
