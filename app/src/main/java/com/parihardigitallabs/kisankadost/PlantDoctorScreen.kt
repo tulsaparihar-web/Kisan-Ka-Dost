@@ -159,13 +159,15 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
         }
         try {
             diagnosisDao.insert(PlantDiagnosisEntity(imagePath = imagePath, predictedLabel = prediction.label, confidence = prediction.confidence))
+        } catch (error: Exception) {
+            File(imagePath).delete(); throw error
+        }
+        runCatching {
             val expired = diagnosisDao.getBeyondLimit(50)
             if (expired.isNotEmpty()) {
                 diagnosisDao.deleteAll(expired)
                 expired.forEach { File(it.imagePath).delete() }
             }
-        } catch (error: Exception) {
-            File(imagePath).delete(); throw error
         }
     }
 
@@ -216,6 +218,7 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
                 val results = output[0].mapIndexed { index, score -> PlantPrediction(labels[index], score) }
                     .filter { it.confidence.isFinite() && it.confidence in 0f..1f }
                     .sortedByDescending { it.confidence }.take(3)
+                check(results.isNotEmpty()) { "Model returned no valid scores" }
                 results.firstOrNull()?.let { prediction -> runCatching { saveHistory(bitmap, prediction) } }
                 withContext(Dispatchers.Main) { _state.value = PlantDoctorState(bitmap = bitmap, predictions = results) }
             } catch (error: Exception) {
