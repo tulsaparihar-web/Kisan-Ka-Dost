@@ -15,6 +15,18 @@ class DiaryPhotoStoreTest {
         assertEquals(1, DiaryPhotoStore.calculateSampleSize(1200, 900, 1600))
     }
 
+    @Test fun extremelyLargeDimensionsDoNotOverflowSampleCalculation() {
+        val sample = DiaryPhotoStore.calculateSampleSize(Int.MAX_VALUE, Int.MAX_VALUE, 1600)
+        assertTrue(sample > 0)
+        assertTrue(Int.MAX_VALUE.toLong() / sample <= 1600L)
+    }
+
+    @Test fun invalidImageDimensionsAreRejected() {
+        assertThrows(IllegalArgumentException::class.java) {
+            DiaryPhotoStore.calculateSampleSize(0, 100, 1600)
+        }
+    }
+
     @Test fun photoNamesRejectTraversalAndPathSeparators() {
         assertTrue(DiaryPhotoStore.isSafeName("diary_abc-123.jpg"))
         assertFalse(DiaryPhotoStore.isSafeName("../private.jpg"))
