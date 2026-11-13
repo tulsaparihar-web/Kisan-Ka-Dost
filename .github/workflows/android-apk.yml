@@ -46,7 +46,7 @@ jobs:
           test "$actual_blob" = "17967ab19d1d7bfedb36cfcdbd959ea518700793"
 
       - name: Build debug APK
-        run: gradle --no-daemon :app:assembleDebug
+        run: gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4

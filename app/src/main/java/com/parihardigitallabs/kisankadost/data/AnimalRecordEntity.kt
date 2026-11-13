@@ -1,5 +1,6 @@
 package com.parihardigitallabs.kisankadost.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -8,6 +9,7 @@ data class AnimalRecordEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val species: String,
+    @ColumnInfo(defaultValue = "''") val breed: String = "",
     val tagNumber: String = "",
     val sex: String = "",
     val ageOrDob: String = "",

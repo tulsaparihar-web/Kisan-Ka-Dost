@@ -99,12 +99,12 @@ Supporting services (farm diary, soil, water, weather, markets, schemes, machine
 ## 3. पशुपालन – Livestock and animal husbandry
 
 ### 3.1 Species and breed library
-- Cattle and indigenous dairy breeds relevant to Rajasthan, including Rathi, Tharparkar and Kankrej.
-- Buffalo management and locally relevant breeds.
-- Goat breeds and systems, including Sirohi and other regionally relevant types.
-- Sheep breeds and wool/meat management, including regional Rajasthan flocks.
-- Camel husbandry, an important arid-region livelihood.
-- Poultry: backyard poultry, layers and broilers.
+- Cattle and indigenous breeds relevant to Rajasthan, including Rathi, Tharparkar, Kankrej, Nagori, Mewati, Nari and Sanchori.
+- Buffalo management and nationally registered breeds with home-tract context; do not imply that breeds from other states are Rajasthan-native.
+- Goat breeds and systems, including Sirohi, Jakhrana, Marwari, Sojat, Karauli, Gujari, Totapuri and Battisi.
+- Sheep breeds and wool/meat management, including Chokla, Nali, Marwari, Magra, Malpura, Jaisalmeri, Pugal, Sonadi and Kheri; distinguish Avishaan as a synthetic breed.
+- Camel husbandry and Rajasthan-associated Bikaneri, Jaisalmeri, Jalori, Marwari, Mewari and Mewati breeds.
+- Poultry: backyard poultry, layers and broilers; identify registered local breeds such as Mewari where relevant.
 - Allied modules can later include beekeeping, fisheries, piggery and rabbit rearing where locally relevant.
 
 ### 3.2 Feeding and nutrition
@@ -116,8 +116,8 @@ Supporting services (farm diary, soil, water, weather, markets, schemes, machine
 - Any ration calculator must disclose assumptions and encourage veterinary/nutritionist validation for special cases.
 
 ### 3.3 Health, prevention and veterinary support
-- Species-wise preventive health calendar.
-- Vaccination and deworming reminder records, with schedules sourced and reviewed by veterinary authorities.
+- Species-wise preventive-care education and user-entered health-event history.
+- User-entered next-date reminders only when confirmed by a veterinarian; any published vaccination/deworming schedule must be sourced and reviewed by veterinary authorities.
 - Common signs of illness, heat stress, dehydration, parasites and injury.
 - Clean housing, ventilation, hygiene, biosecurity and isolation of sick animals.
 - First-response guidance and nearby veterinary-contact information when available.
@@ -130,8 +130,9 @@ Supporting services (farm diary, soil, water, weather, markets, schemes, machine
 - Newborn care and colostrum education.
 - Lactation, milking hygiene, milk yield and quality records.
 - Dry-period and reproductive-cycle tracking.
-- Animal identification/profile: tag number, species, breed, age, sex, purchase details and photographs.
-- Production and expense records for milk, eggs, wool and other outputs.
+- Offline individual animal profile: name, species, breed, identification tag, sex, age/date of birth, purpose and notes; purchase details and photographs are planned extensions.
+- Health-event history with event date, notes and optional veterinarian-confirmed next date; local Android notification attempt around 9 AM, subject to permission and battery-management delays.
+- Production and expense records for milk, eggs, wool and other outputs remain in the later diary milestone.
 
 ### 3.5 Animal and herd diary
 - Individual animal profile and herd register.
@@ -213,7 +214,7 @@ Do not assume that a single recommendation applies to every district. Recommenda
 - Store structured reference content locally (Room/database assets); cache only content with clear update dates.
 - Network-dependent features (weather, live market rates, scheme updates, maps) must show connectivity and last-updated status.
 - Sync should be optional, safe and resilient to interrupted connectivity.
-- User data remains on-device by default; any cloud sync or sharing must be explicit and transparent.
+- User data remains on-device by default; Android automatic app-data backup is disabled. Any export, cloud sync or sharing must be an explicit, user-controlled action.
 - Keep the APK size and memory use suitable for mainstream Android phones.
 
 ## 7. Content quality, trust and safety
@@ -232,7 +233,7 @@ Do not assume that a single recommendation applies to every district. Recommenda
 | M1 | App foundation | Bilingual app, navigation, cloud build and installable APK |
 | M2 | Farmer and farm profile | Offline profile and farm details saved and restored |
 | M3 | Agriculture, horticulture and gardening foundation | Field crop guides, Plant Doctor, fruit/vegetable/flower/home-garden knowledge, soil/water basics and seasonal care content; verified APK and device checks for camera/gallery |
-| M4 | Animal husbandry foundation | Species/breed library, feeding, housing, preventive-care records and animal profiles; verified APK |
+| M4 | Animal husbandry foundation | Bilingual species/breed starter library, feeding and housing education, offline animal profiles and health-event history, veterinarian-confirmed local reminders, non-destructive Room migrations, verified APK and device acceptance |
 | M5 | Farm, garden and livestock diaries | Activity logs, expenses, production records and reminders; verified APK |
 | M6 | Rajasthan advisory services (deferred) | Start only after M3–M5 core foundations are stable and the milestone is explicitly reactivated; verified local calendars, soil testing, weather and alerts where reliable sources/APIs exist |
 | M7 | Markets, schemes and services | Dated mandi prices, official schemes and verified service directory |
@@ -246,7 +247,7 @@ Milestones can overlap only when a shared foundation is ready and the user-appro
 2. Expand My Farm to capture multiple fields/crops, horticulture plants/orchards and individual or herd-level livestock basics.
 3. Build a structured crop library with season, soil, sowing, irrigation, nutrition, pests and harvest sections.
 4. Expand the Plant Doctor guide while keeping AI model scope and confidence transparent.
-5. Build a structured animal and breed library, followed by preventive-care records and reminders.
+5. Build and validate the structured animal/breed starter library, offline animal profiles, veterinarian-confirmed health-event records and local reminders; expand advanced breed and ration content only after expert review.
 6. Add farm, garden and animal diaries as shared reusable record components.
 7. Verify every source, translation, unit, reminder and recommendation before publishing it in the app.
 

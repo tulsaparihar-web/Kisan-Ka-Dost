@@ -1,5 +1,10 @@
 package com.parihardigitallabs.kisankadost
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +34,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -43,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.parihardigitallabs.kisankadost.data.AnimalRecordEntity
 import com.parihardigitallabs.kisankadost.data.AnimalHealthRecordEntity
+import androidx.core.content.ContextCompat
 import java.time.LocalDate
 
 private val RegistryGreen = Color(0xFF247A45)
@@ -52,8 +60,12 @@ private val RegistryInk = Color(0xFF203128)
 fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
     val records by viewModel.records.collectAsState()
     val healthRecords by viewModel.healthRecords.collectAsState()
+    val context = LocalContext.current
+    var pendingReminderId by remember { mutableStateOf<Long?>(null) }
+    var pendingReminderDate by rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     var species by rememberSaveable { mutableStateOf("Cattle") }
+    var breed by rememberSaveable { mutableStateOf("") }
     var tag by rememberSaveable { mutableStateOf("") }
     var sex by rememberSaveable { mutableStateOf("") }
     var age by rememberSaveable { mutableStateOf("") }
@@ -69,6 +81,26 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
     var vetConfirmed by rememberSaveable { mutableStateOf(false) }
     var healthNotes by rememberSaveable { mutableStateOf("") }
     var healthError by remember { mutableStateOf("") }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val id = pendingReminderId
+        if (granted && id != null && pendingReminderDate.isNotBlank()) {
+            AnimalReminderScheduler.schedule(context, id, pendingReminderDate)
+            viewModel.rescheduleReminders()
+            message = if (isHindi) "अगली तारीख के लिए सूचना सेट हो गई।" else "Notification reminder scheduled."
+        } else if (!granted) {
+            message = if (isHindi) "रिकॉर्ड सुरक्षित है, लेकिन सूचना अनुमति बंद है। सेटिंग्स में अनुमति दें।" else "Record saved, but notifications are disabled. Allow them in app settings."
+        }
+        pendingReminderId = null
+        pendingReminderDate = ""
+    }
+
+    LaunchedEffect(Unit) {
+        val allowed = Build.VERSION.SDK_INT < 33 ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        if (allowed) viewModel.rescheduleReminders()
+    }
 
     val speciesOptions = listOf(
         "Cattle" to "गाय/बैल", "Buffalo" to "भैंस", "Goat" to "बकरी",
@@ -115,6 +147,9 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                 }
             }
         }
+        OutlinedTextField(value = breed, onValueChange = { breed = it; message = "" },
+            label = { Text(if (isHindi) "नस्ल / प्रकार (वैकल्पिक)" else "Breed / type (optional)") },
+            modifier = Modifier.fillMaxWidth(), singleLine = true)
         OutlinedTextField(value = tag, onValueChange = { tag = it; message = "" },
             label = { Text(if (isHindi) "पहचान टैग / कान नंबर" else "Identification tag / ear number") },
             modifier = Modifier.fillMaxWidth(), singleLine = true)
@@ -141,12 +176,12 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                     val existing = editingRecord
                     val draft = AnimalRecordEntity(
                         id = existing?.id ?: 0L,
-                        name = name.trim(), species = species, tagNumber = tag.trim(),
+                        name = name.trim(), species = species, breed = breed.trim(), tagNumber = tag.trim(),
                         sex = sex, ageOrDob = age.trim(), purpose = purpose.trim(), notes = notes.trim(),
                         createdAt = existing?.createdAt ?: System.currentTimeMillis()
                     )
                     val saved: () -> Unit = {
-                        name = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
+                        name = ""; breed = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
                         editingRecord = null
                         message = if (isHindi) "पशु का रिकॉर्ड सुरक्षित है।" else "Animal record saved."
                     }
@@ -162,7 +197,7 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
         if (editingRecord != null) {
             TextButton(onClick = {
                 editingRecord = null
-                name = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
+                name = ""; breed = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
                 message = ""
             }) { Text(if (isHindi) "संपादन रद्द करें" else "Cancel editing") }
         }
@@ -181,14 +216,19 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                                     Text(record.name, fontWeight = FontWeight.Bold, color = RegistryInk, fontSize = 16.sp)
-                                    Text(speciesLabel(record.species) + if (record.tagNumber.isNotBlank()) " • ${record.tagNumber}" else "", color = RegistryGreen, fontSize = 12.sp)
+                                    Text(
+                                        speciesLabel(record.species) +
+                                            (if (record.breed.isNotBlank()) " • ${record.breed}" else "") +
+                                            (if (record.tagNumber.isNotBlank()) " • ${record.tagNumber}" else ""),
+                                        color = RegistryGreen, fontSize = 12.sp
+                                    )
                                     val details = listOf(record.sex.takeIf { it.isNotBlank() }?.let { if (isHindi) if (it == "Female") "मादा" else if (it == "Male") "नर" else "अज्ञात" else it }, record.ageOrDob, record.purpose).filterNotNull().filter { it.isNotBlank() }
                                     if (details.isNotEmpty()) Text(details.joinToString(" • "), fontSize = 12.sp, color = Color(0xFF66766B))
                                     if (record.notes.isNotBlank()) Text(record.notes, fontSize = 12.sp, color = RegistryInk)
                                 }
                                 IconButton(onClick = {
                                     editingRecord = record
-                                    name = record.name; species = record.species; tag = record.tagNumber
+                                    name = record.name; species = record.species; breed = record.breed; tag = record.tagNumber
                                     sex = record.sex; age = record.ageOrDob; purpose = record.purpose; notes = record.notes
                                     message = if (isHindi) "रिकॉर्ड संपादित किया जा रहा है।" else "Editing this record."
                                 }) {
@@ -244,8 +284,8 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                     }
                     OutlinedTextField(value = healthNotes, onValueChange = { healthNotes = it },
                         label = { Text(if (isHindi) "नोट (वैकल्पिक)" else "Notes (optional)") }, minLines = 2)
-                    Text(if (isHindi) "अगली तारीख केवल पशु चिकित्सक से पुष्टि के बाद भरें। यह ऐप अभी फोन पर सूचना/अलार्म नहीं भेजता।" else
-                        "Enter a next date only after veterinary confirmation. The app does not send phone notifications or alarms yet.", fontSize = 11.sp, color = Color(0xFF66766B))
+                    Text(if (isHindi) "अगली तारीख केवल पशु चिकित्सक से पुष्टि के बाद भरें। सूचना स्थानीय समयानुसार सुबह 9 बजे के बाद भेजने का प्रयास होगा; Android बैटरी प्रबंधन के कारण देर हो सकती है और सूचना अनुमति जरूरी है।" else
+                        "Enter a next date only after veterinary confirmation. A notification is scheduled for around 9:00 AM local time; Android battery management may delay it, and notification permission is required.", fontSize = 11.sp, color = Color(0xFF66766B))
                     if (healthError.isNotBlank()) Text(healthError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
                 }
             },
@@ -258,13 +298,30 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                         parsedEventDate == null -> healthError = if (isHindi) "सही तारीख YYYY-MM-DD में भरें।" else "Enter a valid date as YYYY-MM-DD."
                         nextReminderDate.isNotBlank() && parsedReminderDate == null -> healthError = if (isHindi) "अगली तारीख सही YYYY-MM-DD में भरें।" else "Enter a valid next date as YYYY-MM-DD."
                         parsedReminderDate != null && parsedReminderDate.isBefore(parsedEventDate) -> healthError = if (isHindi) "अगली तारीख घटना की तारीख से पहले नहीं हो सकती।" else "Next date cannot be before the event date."
+                        parsedReminderDate != null && parsedReminderDate.isBefore(LocalDate.now()) -> healthError = if (isHindi) "अगली तारीख आज या भविष्य की होनी चाहिए।" else "Next date must be today or in the future."
                         nextReminderDate.isNotBlank() && !vetConfirmed -> healthError = if (isHindi) "अगली तारीख के लिए पशु चिकित्सक की पुष्टि जरूरी है।" else "Veterinarian confirmation is required for a next date."
                         else -> viewModel.addHealthRecord(
                             AnimalHealthRecordEntity(
                                 animalId = animal.id, eventTitle = healthTitle.trim(), eventDate = healthDate,
                                 nextReminderDate = nextReminderDate, veterinarianConfirmed = vetConfirmed, notes = healthNotes.trim()
                             ),
-                            onSaved = { healthAnimal = null },
+                            onSaved = { savedId ->
+                                if (nextReminderDate.isNotBlank()) {
+                                    val permissionGranted = Build.VERSION.SDK_INT < 33 ||
+                                        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+                                    if (permissionGranted) {
+                                        AnimalReminderScheduler.schedule(context, savedId, nextReminderDate)
+                                        message = if (isHindi) "रिकॉर्ड सुरक्षित और सूचना सेट हो गई।" else "Record saved and reminder scheduled."
+                                    } else {
+                                        pendingReminderId = savedId
+                                        pendingReminderDate = nextReminderDate
+                                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                } else {
+                                    message = if (isHindi) "स्वास्थ्य रिकॉर्ड सुरक्षित है।" else "Health record saved."
+                                }
+                                healthAnimal = null
+                            },
                             onError = { healthError = if (isHindi) "रिकॉर्ड सुरक्षित नहीं हो सका।" else "Could not save the record." }
                         )
                     }

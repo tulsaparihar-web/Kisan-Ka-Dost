@@ -62,13 +62,13 @@ private val animalGuides = listOf(
         "दूध दुहने से पहले और बाद में स्वच्छता रखें। थन में सूजन, दर्द या दूध में बदलाव हो तो पशु चिकित्सक से जाँच कराएँ।", "Maintain hygiene before and after milking. Seek veterinary examination for udder swelling, pain or changes in milk."
     ),
     AnimalGuide("Goat", "बकरी", "Goat",
-        "सिरोही, जखराना, मारवाड़ी, सोजत, करौली, गुजरी", "Sirohi, Jakhrana, Marwari, Sojat, Karauli, Gujari",
+        "सिरोही, जखराना, मारवाड़ी, सोजत, करौली, गुजरी, टोटापुरी, बत्तीसी", "Sirohi, Jakhrana, Marwari, Sojat, Karauli, Gujari, Totapuri, Battisi",
         "पत्तेदार चारा/ब्राउज़िंग, सूखा चारा और जरूरत अनुसार संतुलित पूरक आहार दें। साफ पानी और उपयुक्त खनिज स्रोत उपलब्ध रखें।", "Provide browse/leafy fodder, dry roughage and suitable balanced supplements when needed. Keep clean water and an appropriate mineral source available.",
         "सूखा, हवादार और सुरक्षित शेड रखें। फर्श फिसलन-रहित हो और बच्चों के लिए अलग साफ कोना हो।", "Use a dry, ventilated and secure shelter. Keep floors non-slip and provide a clean separate area for kids.",
         "नए पशु को झुंड में मिलाने से पहले अलग रखें और निरीक्षण करें। भूख बंद होना, दस्त, खाँसी या अचानक कमजोरी पर पशु चिकित्सक से संपर्क करें।", "Isolate and observe new animals before mixing with the flock. Contact a veterinarian for loss of appetite, diarrhoea, cough or sudden weakness."
     ),
     AnimalGuide("Sheep", "भेड़", "Sheep",
-        "चोकला, मगरा, मालपुरा, मारवाड़ी, नाली, जैसलमेरी", "Chokla, Magra, Malpura, Marwari, Nali, Jaisalmeri",
+        "चोकला, मगरा, मालपुरा, मारवाड़ी, नाली, जैसलमेरी, पूगल, सोनाड़ी, खेरी; अविशान (सिंथेटिक)", "Chokla, Magra, Malpura, Marwari, Nali, Jaisalmeri, Pugal, Sonadi, Kheri; Avishaan (synthetic)",
         "चराई के साथ उपलब्ध हरा/सूखा चारा दें। गर्भित और दूध पिलाने वाली भेड़ों की पोषण जरूरत अलग हो सकती है; स्थानीय विशेषज्ञ से राशन तय करें।", "Use grazing with available green/dry fodder. Pregnant and lactating ewes may have different needs; plan rations with a local expert.",
         "रात में सुरक्षित, सूखा और हवादार बाड़ा रखें। भीड़, गीली बिछावन और तेज हवा/बारिश से बचाएँ।", "Provide a secure, dry and ventilated night shelter. Avoid overcrowding, wet bedding and exposure to harsh wind or rain.",
         "झुंड की नियमित जाँच करें। खुर, त्वचा, ऊन और शरीर की स्थिति देखें; टीकाकरण व कृमिनाशन पशु चिकित्सक की सलाह से करें।", "Inspect the flock regularly. Check hooves, skin, fleece and body condition; follow veterinary advice for vaccination and parasite control."
@@ -149,8 +149,10 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
                         }
                         if (open) {
                             AnimalDetail(if (isHindi) "चारा और पानी" else "Feed & water", if (isHindi) guide.feedHi else guide.feedEn)
+                            AnimalDetail(if (isHindi) "चारा संरक्षण और भंडारण" else "Fodder conservation & storage", animalFodderGuidance(guide.key, isHindi))
                             AnimalDetail(if (isHindi) "आवास और आराम" else "Housing & comfort", if (isHindi) guide.housingHi else guide.housingEn)
                             AnimalDetail(if (isHindi) "स्वास्थ्य और देखभाल" else "Health & care", if (isHindi) guide.careHi else guide.careEn)
+                            AnimalDetail(if (isHindi) "नस्ल संदर्भ" else "Breed context", animalBreedNotes(guide.key, isHindi))
                             AnimalDetail(if (isHindi) "आयु और उत्पादन अवस्था के अनुसार" else "By age and production stage", animalStageGuidance(guide.key, isHindi))
                             AnimalDetail(if (isHindi) "जैव-सुरक्षा" else "Biosecurity", animalBiosecurityGuidance(guide.key, isHindi))
                         } else {
@@ -179,6 +181,42 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
     }
 }
 
+
+private fun animalBreedNotes(key: String, isHindi: Boolean): String = when (key) {
+    "Cattle" -> if (isHindi)
+        "ICAR-NBAGR गृह क्षेत्र: राठी और थारपारकर—राजस्थान; कांकरेज—राजस्थान/गुजरात; नागौरी और सांचोरी—राजस्थान; मेवाती—राजस्थान/हरियाणा/उत्तर प्रदेश; नारी—राजस्थान/गुजरात। ये पंजीकृत नस्ल-नाम हैं, व्यक्तिगत पशु की शुद्धता या उत्पादन की गारंटी नहीं।"
+    else "ICAR-NBAGR home tracts: Rathi and Tharparkar—Rajasthan; Kankrej—Rajasthan/Gujarat; Nagori and Sanchori—Rajasthan; Mewati—Rajasthan/Haryana/Uttar Pradesh; Nari—Rajasthan/Gujarat. Registration does not prove an individual animal's purity or guarantee its performance."
+    "Goat" -> if (isHindi)
+        "सिरोही: सिरोही क्षेत्र से जुड़ी मध्यम आकार की, प्रायः भूरे रंग/धब्बों वाली बकरी। जखराना: अलवर के बहरोड़-जखराना क्षेत्र से; बड़ी कद-काठी और प्रायः काले रंग पर सफेद निशान। मारवाड़ी: मारवाड़ क्षेत्र की मध्यम आकार, प्रायः काले लंबे बालों वाली नस्ल। सोजत, करौली, गुजरी, टोटापुरी और बत्तीसी भी ICAR-NBAGR सूची में पंजीकृत हैं। स्थानीय प्रजनन रिकॉर्ड और विशेषज्ञ से पहचान जाँचें।"
+    else "Sirohi: a medium-sized breed associated with Sirohi, commonly brown with patches. Jakhrana: from the Behror/Jakhrana area of Alwar, generally larger and often black with white markings. Marwari: a medium-sized Marwar breed, commonly with a long black coat. Sojat, Karauli, Gujari, Totapuri and Battisi are also registered in the ICAR-NBAGR list. Verify identity and breeding records locally."
+    "Sheep" -> if (isHindi)
+        "चोकला (शेखावाटी/छप्पर) को महीन carpet wool के लिए जाना जाता है; नाली भी राजस्थान की ऊन देने वाली नस्ल है। मारवाड़ी भेड़ मारवाड़ क्षेत्र से जुड़ी है और अच्छी fleece के लिए वर्णित है। पूगल और खेरी के गृह क्षेत्र भी राजस्थान हैं। अविशान राजस्थान की पंजीकृत सिंथेटिक नस्ल है—इसे देशी नस्लों से अलग समझें।"
+    else "Chokla (Shekhawati/Chappar) is described for fine carpet wool; Nali is another Rajasthan wool breed. Marwari sheep is associated with the Marwar tract and is described for its fleece. Pugal and Kheri also have Rajasthan home tracts. Avishaan is a registered synthetic breed from Rajasthan and must be distinguished from indigenous breeds."
+    "Camel" -> if (isHindi)
+        "बीकानेरी ऊँट भारी शरीर और भारवाही क्षमता के लिए वर्णित है। जैसलमेरी ऊँट रेतीले शुष्क क्षेत्र से जुड़ा, लंबा और सक्रिय प्रकार है। जालोरी, मारवाड़ी, मेवाड़ी और मेवाती भी राजस्थान से जुड़े पंजीकृत नाम हैं। काम, मौसम और पशु की स्थिति के अनुसार देखभाल बदलती है।"
+    else "Bikaneri camels are described as heavily built with draught potential. Jaisalmeri camels are associated with arid sandy tracts and described as tall and active. Jalori, Marwari, Mewari and Mewati are also registered Rajasthan-associated names. Care needs vary with workload, season and individual condition."
+    "Buffalo" -> if (isHindi)
+        "मुर्रा—हरियाणा; भदावरी—उत्तर प्रदेश/मध्य प्रदेश; मेहसाणा, जाफराबादी और बन्नी—गुजरात के गृह क्षेत्रों से जुड़ी नस्लें हैं। राजस्थान में खरीद/प्रजनन से पहले स्थानीय जलवायु, चारा, पानी और पशु चिकित्सक/पशुपालन विशेषज्ञ की सलाह देखें।"
+    else "Murrah—Haryana; Bhadawari—Uttar Pradesh/Madhya Pradesh; Mehsana, Jaffarabadi and Banni—Gujarat home tracts. Before selecting one in Rajasthan, check local climate, fodder and water availability with an animal husbandry expert."
+    else -> if (isHindi)
+        "मेवाड़ी मुर्गी ICAR-NBAGR में पंजीकृत नाम है। स्थानीय backyard poultry के लिए चूजों का स्रोत, रोग-स्थिति और क्षेत्रानुकूलता पशुपालन विभाग/KVK से जाँचें।"
+    else "Mewari chicken is a registered breed name in ICAR-NBAGR. For backyard poultry, verify chick source, health status and local suitability with the Animal Husbandry Department/KVK."
+}
+
+private fun animalFodderGuidance(key: String, isHindi: Boolean): String = when (key) {
+    "Cattle", "Buffalo" -> if (isHindi)
+        "अतिरिक्त हरे चारे को सही तरीके से हे/साइलेज बनाकर कमी के मौसम के लिए बचाएँ। चारा काटकर खिलाने से बर्बादी घट सकती है। आहार अचानक न बदलें; फफूंद, सड़न या मिट्टी से दूषित चारा न दें। क्षेत्रानुकूल mineral mixture और संतुलित राशन की सलाह NDDB/पशु पोषण विशेषज्ञ से लें।"
+    else "Conserve surplus green fodder as properly prepared hay or silage for lean seasons. Chaffing can reduce wastage. Avoid sudden diet changes and never feed mouldy, rotten or soil-contaminated fodder. Seek NDDB/local nutritionist advice on area-specific mineral mixture and balanced rations."
+    "Goat", "Sheep" -> if (isHindi)
+        "मौसमी पत्तेदार चारे और सुरक्षित फसल-अवशेष की उपलब्धता पहले से देखें। साफ, सूखे स्थान पर सूखा चारा/हे सुरक्षित रखें; गीला या फफूंद लगा चारा न दें। गर्भित, दूध पिलाने वाले और बढ़ते पशुओं के लिए अलग राशन विशेषज्ञ से तय करें।"
+    else "Plan seasonal browse and safe crop-residue availability ahead. Store dry fodder/hay in a clean, dry place; do not feed damp or mouldy material. Have separate rations assessed for pregnant, lactating and growing animals."
+    "Poultry" -> if (isHindi)
+        "दाना सूखे, हवादार, चूहे/कीट से सुरक्षित डिब्बे में रखें। पुराना और नया feed धीरे-धीरे बदलें; गीला, बदबूदार या फफूंद लगा दाना हटाएँ। उम्र और उत्पादन के लिए उपयुक्त पूर्ण poultry feed चुनें।"
+    else "Store feed in a dry, ventilated, rodent- and pest-proof container. Transition between feeds gradually; discard damp, foul-smelling or mouldy feed. Choose complete poultry feed suited to age and production."
+    else -> if (isHindi)
+        "स्थानीय ब्राउज़िंग और उपलब्ध सुरक्षित चारे का मौसम के अनुसार प्रबंधन करें। सूखा चारा साफ जगह रखें, अचानक आहार न बदलें और फफूंद/सड़े चारे से बचें।"
+    else "Plan local browsing and safe available fodder seasonally. Store dry fodder cleanly, avoid abrupt diet changes and keep mouldy or spoiled feed away."
+}
 
 private fun animalStageGuidance(key: String, isHindi: Boolean): String = when (key) {
     "Cattle", "Buffalo" -> if (isHindi)
