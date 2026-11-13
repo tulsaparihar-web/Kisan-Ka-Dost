@@ -1,7 +1,7 @@
 # M5 Release Notes – Farm, Garden and Livestock Diaries
 
 ## Included
-- Bilingual offline diary for field, garden/orchard, animal, expense, labour, input and production activities.
+- Bilingual offline diary for field, garden/orchard, animal, expense, labour, input, production and sales/income activities.
 - Add, edit, delete, category filtering and text search.
 - Record date, related crop/plant/animal, quantity, unit, amount, notes and optional reminder date.
 - Local one-time reminders attempted around 9:00 AM; delivery state is stored to prevent repeats when users reopen the diary. Android WorkManager/battery management can delay delivery. Notification permission is requested only when the user saves a reminder; if notifications are disabled, delivery remains pending until permission is enabled.
@@ -12,13 +12,13 @@
 
 ## Privacy and data safety
 - All farm and diary records remain in the app's local database by default.
-- Photos are stored in the app's private files directory.
+- Photos are stored in the app's private files directory. Photo decoding/import runs off the UI thread, source image dimensions are bounded, and unused temporary imports are cleaned on app startup.
 - Android automatic app-data backup remains disabled.
 - No background upload, cloud sync, user account or data sale.
 - Backup is written only to the location selected by the user.
 - ZIP backups are not password-encrypted; they may contain personal/contact and farm records. Store and share them carefully. Export is limited to 100 MB uncompressed, 12 MB per photo, and 599 photo files per archive.
 - Restore replaces the current local farmer, animal, animal-health and diary data. The UI warns the user to create a backup first.
-- Archive structure, duplicate/unknown entries, photo manifest, record IDs, dates, numeric values and animal-health foreign-key relationships are validated before database replacement; table replacement occurs in a Room transaction. Existing reminder work is cancelled and rebuilt for restored records.
+- Archive structure, duplicate/unknown entries, size limits, photo manifest/content/dimensions, record IDs, dates, numeric values and animal-health foreign-key relationships are validated before database replacement; table replacement occurs in a Room transaction. Existing reminder work is cancelled and rebuilt for restored records.
 - A backup archive should be kept in a safe personal location. It may contain private farm and contact information.
 
 ## Release acceptance still required on a physical device
@@ -37,5 +37,5 @@
 - PDF report generation, multi-farm parcel management and cloud synchronization are not part of M5.
 
 ## Cloud verification
-- Release-hardening unit tests, debug APK build and artifact upload succeeded in [GitHub Actions run 43411964102](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43411964102). The tested code was merged to main in [PR #4](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/4).
+- M5 release-hardening unit tests, debug APK build and artifact upload succeeded in [GitHub Actions run 43411964102](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43411964102), and the follow-up Sales/photo/backup validation polish passed in [run 43415378775](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43415378775). Core M5, release hardening and completion polish are tracked in [PR #3](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/3), [PR #4](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/4) and [PR #5](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/5).
 - APK artifact downloaded and inspected. Physical-device acceptance remains outstanding and is not claimed as complete.

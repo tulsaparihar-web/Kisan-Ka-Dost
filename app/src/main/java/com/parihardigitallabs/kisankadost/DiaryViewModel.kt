@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.parihardigitallabs.kisankadost.data.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -16,6 +17,13 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
  private val db = AppDatabase.getInstance(application)
  private val repo = DiaryRecordRepository(db.diaryRecordDao())
  val records = repo.records.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+ init {
+  viewModelScope.launch(Dispatchers.IO) {
+   val referenced = db.diaryRecordDao().getAllForBackup()
+    .flatMap { it.photoPaths.lineSequence().filter { name -> name.isNotBlank() }.toList() }.toSet()
+   DiaryPhotoStore.pruneUnused(app, referenced)
+  }
+ }
  fun add(record: DiaryRecordEntity, saved:(Long)->Unit, failed:()->Unit) { viewModelScope.launch { runCatching { repo.add(record) }.onSuccess(saved).onFailure { failed() } } }
  fun update(record: DiaryRecordEntity, saved:()->Unit, failed:()->Unit) { viewModelScope.launch { runCatching { repo.update(record) }.onSuccess { if(record.reminderDate.isBlank()) DiaryReminderScheduler.cancel(app,record.id); saved() }.onFailure { failed() } } }
  fun delete(record: DiaryRecordEntity) { viewModelScope.launch { repo.delete(record); DiaryReminderScheduler.cancel(app,record.id); record.photoPaths.lineSequence().filter { it.isNotBlank() }.forEach { DiaryPhotoStore.delete(app,it) } } }

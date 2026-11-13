@@ -68,6 +68,13 @@ class DiaryBackupValidationTest {
         }
     }
 
+    @Test fun acceptsSalesAndIncomeDiaryCategory() {
+        val sale = DiaryRecordEntity(
+            id = 8, recordType = "SALES", title = "Milk sale", recordDate = "2026-11-13", amount = 650.0
+        )
+        DiaryBackupManager.validateBackupRecords(emptyList(), emptyList(), emptyList(), listOf(sale))
+    }
+
     @Test fun rejectsOrphanAnimalHealthRecords() {
         val animal = AnimalRecordEntity(id = 1, name = "Gauri", species = "Cattle")
         val health = AnimalHealthRecordEntity(

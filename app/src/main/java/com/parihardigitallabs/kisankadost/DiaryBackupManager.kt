@@ -103,6 +103,7 @@ object DiaryBackupManager {
                             require(bytes.isNotEmpty()) { "Backup contains an empty photo" }
                             totalBytes += bytes.size
                             file.writeBytes(bytes)
+                            require(DiaryPhotoStore.isValidStoredPhoto(file)) { "Backup contains an invalid or oversized photo" }
                             stagedPhotos[name] = file
                         }
                         else -> throw IOException("Backup contains an unsupported file")
@@ -193,17 +194,21 @@ object DiaryBackupManager {
         diaries: List<DiaryRecordEntity>
     ) {
         require(farmers.size <= 1 && farmers.all { it.id == 1 }) { "Backup must contain at most one farmer profile" }
-        require(animals.all { it.id > 0 && it.name.isNotBlank() && it.species.isNotBlank() }) { "Backup contains an invalid animal profile" }
+        require(animals.size <= 5_000 && health.size <= 10_000 && diaries.size <= 10_000) {
+            "Backup contains too many records"
+        }
+        require(animals.all { it.id > 0 && it.name.isNotBlank() && it.species.isNotBlank() && it.name.length <= 120 && it.species.length <= 80 }) { "Backup contains an invalid animal profile" }
         require(animals.map { it.id }.distinct().size == animals.size) { "Backup contains duplicate animal IDs" }
         val animalIds = animals.map { it.id }.toSet()
         require(health.all { it.id > 0 && it.animalId in animalIds && it.eventTitle.isNotBlank() }) { "Backup has an invalid animal health record or a record without a matching animal" }
         require(health.map { it.id }.distinct().size == health.size) { "Backup contains duplicate animal health IDs" }
         health.forEach {
+            require(it.eventTitle.length <= 160 && it.notes.length <= 3000) { "Backup contains an oversized animal health record" }
             require(runCatching { LocalDate.parse(it.eventDate) }.isSuccess) { "Backup contains an invalid animal health date" }
             require(it.nextReminderDate.isBlank() || runCatching { LocalDate.parse(it.nextReminderDate) }.isSuccess) { "Backup contains an invalid animal reminder date" }
             require(it.nextReminderDate.isBlank() || it.veterinarianConfirmed) { "Backup contains an animal reminder without veterinary confirmation" }
         }
-        require(diaries.all { it.id > 0 && it.title.isNotBlank() && it.recordType in setOf("FIELD", "GARDEN", "ANIMAL", "EXPENSE", "LABOUR", "INPUT", "PRODUCTION") }) {
+        require(diaries.all { it.id > 0 && it.title.isNotBlank() && it.recordType in setOf("FIELD", "GARDEN", "ANIMAL", "EXPENSE", "LABOUR", "INPUT", "PRODUCTION", "SALES") }) {
             "Backup contains an invalid diary entry"
         }
         require(diaries.map { it.id }.distinct().size == diaries.size) { "Backup contains duplicate diary IDs" }
