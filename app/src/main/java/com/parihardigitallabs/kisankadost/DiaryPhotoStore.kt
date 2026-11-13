@@ -41,7 +41,7 @@ object DiaryPhotoStore {
             val corrected = if (orientation == ExifInterface.ORIENTATION_NORMAL || orientation == ExifInterface.ORIENTATION_UNDEFINED) bitmap
                 else Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
             try {
-                val name = "diary_\${UUID.randomUUID()}.jpg"
+                val name = "diary_${UUID.randomUUID()}.jpg"
                 File(directory(context), name).outputStream().use { output ->
                     check(corrected.compress(Bitmap.CompressFormat.JPEG, 82, output)) { "Could not save photo" }
                 }
