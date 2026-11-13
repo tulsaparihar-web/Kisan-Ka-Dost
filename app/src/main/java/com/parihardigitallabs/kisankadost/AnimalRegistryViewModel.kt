@@ -60,6 +60,18 @@ class AnimalRegistryViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
+    fun rescheduleReminders() {
+        viewModelScope.launch {
+            healthRepository.confirmedReminders().forEach { record ->
+                if (record.nextReminderDate.isNotBlank()) {
+                    runCatching {
+                        AnimalReminderScheduler.schedule(getApplication(), record.id, record.nextReminderDate)
+                    }
+                }
+            }
+        }
+    }
+
     fun delete(record: AnimalRecordEntity) {
         viewModelScope.launch { repository.delete(record) }
     }
