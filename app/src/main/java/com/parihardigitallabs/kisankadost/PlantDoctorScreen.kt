@@ -174,7 +174,7 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
                 withContext(Dispatchers.Main) { _state.value = PlantDoctorState(bitmap = bitmap, predictions = results) }
             } catch (error: Exception) {
                 withContext(Dispatchers.Main) {
-                    _state.value = PlantDoctorState(bitmap = bitmap, error = error.message ?: "Unable to analyse this image.")
+                    _state.value = PlantDoctorState(bitmap = bitmap, error = "ANALYSIS_FAILED")
                 }
             }
         }
@@ -264,8 +264,12 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     }
                 }
             }
-            state.error?.let { Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF0E8))) {
-                Text((if (isHindi) "जाँच पूरी नहीं हो सकी: " else "Analysis failed: ") + it, Modifier.padding(13.dp), color = Color(0xFF8A3D20), fontSize = 13.sp)
+            state.error?.let { error -> Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF0E8))) {
+                val message = if (error == "ANALYSIS_FAILED") {
+                    if (isHindi) "फोटो की जाँच नहीं हो सकी। साफ फोटो चुनें और फिर प्रयास करें।"
+                    else "Unable to analyse this image. Choose a clear photo and try again."
+                } else error
+                Text((if (isHindi) "जाँच पूरी नहीं हो सकी: " else "Analysis failed: ") + message, Modifier.padding(13.dp), color = Color(0xFF8A3D20), fontSize = 13.sp)
             } }
             if (state.predictions.isNotEmpty()) {
                 val top = state.predictions.first()
