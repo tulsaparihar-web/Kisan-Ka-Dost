@@ -12,8 +12,14 @@ interface PlantDiagnosisDao {
     @Query("SELECT * FROM plant_diagnosis_history ORDER BY createdAt DESC, id DESC")
     fun observeAll(): Flow<List<PlantDiagnosisEntity>>
 
+    @Query("SELECT * FROM plant_diagnosis_history ORDER BY createdAt DESC, id DESC")
+    suspend fun getAllForBackup(): List<PlantDiagnosisEntity>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(record: PlantDiagnosisEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insertAll(records: List<PlantDiagnosisEntity>)
 
     @Delete
     suspend fun delete(record: PlantDiagnosisEntity)
