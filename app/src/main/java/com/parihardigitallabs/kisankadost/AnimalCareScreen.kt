@@ -182,13 +182,24 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
 
 
 private fun animalBreedNotes(key: String, isHindi: Boolean): String = when (key) {
+    "Cattle" -> if (isHindi)
+        "ICAR-NBAGR गृह क्षेत्र: राठी और थारपारकर—राजस्थान; कांकरेज—राजस्थान/गुजरात; नागौरी और सांचोरी—राजस्थान; मेवाती—राजस्थान/हरियाणा/उत्तर प्रदेश; नारी—राजस्थान/गुजरात। ये पंजीकृत नस्ल-नाम हैं, व्यक्तिगत पशु की शुद्धता या उत्पादन की गारंटी नहीं।"
+    else "ICAR-NBAGR home tracts: Rathi and Tharparkar—Rajasthan; Kankrej—Rajasthan/Gujarat; Nagori and Sanchori—Rajasthan; Mewati—Rajasthan/Haryana/Uttar Pradesh; Nari—Rajasthan/Gujarat. Registration does not prove an individual animal's purity or guarantee its performance."
     "Goat" -> if (isHindi)
-        "ICAR-NBAGR की सूची में सोजत, करौली, गुजरी, टोटापुरी और बत्तीसी राजस्थान से जुड़े पंजीकृत नाम हैं। टोटापुरी का गृह क्षेत्र राजस्थान और बत्तीसी का राजस्थान/उत्तर प्रदेश दर्ज है। नस्ल चयन में स्थानीय अनुकूलता और उपलब्ध प्रजनन रिकॉर्ड देखें।"
-    else "ICAR-NBAGR lists Sojat, Karauli, Gujari and Totapuri as Rajasthan breeds; Battisi has a Rajasthan/Uttar Pradesh home tract. Check local suitability and breeding records before selection."
+        "सिरोही: सिरोही क्षेत्र से जुड़ी मध्यम आकार की, प्रायः भूरे रंग/धब्बों वाली बकरी। जखराना: अलवर के बहरोड़-जखराना क्षेत्र से; बड़ी कद-काठी और प्रायः काले रंग पर सफेद निशान। मारवाड़ी: मारवाड़ क्षेत्र की मध्यम आकार, प्रायः काले लंबे बालों वाली नस्ल। सोजत, करौली, गुजरी, टोटापुरी और बत्तीसी भी ICAR-NBAGR सूची में पंजीकृत हैं। स्थानीय प्रजनन रिकॉर्ड और विशेषज्ञ से पहचान जाँचें।"
+    else "Sirohi: a medium-sized breed associated with Sirohi, commonly brown with patches. Jakhrana: from the Behror/Jakhrana area of Alwar, generally larger and often black with white markings. Marwari: a medium-sized Marwar breed, commonly with a long black coat. Sojat, Karauli, Gujari, Totapuri and Battisi are also registered in the ICAR-NBAGR list. Verify identity and breeding records locally."
     "Sheep" -> if (isHindi)
-        "अविशान राजस्थान की पंजीकृत सिंथेटिक भेड़ नस्ल है; इसे देशी नस्लों से अलग श्रेणी में समझें। चोकला, मगरा, मालपुरा, मारवाड़ी, नाली, जैसलमेरी, पूगल, सोनाड़ी और खेरी के गृह क्षेत्र/पंजीकरण ICAR-NBAGR सूची से देखें।"
-    else "Avishaan is a registered synthetic sheep breed associated with Rajasthan and is distinguished from indigenous breeds. Check ICAR-NBAGR for the home tracts/registration of Chokla, Magra, Malpura, Marwari, Nali, Jaisalmeri, Pugal, Sonadi and Kheri."
-    else -> if (isHindi) "गृह क्षेत्र और पंजीकरण की जानकारी ICAR-NBAGR के प्रकाशित नस्ल रजिस्टर में देखें।" else "Refer to ICAR-NBAGR's published breed registers for home-tract and registration details."
+        "चोकला (शेखावाटी/छप्पर) को महीन carpet wool के लिए जाना जाता है; नाली भी राजस्थान की ऊन देने वाली नस्ल है। मारवाड़ी भेड़ मारवाड़ क्षेत्र से जुड़ी है और अच्छी fleece के लिए वर्णित है। पूगल और खेरी के गृह क्षेत्र भी राजस्थान हैं। अविशान राजस्थान की पंजीकृत सिंथेटिक नस्ल है—इसे देशी नस्लों से अलग समझें।"
+    else "Chokla (Shekhawati/Chappar) is described for fine carpet wool; Nali is another Rajasthan wool breed. Marwari sheep is associated with the Marwar tract and is described for its fleece. Pugal and Kheri also have Rajasthan home tracts. Avishaan is a registered synthetic breed from Rajasthan and must be distinguished from indigenous breeds."
+    "Camel" -> if (isHindi)
+        "बीकानेरी ऊँट भारी शरीर और भारवाही क्षमता के लिए वर्णित है। जैसलमेरी ऊँट रेतीले शुष्क क्षेत्र से जुड़ा, लंबा और सक्रिय प्रकार है। जालोरी, मारवाड़ी, मेवाड़ी और मेवाती भी राजस्थान से जुड़े पंजीकृत नाम हैं। काम, मौसम और पशु की स्थिति के अनुसार देखभाल बदलती है।"
+    else "Bikaneri camels are described as heavily built with draught potential. Jaisalmeri camels are associated with arid sandy tracts and described as tall and active. Jalori, Marwari, Mewari and Mewati are also registered Rajasthan-associated names. Care needs vary with workload, season and individual condition."
+    "Buffalo" -> if (isHindi)
+        "मुर्रा—हरियाणा; भदावरी—उत्तर प्रदेश/मध्य प्रदेश; मेहसाणा, जाफराबादी और बन्नी—गुजरात के गृह क्षेत्रों से जुड़ी नस्लें हैं। राजस्थान में खरीद/प्रजनन से पहले स्थानीय जलवायु, चारा, पानी और पशु चिकित्सक/पशुपालन विशेषज्ञ की सलाह देखें।"
+    else "Murrah—Haryana; Bhadawari—Uttar Pradesh/Madhya Pradesh; Mehsana, Jaffarabadi and Banni—Gujarat home tracts. Before selecting one in Rajasthan, check local climate, fodder and water availability with an animal husbandry expert."
+    else -> if (isHindi)
+        "मेवाड़ी मुर्गी ICAR-NBAGR में पंजीकृत नाम है। स्थानीय backyard poultry के लिए चूजों का स्रोत, रोग-स्थिति और क्षेत्रानुकूलता पशुपालन विभाग/KVK से जाँचें।"
+    else "Mewari chicken is a registered breed name in ICAR-NBAGR. For backyard poultry, verify chick source, health status and local suitability with the Animal Husbandry Department/KVK."
 }
 
 private fun animalStageGuidance(key: String, isHindi: Boolean): String = when (key) {
