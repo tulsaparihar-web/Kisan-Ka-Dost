@@ -85,6 +85,21 @@ private fun decodePlantBitmap(context: Context, uri: Uri): Bitmap? {
     return rotated
 }
 
+/** Decode a small on-device history thumbnail without loading the full saved photo. */
+private fun decodeDiagnosisThumbnail(path: String): Bitmap? {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeFile(path, bounds)
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+    var sampleSize = 1
+    while (maxOf(bounds.outWidth / sampleSize, bounds.outHeight / sampleSize) > 256) {
+        sampleSize *= 2
+    }
+    return BitmapFactory.decodeFile(path, BitmapFactory.Options().apply {
+        inSampleSize = sampleSize
+        inPreferredConfig = Bitmap.Config.RGB_565
+    })
+}
+
 private data class PlantGuide(
     val en: String, val hi: String, val category: String, val categoryHi: String,
     val lightEn: String, val lightHi: String, val waterEn: String, val waterHi: String,
@@ -395,7 +410,7 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
 @Composable
 private fun PlantDiagnosisHistoryCard(record: PlantDiagnosisEntity, isHindi: Boolean, onDelete: () -> Unit) {
     val thumbnail by produceState<Bitmap?>(initialValue = null, key1 = record.imagePath) {
-        value = withContext(Dispatchers.IO) { BitmapFactory.decodeFile(record.imagePath) }
+        value = withContext(Dispatchers.IO) { decodeDiagnosisThumbnail(record.imagePath) }
     }
     Card(shape = RoundedCornerShape(15.dp)) {
         Row(Modifier.fillMaxWidth().padding(11.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
