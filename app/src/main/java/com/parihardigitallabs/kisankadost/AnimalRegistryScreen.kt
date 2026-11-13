@@ -65,6 +65,7 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
     var pendingReminderDate by rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     var species by rememberSaveable { mutableStateOf("Cattle") }
+    var breed by rememberSaveable { mutableStateOf("") }
     var tag by rememberSaveable { mutableStateOf("") }
     var sex by rememberSaveable { mutableStateOf("") }
     var age by rememberSaveable { mutableStateOf("") }
@@ -146,6 +147,9 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                 }
             }
         }
+        OutlinedTextField(value = breed, onValueChange = { breed = it; message = "" },
+            label = { Text(if (isHindi) "नस्ल / प्रकार (वैकल्पिक)" else "Breed / type (optional)") },
+            modifier = Modifier.fillMaxWidth(), singleLine = true)
         OutlinedTextField(value = tag, onValueChange = { tag = it; message = "" },
             label = { Text(if (isHindi) "पहचान टैग / कान नंबर" else "Identification tag / ear number") },
             modifier = Modifier.fillMaxWidth(), singleLine = true)
@@ -172,12 +176,12 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                     val existing = editingRecord
                     val draft = AnimalRecordEntity(
                         id = existing?.id ?: 0L,
-                        name = name.trim(), species = species, tagNumber = tag.trim(),
+                        name = name.trim(), species = species, breed = breed.trim(), tagNumber = tag.trim(),
                         sex = sex, ageOrDob = age.trim(), purpose = purpose.trim(), notes = notes.trim(),
                         createdAt = existing?.createdAt ?: System.currentTimeMillis()
                     )
                     val saved: () -> Unit = {
-                        name = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
+                        name = ""; breed = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
                         editingRecord = null
                         message = if (isHindi) "पशु का रिकॉर्ड सुरक्षित है।" else "Animal record saved."
                     }
@@ -212,14 +216,19 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                                     Text(record.name, fontWeight = FontWeight.Bold, color = RegistryInk, fontSize = 16.sp)
-                                    Text(speciesLabel(record.species) + if (record.tagNumber.isNotBlank()) " • ${record.tagNumber}" else "", color = RegistryGreen, fontSize = 12.sp)
+                                    Text(
+                                        speciesLabel(record.species) +
+                                            (if (record.breed.isNotBlank()) " • ${record.breed}" else "") +
+                                            (if (record.tagNumber.isNotBlank()) " • ${record.tagNumber}" else ""),
+                                        color = RegistryGreen, fontSize = 12.sp
+                                    )
                                     val details = listOf(record.sex.takeIf { it.isNotBlank() }?.let { if (isHindi) if (it == "Female") "मादा" else if (it == "Male") "नर" else "अज्ञात" else it }, record.ageOrDob, record.purpose).filterNotNull().filter { it.isNotBlank() }
                                     if (details.isNotEmpty()) Text(details.joinToString(" • "), fontSize = 12.sp, color = Color(0xFF66766B))
                                     if (record.notes.isNotBlank()) Text(record.notes, fontSize = 12.sp, color = RegistryInk)
                                 }
                                 IconButton(onClick = {
                                     editingRecord = record
-                                    name = record.name; species = record.species; tag = record.tagNumber
+                                    name = record.name; species = record.species; breed = record.breed; tag = record.tagNumber
                                     sex = record.sex; age = record.ageOrDob; purpose = record.purpose; notes = record.notes
                                     message = if (isHindi) "रिकॉर्ड संपादित किया जा रहा है।" else "Editing this record."
                                 }) {
