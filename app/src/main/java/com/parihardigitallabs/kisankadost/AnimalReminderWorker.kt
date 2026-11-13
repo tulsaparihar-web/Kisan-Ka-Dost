@@ -44,7 +44,11 @@ class AnimalReminderWorker(
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
-        val title = if (event.eventTitle.isBlank()) "Animal care reminder" else event.eventTitle
+        val isHindi = applicationContext.getSharedPreferences("kisan_preferences", Context.MODE_PRIVATE)
+            .getBoolean("is_hindi", true)
+        val title = if (event.eventTitle.isBlank()) {
+            if (isHindi) "पशु देखभाल की याद दिलाना" else "Animal care reminder"
+        } else event.eventTitle
         val body = "${animal.name} • ${event.nextReminderDate}"
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
@@ -72,9 +76,14 @@ class AnimalReminderWorker(
             val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Animal care reminders",
+                if (applicationContext.getSharedPreferences("kisan_preferences", Context.MODE_PRIVATE).getBoolean("is_hindi", true))
+                    "पशु देखभाल की सूचनाएँ" else "Animal care reminders",
                 NotificationManager.IMPORTANCE_DEFAULT
-            ).apply { description = "Reminders entered and confirmed by the animal owner and veterinarian." }
+            ).apply {
+                description = if (applicationContext.getSharedPreferences("kisan_preferences", Context.MODE_PRIVATE).getBoolean("is_hindi", true))
+                    "पशु देखभाल और पशु चिकित्सक से पुष्टि की गई तारीखों की सूचनाएँ।"
+                else "Reminders entered and confirmed by the animal owner and veterinarian."
+            }
             manager.createNotificationChannel(channel)
         }
     }
