@@ -32,6 +32,10 @@ The initial M4 screen is general education and a breed-discovery starter library
 | Government of Rajasthan – Sheep Breeds in Rajasthan (breed monograph) | Chokla, Nali and Marwari sheep distribution and wool characteristics | Used for concise historical breed descriptors (e.g. carpet-wool context), not for current population, production or flock-performance estimates. https://jankalyanfile.rajasthan.gov.in/Content/UploadFolder/DepartmentMaster/187/2022/Dec/30409/172935.pdf |
 | ICAR – Camel breed documentation (2018) | Bikaneri and Jaisalmeri camel descriptions | Used for broad descriptive traits only; not treated as a current performance benchmark or a guarantee of work capacity. https://icar.org.in/sites/default/files/2022-09/ICARNewsApril-June2018.pdf |
 
+| National Dairy Development Board – Handbook of Good Dairy Husbandry Practices | Balanced feeding concepts, gradual feed changes, chaffing, area-specific mineral mixture and hay/silage conservation | Used for general feeding and fodder-management principles only. Generalized adult-animal quantities are intentionally not copied into the app because individual ration needs depend on species, weight, production, pregnancy and local feed analysis. https://www.nddb.coop/sites/default/files/pdfs/Handbook-of-Good-Dairy-Husbandry-Practices.pdf |
+| NDDB – Ration Balancing Programme | Individualized ration balancing based on species, age, milk output, fat and local feed ingredients | Supports the app's advice to use locally balanced rations rather than universal fixed feed quantities. https://sapplpp.nddb.coop/services/animalnutrition/programmes/ration-balancing-programme |
+| ICAR – Kharif Agro-Advisories for Farmers 2025 | Seasonal fodder availability and conservation through silage/hay | Used for broad fodder-conservation education only; the document is a dated seasonal advisory and its crop-specific steps are not presented as a universal recipe. https://www.icar.gov.in/sites/default/files/Circulars/ICAR%20En-Kharif%20Agro-Advisories%20for%20Farmers%202025.pdf |
+
 ## Editorial and safety rules
 
 - Keep Hindi and English guidance equivalent.
