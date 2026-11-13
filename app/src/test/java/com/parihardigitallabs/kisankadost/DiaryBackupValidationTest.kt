@@ -78,6 +78,17 @@ class DiaryBackupValidationTest {
         }
     }
 
+    @Test fun rejectsAnimalReminderWithoutVeterinaryConfirmation() {
+        val animal = AnimalRecordEntity(id = 1, name = "Gauri", species = "Cattle")
+        val health = AnimalHealthRecordEntity(
+            id = 1, animalId = 1, eventTitle = "Vaccination", eventDate = "2026-11-13",
+            nextReminderDate = "2026-12-01", veterinarianConfirmed = false
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            DiaryBackupManager.validateBackupRecords(emptyList(), listOf(animal), listOf(health), emptyList())
+        }
+    }
+
     @Test fun validatesDiaryDateAndFarmerSingleton() {
         val invalidDate = DiaryRecordEntity(
             id = 1, recordType = "FIELD", title = "Sowing", recordDate = "not-a-date"
