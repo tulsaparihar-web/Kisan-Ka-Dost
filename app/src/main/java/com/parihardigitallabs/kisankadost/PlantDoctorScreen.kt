@@ -399,7 +399,7 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
             if (history.isEmpty()) {
                 Text(if (isHindi) "अभी तक कोई फोटो जाँच सहेजी नहीं गई है। जाँच पूरी होने पर उसका फोटो और परिणाम यहाँ दिखेगा।" else "No saved photo checks yet. Completed scans will appear here with their photo and result.", color = PlantMuted, fontSize = 13.sp)
             } else {
-                Text(if (isHindi) "आपकी पिछली जाँचें इस फोन पर निजी रूप से सहेजी जाती हैं।" else "Your previous checks are stored privately on this phone.", color = PlantMuted, fontSize = 12.sp)
+                Text(if (isHindi) "आपकी पिछली जाँचें इसी फोन पर निजी रूप से सहेजी जाती हैं। ये खेत डायरी के ZIP बैकअप में शामिल नहीं हैं।" else "Your previous checks are stored privately on this phone and are not included in the Farm Diary ZIP backup.", color = PlantMuted, fontSize = 12.sp)
                 history.forEach { record -> PlantDiagnosisHistoryCard(record = record, isHindi = isHindi, onDelete = { viewModel.deleteHistory(record) }) }
             }
         }
