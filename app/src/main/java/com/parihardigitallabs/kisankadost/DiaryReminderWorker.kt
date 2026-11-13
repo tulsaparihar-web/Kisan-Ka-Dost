@@ -25,7 +25,13 @@ class DiaryReminderWorker(context:Context,params:WorkerParameters):CoroutineWork
   val note=NotificationCompat.Builder(applicationContext,CHANNEL).setSmallIcon(android.R.drawable.ic_dialog_info)
    .setContentTitle(r.title).setContentText(body.ifBlank { "Farm diary reminder" }).setAutoCancel(true)
    .apply { if(pending!=null)setContentIntent(pending) }.build()
-  return try { NotificationManagerCompat.from(applicationContext).notify(id.toInt(),note); AppDatabase.getInstance(applicationContext).diaryRecordDao().markReminderNotified(id); Result.success() } catch(_:SecurityException) { Result.success() }
+  val notifications = NotificationManagerCompat.from(applicationContext)
+  if (!notifications.areNotificationsEnabled()) return Result.success()
+  return try {
+   notifications.notify(id.toInt(),note)
+   AppDatabase.getInstance(applicationContext).diaryRecordDao().markReminderNotified(id)
+   Result.success()
+  } catch(_:SecurityException) { Result.success() }
  }
  companion object { const val KEY_ID="diary_record_id"; const val CHANNEL="farm_diary_reminders" }
 }
