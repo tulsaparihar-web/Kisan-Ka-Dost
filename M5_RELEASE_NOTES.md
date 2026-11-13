@@ -1,7 +1,7 @@
 # M5 Release Notes – Farm, Garden and Livestock Diaries
 
 ## Included
-- Bilingual offline diary for field, garden/orchard, animal, expense, labour, input and production activities.
+- Bilingual offline diary for field, garden/orchard, animal, expense, labour, input, production and sales/income activities.
 - Add, edit, delete, category filtering and text search.
 - Record date, related crop/plant/animal, quantity, unit, amount, notes and optional reminder date.
 - Local reminders attempted around 9:00 AM; Android WorkManager/battery management can delay delivery. Notification permission is requested only when the user saves a reminder.
@@ -18,8 +18,12 @@
 - Backup is written only to the location selected by the user.
 - ZIP backups are not password-encrypted; they may contain personal/contact and farm records. Store and share them carefully.
 - Restore replaces the current local farmer, animal, animal-health and diary data. The UI warns the user to create a backup first.
-- Archive structure, referenced photo files and animal-health foreign-key relationships are validated before database replacement; table replacement occurs in a Room transaction.
+- Archive structure, duplicate/unexpected entries, size limits, record IDs/dates, referenced photo files, photo dimensions and animal-health foreign-key relationships are validated before database replacement; table replacement occurs in a Room transaction. Existing reminders are replaced and re-scheduled after a successful restore.
 - A backup archive should be kept in a safe personal location. It may contain private farm and contact information.
+
+## Cloud verification
+- Unit tests and debug APK build/package pass in [GitHub Actions run 43407183023](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/43407183023) for the initial complete M5 feature set. Final hardening changes are being re-verified in the current workflow before release.
+- Unit tests cover reminder timing, CSV quoting/formula protection, photo-name safety/downsampling, backup relationships, photo references, date/category validation and veterinarian-confirmed reminder constraints.
 
 ## Release acceptance still required on a physical device
 1. Upgrade a populated M4 installation through v4→v5→v6 and verify farmer, animal and health records remain intact.
@@ -28,8 +32,8 @@
 4. Try an invalid/corrupt ZIP; verify it is rejected without replacing current records.
 5. Test notification permission, scheduled reminders, reboot and battery optimization behavior.
 6. Confirm a backup ZIP can be opened as an archive and remind users that it is not encrypted.
-6. Test CSV export, offline use, Hindi/English layouts and long-text/small-screen layout.
-7. Verify no farm data or photos are uploaded automatically.
+7. Test CSV export, offline use, Hindi/English layouts and long-text/small-screen layout.
+8. Verify no farm data or photos are uploaded automatically.
 
 ## Explicit limitations
 - M5 is a record-keeping tool, not a crop or veterinary diagnosis system.
