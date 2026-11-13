@@ -3,9 +3,11 @@ package com.parihardigitallabs.kisankadost
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -24,6 +26,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -141,7 +145,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
    IconButton(onClick={restoreLauncher.launch(arrayOf("application/zip","application/octet-stream"))}){Icon(Icons.Default.Restore,contentDescription=if(isHindi)"बहाली" else "Restore",tint=DiaryGreen)}
   }
   Card(colors=CardDefaults.cardColors(containerColor=Color(0xFFEFF6F0)),shape=RoundedCornerShape(12.dp)){
-   Text(if(isHindi)"बैकअप में किसान प्रोफाइल, पशु, स्वास्थ्य रिकॉर्ड, डायरी और फोटो शामिल हैं। बहाली मौजूदा स्थानीय डेटा को बदल देगी।" else "Backup includes farmer profile, animals, health records, diary entries and photos. Restoring replaces current local data.",modifier=Modifier.padding(10.dp),fontSize=11.sp,color=DiaryInk)
+   Text(if(isHindi)"बैकअप में किसान प्रोफाइल, पशु, स्वास्थ्य रिकॉर्ड, डायरी और फोटो शामिल हैं। ZIP पासवर्ड से सुरक्षित नहीं है; सुरक्षित स्थान पर रखें। बहाली मौजूदा स्थानीय डेटा को बदल देगी।" else "Backup includes farmer profile, animals, health records, diary entries and photos. The ZIP is not password-protected; store it securely. Restoring replaces current local data.",modifier=Modifier.padding(10.dp),fontSize=11.sp,color=DiaryInk)
   }
   OutlinedTextField(query,{query=it},Modifier.fillMaxWidth(),singleLine=true,label={Text(if(isHindi)"डायरी में खोजें" else "Search diary entries")})
   Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(5.dp)){
@@ -168,6 +172,8 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
     }
     if(photoNames(photoPathsRaw).isNotEmpty())Column(verticalArrangement=Arrangement.spacedBy(3.dp)){
      photoNames(photoPathsRaw).forEach{name->Row(verticalAlignment=Alignment.CenterVertically){
+      val thumb=remember(name){DiaryPhotoStore.file(context,name)?.let{file->BitmapFactory.decodeFile(file.absolutePath,BitmapFactory.Options().apply{inSampleSize=4})?.asImageBitmap()}}
+      if(thumb!=null)Image(thumb,contentDescription=if(isHindi)"डायरी फोटो" else "Diary photo",modifier=Modifier.size(52.dp),contentScale=ContentScale.Crop)
       Text(name,modifier=Modifier.weight(1f),fontSize=11.sp,color=DiaryInk)
       TextButton(onClick={
        photoPathsRaw=photoNames(photoPathsRaw).filterNot{it==name}.joinToString("\n")
@@ -199,7 +205,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
     if(details.isNotBlank())Text(details,fontSize=12.sp,color=DiaryInk)
     if(r.notes.isNotBlank())Text(r.notes,fontSize=12.sp,color=Color(0xFF66766B))
     if(r.reminderDate.isNotBlank())Text((if(isHindi)"रिमाइंडर: " else "Reminder: ")+r.reminderDate,fontSize=11.sp,color=DiaryGreen)
-    if(photoNames(r.photoPaths).isNotEmpty())Text(if(isHindi)"📷 ${photoNames(r.photoPaths).size} फोटो संलग्न" else "📷 ${photoNames(r.photoPaths).size} photo(s) attached",fontSize=11.sp,color=DiaryGreen)
+    if(photoNames(r.photoPaths).isNotEmpty())Row(horizontalArrangement=Arrangement.spacedBy(5.dp)){photoNames(r.photoPaths).forEach{name->val thumb=remember(name){DiaryPhotoStore.file(context,name)?.let{file->BitmapFactory.decodeFile(file.absolutePath,BitmapFactory.Options().apply{inSampleSize=4})?.asImageBitmap()}};if(thumb!=null)Image(thumb,contentDescription=if(isHindi)"डायरी फोटो" else "Diary photo",modifier=Modifier.size(52.dp),contentScale=ContentScale.Crop)}}
    }
   }}
   if(message.isNotBlank())Text(message,color=DiaryGreen,fontSize=12.sp)
