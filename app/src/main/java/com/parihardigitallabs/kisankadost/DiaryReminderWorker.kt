@@ -15,15 +15,21 @@ class DiaryReminderWorker(context:Context,params:WorkerParameters):CoroutineWork
   if(r.reminderDate.isBlank() || r.reminderNotified)return Result.success()
   val date=runCatching { LocalDate.parse(r.reminderDate) }.getOrNull()?:return Result.failure()
   if(LocalDateTime.now()<LocalDateTime.of(date,LocalTime.of(9,0)))return Result.retry()
+  val isHindi = applicationContext.getSharedPreferences("kisan_preferences", Context.MODE_PRIVATE)
+   .getBoolean("is_hindi", true)
   if(Build.VERSION.SDK_INT>=26) {
    val mgr=applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-   mgr.createNotificationChannel(NotificationChannel(CHANNEL,"Farm diary reminders",NotificationManager.IMPORTANCE_DEFAULT))
+   val channelName = if (isHindi) "खेत डायरी की सूचनाएँ" else "Farm diary reminders"
+   val channelDescription = if (isHindi) "खेत डायरी में दर्ज कार्यों और तारीखों की याद दिलाने वाली सूचनाएँ।" else "Reminders for tasks and dates recorded in the farm diary."
+   mgr.createNotificationChannel(NotificationChannel(CHANNEL,channelName,NotificationManager.IMPORTANCE_DEFAULT).apply {
+    description = channelDescription
+   })
   }
   val intent=applicationContext.packageManager.getLaunchIntentForPackage(applicationContext.packageName)
   val pending=intent?.let { PendingIntent.getActivity(applicationContext,id.toInt(),it,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE) }
   val body=listOf(r.subject,r.recordDate).filter { it.isNotBlank() }.joinToString(" • ")
   val note=NotificationCompat.Builder(applicationContext,CHANNEL).setSmallIcon(android.R.drawable.ic_dialog_info)
-   .setContentTitle(r.title).setContentText(body.ifBlank { "Farm diary reminder" }).setAutoCancel(true)
+   .setContentTitle(r.title).setContentText(body.ifBlank { if (isHindi) "खेत डायरी की याद दिलाना" else "Farm diary reminder" }).setAutoCancel(true)
    .apply { if(pending!=null)setContentIntent(pending) }.build()
   val notifications = NotificationManagerCompat.from(applicationContext)
   if (!notifications.areNotificationsEnabled()) return Result.success()
