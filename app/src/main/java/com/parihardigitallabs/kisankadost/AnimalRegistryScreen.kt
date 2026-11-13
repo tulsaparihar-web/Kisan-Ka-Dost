@@ -20,6 +20,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.parihardigitallabs.kisankadost.data.AnimalRecordEntity
+import com.parihardigitallabs.kisankadost.data.AnimalHealthRecordEntity
 
 private val RegistryGreen = Color(0xFF247A45)
 private val RegistryInk = Color(0xFF203128)
@@ -48,6 +50,7 @@ private val RegistryInk = Color(0xFF203128)
 @Composable
 fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
     val records by viewModel.records.collectAsState()
+    val healthRecords by viewModel.healthRecords.collectAsState()
     var name by rememberSaveable { mutableStateOf("") }
     var species by rememberSaveable { mutableStateOf("Cattle") }
     var tag by rememberSaveable { mutableStateOf("") }
@@ -58,6 +61,13 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
     var message by rememberSaveable { mutableStateOf("") }
     var pendingDelete by remember { mutableStateOf<AnimalRecordEntity?>(null) }
     var editingRecord by remember { mutableStateOf<AnimalRecordEntity?>(null) }
+    var healthAnimal by remember { mutableStateOf<AnimalRecordEntity?>(null) }
+    var healthTitle by rememberSaveable { mutableStateOf("") }
+    var healthDate by rememberSaveable { mutableStateOf("") }
+    var nextReminderDate by rememberSaveable { mutableStateOf("") }
+    var vetConfirmed by rememberSaveable { mutableStateOf(false) }
+    var healthNotes by rememberSaveable { mutableStateOf("") }
+    var healthError by remember { mutableStateOf("") }
 
     val speciesOptions = listOf(
         "Cattle" to "गाय/बैल", "Buffalo" to "भैंस", "Goat" to "बकरी",
@@ -166,30 +176,94 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 records.forEach { record ->
                     Card(colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(14.dp)) {
-                        Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                                Text(record.name, fontWeight = FontWeight.Bold, color = RegistryInk, fontSize = 16.sp)
-                                Text(speciesLabel(record.species) + if (record.tagNumber.isNotBlank()) " • ${record.tagNumber}" else "", color = RegistryGreen, fontSize = 12.sp)
-                                val details = listOf(record.sex.takeIf { it.isNotBlank() }?.let { if (isHindi) if (it == "Female") "मादा" else if (it == "Male") "नर" else "अज्ञात" else it }, record.ageOrDob, record.purpose).filterNotNull().filter { it.isNotBlank() }
-                                if (details.isNotEmpty()) Text(details.joinToString(" • "), fontSize = 12.sp, color = Color(0xFF66766B))
-                                if (record.notes.isNotBlank()) Text(record.notes, fontSize = 12.sp, color = RegistryInk)
+                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                    Text(record.name, fontWeight = FontWeight.Bold, color = RegistryInk, fontSize = 16.sp)
+                                    Text(speciesLabel(record.species) + if (record.tagNumber.isNotBlank()) " • ${record.tagNumber}" else "", color = RegistryGreen, fontSize = 12.sp)
+                                    val details = listOf(record.sex.takeIf { it.isNotBlank() }?.let { if (isHindi) if (it == "Female") "मादा" else if (it == "Male") "नर" else "अज्ञात" else it }, record.ageOrDob, record.purpose).filterNotNull().filter { it.isNotBlank() }
+                                    if (details.isNotEmpty()) Text(details.joinToString(" • "), fontSize = 12.sp, color = Color(0xFF66766B))
+                                    if (record.notes.isNotBlank()) Text(record.notes, fontSize = 12.sp, color = RegistryInk)
+                                }
+                                IconButton(onClick = {
+                                    editingRecord = record
+                                    name = record.name; species = record.species; tag = record.tagNumber
+                                    sex = record.sex; age = record.ageOrDob; purpose = record.purpose; notes = record.notes
+                                    message = if (isHindi) "रिकॉर्ड संपादित किया जा रहा है।" else "Editing this record."
+                                }) {
+                                    Icon(Icons.Default.Edit, contentDescription = if (isHindi) "बदलें" else "Edit", tint = RegistryGreen)
+                                }
+                                IconButton(onClick = { pendingDelete = record }) {
+                                    Icon(Icons.Default.DeleteOutline, contentDescription = if (isHindi) "हटाएँ" else "Delete", tint = Color(0xFF9B3D32))
+                                }
                             }
-                            IconButton(onClick = {
-                                editingRecord = record
-                                name = record.name; species = record.species; tag = record.tagNumber
-                                sex = record.sex; age = record.ageOrDob; purpose = record.purpose; notes = record.notes
-                                message = if (isHindi) "रिकॉर्ड संपादित किया जा रहा है।" else "Editing this record."
-                            }) {
-                                Icon(Icons.Default.Edit, contentDescription = if (isHindi) "बदलें" else "Edit", tint = RegistryGreen)
+                            val eventsForAnimal = healthRecords.filter { it.animalId == record.id }
+                            if (eventsForAnimal.isNotEmpty()) {
+                                Text(if (isHindi) "स्वास्थ्य रिकॉर्ड" else "Health records", fontWeight = FontWeight.SemiBold, color = RegistryGreen, fontSize = 12.sp)
+                                eventsForAnimal.forEach { event ->
+                                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                        Text("${event.eventTitle} • ${event.eventDate}", fontSize = 12.sp, color = RegistryInk)
+                                        if (event.nextReminderDate.isNotBlank()) Text((if (isHindi) "अगली याद दिलाने की तारीख: " else "Next reminder date: ") + event.nextReminderDate, fontSize = 11.sp, color = RegistryGreen)
+                                        Text(if (event.veterinarianConfirmed) { if (isHindi) "पशु चिकित्सक से पुष्टि" else "Veterinarian confirmed" } else { if (isHindi) "स्वयं दर्ज • पुष्टि नहीं" else "Self-entered • unconfirmed" }, fontSize = 10.sp, color = Color(0xFF66766B))
+                                        if (event.notes.isNotBlank()) Text(event.notes, fontSize = 11.sp, color = Color(0xFF66766B))
+                                    }
+                                }
                             }
-                            IconButton(onClick = { pendingDelete = record }) {
-                                Icon(Icons.Default.DeleteOutline, contentDescription = if (isHindi) "हटाएँ" else "Delete", tint = Color(0xFF9B3D32))
-                            }
+                            TextButton(onClick = {
+                                healthAnimal = record
+                                healthTitle = ""; healthDate = ""; nextReminderDate = ""
+                                vetConfirmed = false; healthNotes = ""; healthError = ""
+                            }) { Text(if (isHindi) "स्वास्थ्य रिकॉर्ड / अगली तारीख जोड़ें" else "Add health record / next date") }
                         }
                     }
                 }
             }
         }
+    }
+    healthAnimal?.let { animal ->
+        AlertDialog(
+            onDismissRequest = { healthAnimal = null },
+            title = { Text(if (isHindi) "${animal.name} – स्वास्थ्य रिकॉर्ड" else "${animal.name} – Health record") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(value = healthTitle, onValueChange = { healthTitle = it; healthError = "" },
+                        label = { Text(if (isHindi) "घटना / देखभाल का नाम *" else "Event / care title *") }, singleLine = true)
+                    OutlinedTextField(value = healthDate, onValueChange = { healthDate = it; healthError = "" },
+                        label = { Text(if (isHindi) "तारीख (YYYY-MM-DD) *" else "Date (YYYY-MM-DD) *") }, singleLine = true)
+                    OutlinedTextField(value = nextReminderDate, onValueChange = { nextReminderDate = it; healthError = "" },
+                        label = { Text(if (isHindi) "अगली तारीख (YYYY-MM-DD)" else "Next date (YYYY-MM-DD)") }, singleLine = true)
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Checkbox(checked = vetConfirmed, onCheckedChange = { vetConfirmed = it; healthError = "" })
+                        Text(if (isHindi) "पशु चिकित्सक से तारीख/योजना की पुष्टि हुई है" else "Date/plan confirmed by a veterinarian", fontSize = 12.sp)
+                    }
+                    OutlinedTextField(value = healthNotes, onValueChange = { healthNotes = it },
+                        label = { Text(if (isHindi) "नोट (वैकल्पिक)" else "Notes (optional)") }, minLines = 2)
+                    Text(if (isHindi) "अगली तारीख केवल पशु चिकित्सक से पुष्टि के बाद भरें। यह ऐप अभी फोन पर सूचना/अलार्म नहीं भेजता।" else
+                        "Enter a next date only after veterinary confirmation. The app does not send phone notifications or alarms yet.", fontSize = 11.sp, color = Color(0xFF66766B))
+                    if (healthError.isNotBlank()) Text(healthError, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}")
+                    when {
+                        healthTitle.isBlank() -> healthError = if (isHindi) "घटना का नाम भरें।" else "Enter an event title."
+                        !healthDate.matches(datePattern) -> healthError = if (isHindi) "तारीख YYYY-MM-DD में भरें।" else "Enter date as YYYY-MM-DD."
+                        nextReminderDate.isNotBlank() && !nextReminderDate.matches(datePattern) -> healthError = if (isHindi) "अगली तारीख YYYY-MM-DD में भरें।" else "Enter next date as YYYY-MM-DD."
+                        nextReminderDate.isNotBlank() && !vetConfirmed -> healthError = if (isHindi) "अगली तारीख के लिए पशु चिकित्सक की पुष्टि जरूरी है।" else "Veterinarian confirmation is required for a next date."
+                        else -> viewModel.addHealthRecord(
+                            AnimalHealthRecordEntity(
+                                animalId = animal.id, eventTitle = healthTitle.trim(), eventDate = healthDate,
+                                nextReminderDate = nextReminderDate, veterinarianConfirmed = vetConfirmed, notes = healthNotes.trim()
+                            ),
+                            onSaved = { healthAnimal = null },
+                            onError = { healthError = if (isHindi) "रिकॉर्ड सुरक्षित नहीं हो सका।" else "Could not save the record." }
+                        )
+                    }
+                }) { Text(if (isHindi) "सुरक्षित करें" else "Save") }
+            },
+            dismissButton = { TextButton(onClick = { healthAnimal = null }) { Text(if (isHindi) "रद्द करें" else "Cancel") } }
+        )
     }
     pendingDelete?.let { record ->
         AlertDialog(
