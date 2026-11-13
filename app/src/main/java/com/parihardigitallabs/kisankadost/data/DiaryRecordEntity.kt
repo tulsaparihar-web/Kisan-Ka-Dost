@@ -1,4 +1,5 @@
 package com.parihardigitallabs.kisankadost.data
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 @Entity(tableName = "diary_records")
@@ -7,6 +8,6 @@ data class DiaryRecordEntity(
  val recordType: String, val title: String, val recordDate: String,
  val subject: String = "", val quantity: Double = 0.0, val unit: String = "",
  val amount: Double = 0.0, val notes: String = "", val reminderDate: String = "",
- val photoPaths: String = "",
+ @ColumnInfo(defaultValue = "''") val photoPaths: String = "",
  val createdAt: Long = System.currentTimeMillis(), val updatedAt: Long = System.currentTimeMillis()
 )
