@@ -103,6 +103,7 @@ object DiaryBackupManager {
                             val bytes = readLimited(zip, MAX_PHOTO_BYTES)
                             totalBytes += bytes.size
                             file.writeBytes(bytes)
+                            require(DiaryPhotoStore.isValidStoredPhoto(file)) { "Backup contains an invalid or oversized photo" }
                             stagedPhotos[name] = file
                         }
                         else -> throw IOException("Backup contains an unexpected file")
