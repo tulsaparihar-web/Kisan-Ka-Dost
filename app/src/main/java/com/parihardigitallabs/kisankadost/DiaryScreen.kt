@@ -48,6 +48,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
  val records by viewModel.records.collectAsState()
  val context=LocalContext.current
  var filter by rememberSaveable{mutableStateOf("ALL")}
+ var query by rememberSaveable{mutableStateOf("")}
  var showForm by rememberSaveable{mutableStateOf(false)}
  var editing by remember{mutableStateOf<DiaryRecordEntity?>(null)}
  var deleting by remember{mutableStateOf<DiaryRecordEntity?>(null)}
@@ -142,6 +143,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
   Card(colors=CardDefaults.cardColors(containerColor=Color(0xFFEFF6F0)),shape=RoundedCornerShape(12.dp)){
    Text(if(isHindi)"बैकअप में किसान प्रोफाइल, पशु, स्वास्थ्य रिकॉर्ड, डायरी और फोटो शामिल हैं। बहाली मौजूदा स्थानीय डेटा को बदल देगी।" else "Backup includes farmer profile, animals, health records, diary entries and photos. Restoring replaces current local data.",modifier=Modifier.padding(10.dp),fontSize=11.sp,color=DiaryInk)
   }
+  OutlinedTextField(query,{query=it},Modifier.fillMaxWidth(),singleLine=true,label={Text(if(isHindi)"डायरी में खोजें" else "Search diary entries")})
   Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(5.dp)){
    (listOf("ALL")+diaryTypes).forEach{t->FilterChip(selected=filter==t,onClick={filter=t},label={Text(if(t=="ALL"){if(isHindi)"सभी" else "All"}else diaryLabel(t,isHindi))})}
   }
@@ -182,7 +184,7 @@ fun DiaryScreen(isHindi:Boolean,viewModel:DiaryViewModel){
     }
    }
   }
-  val visible=records.filter{filter=="ALL"||it.recordType==filter}
+  val visible=records.filter{(filter=="ALL"||it.recordType==filter) && (query.isBlank() || listOf(it.title,it.subject,it.notes,it.recordDate).any{value->value.contains(query.trim(),ignoreCase=true)})}
   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text(if(isHindi)"डायरी रिकॉर्ड" else "Diary entries",fontWeight=FontWeight.Bold,color=DiaryInk);Text(if(isHindi)"कुल ${visible.size}" else "${visible.size} total",color=DiaryGreen,fontSize=12.sp)}
   if(visible.isEmpty())Text(if(isHindi)"अभी कोई रिकॉर्ड नहीं है। पहला रिकॉर्ड जोड़ें।" else "No entries yet. Add your first record.",color=Color(0xFF66766B),fontSize=13.sp)
   visible.forEach{r->Card(colors=CardDefaults.cardColors(containerColor=Color.White),shape=RoundedCornerShape(14.dp)){
