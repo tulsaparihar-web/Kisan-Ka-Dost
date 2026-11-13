@@ -197,7 +197,7 @@ fun AnimalRegistryScreen(isHindi: Boolean, viewModel: AnimalRegistryViewModel) {
         if (editingRecord != null) {
             TextButton(onClick = {
                 editingRecord = null
-                name = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
+                name = ""; breed = ""; tag = ""; sex = ""; age = ""; purpose = ""; notes = ""
                 message = ""
             }) { Text(if (isHindi) "संपादन रद्द करें" else "Cancel editing") }
         }
