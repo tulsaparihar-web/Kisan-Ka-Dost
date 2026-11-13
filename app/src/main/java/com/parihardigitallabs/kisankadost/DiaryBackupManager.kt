@@ -26,7 +26,8 @@ object DiaryBackupManager {
     private const val BACKUP_VERSION = 1
     private const val MAX_ARCHIVE_BYTES = 100L * 1024L * 1024L
     private const val MAX_JSON_BYTES = 8L * 1024L * 1024L
-    private const val MAX_ENTRIES = 600
+    private const val MAX_ENTRIES = 25_001
+    private const val MAX_PHOTO_BYTES = 12L * 1024L * 1024L
 
     suspend fun exportBackup(context: Context, uri: Uri, db: AppDatabase) = withContext(Dispatchers.IO) {
         val snapshot = db.withTransaction {
@@ -37,21 +38,34 @@ object DiaryBackupManager {
                 diaries = db.diaryRecordDao().getAllForBackup()
             )
         }
+        val photoNames = snapshot.diaries.flatMap { it.photoPaths.toPhotoNames() }.distinct()
+        require(photoNames.size + 1 <= MAX_ENTRIES) { "There are too many photos for one backup" }
         val json = encode(snapshot).toByteArray(Charsets.UTF_8)
         require(json.size <= MAX_JSON_BYTES) { "Backup data is too large" }
-        val output = context.contentResolver.openOutputStream(uri) ?: throw IOException("Cannot open backup destination")
-        ZipOutputStream(BufferedOutputStream(output)).use { zip ->
-            zip.putNextEntry(ZipEntry("backup.json"))
-            zip.write(json)
-            zip.closeEntry()
-            snapshot.diaries.flatMap { it.photoPaths.toPhotoNames() }.distinct().forEach { name ->
-                val photo = DiaryPhotoStore.file(context, name) ?: throw IOException("An attached diary photo is missing")
-                zip.putNextEntry(ZipEntry("photos/$name"))
-                photo.inputStream().buffered().use { it.copyTo(zip) }
+        var totalBytes = json.size.toLong()
+        require(totalBytes <= MAX_ARCHIVE_BYTES) { "Backup archive is too large" }
+        val temporaryZip = File(context.cacheDir, "farm_backup_${UUID.randomUUID()}.zip")
+        try {
+            ZipOutputStream(BufferedOutputStream(temporaryZip.outputStream())).use { zip ->
+                zip.putNextEntry(ZipEntry("backup.json"))
+                zip.write(json)
                 zip.closeEntry()
+                photoNames.forEach { name ->
+                    val photo = DiaryPhotoStore.file(context, name) ?: throw IOException("An attached diary photo is missing")
+                    require(photo.length() <= MAX_PHOTO_BYTES) { "An attached photo is too large for backup" }
+                    zip.putNextEntry(ZipEntry("photos/$name"))
+                    val copied = photo.inputStream().buffered().use { copyLimited(it, zip, MAX_PHOTO_BYTES) }
+                    totalBytes += copied
+                    require(totalBytes <= MAX_ARCHIVE_BYTES) { "Backup archive is too large" }
+                    zip.closeEntry()
+                }
             }
+            val output = context.contentResolver.openOutputStream(uri) ?: throw IOException("Cannot open backup destination")
+            temporaryZip.inputStream().buffered().use { input -> output.buffered().use { input.copyTo(it) } }
+            true
+        } finally {
+            temporaryZip.delete()
         }
-        true
     }
 
     suspend fun restoreBackup(context: Context, uri: Uri, db: AppDatabase) = withContext(Dispatchers.IO) {
@@ -62,6 +76,7 @@ object DiaryBackupManager {
             var totalBytes = 0L
             var entries = 0
             var jsonBytes: ByteArray? = null
+            var backupFound = false
             val stagedPhotos = linkedMapOf<String, File>()
             val input = context.contentResolver.openInputStream(uri) ?: throw IOException("Cannot open selected backup")
             ZipInputStream(BufferedInputStream(input)).use { zip ->
@@ -72,20 +87,24 @@ object DiaryBackupManager {
                     require(!entry.isDirectory && !entry.name.startsWith("/") && !entry.name.contains("..")) { "Invalid backup entry" }
                     when {
                         entry.name == "backup.json" -> {
+                            require(!backupFound) { "Backup contains duplicate data files" }
+                            backupFound = true
                             val bytes = readLimited(zip, MAX_JSON_BYTES)
                             totalBytes += bytes.size
                             jsonBytes = bytes
                         }
                         entry.name.startsWith("photos/") -> {
+                            require(entry.name.count { it == '/' } == 1) { "Invalid photo path" }
                             val name = entry.name.removePrefix("photos/")
                             require(DiaryPhotoStore.isSafeName(name)) { "Invalid photo filename" }
                             require(!stagedPhotos.containsKey(name)) { "Duplicate photo filename" }
                             val file = File(staging, name)
-                            val bytes = readLimited(zip, 12L * 1024L * 1024L)
+                            val bytes = readLimited(zip, MAX_PHOTO_BYTES)
                             totalBytes += bytes.size
                             file.writeBytes(bytes)
                             stagedPhotos[name] = file
                         }
+                        else -> throw IOException("Backup contains an unexpected file")
                     }
                     require(totalBytes <= MAX_ARCHIVE_BYTES) { "Backup archive is too large" }
                     zip.closeEntry()
@@ -97,10 +116,7 @@ object DiaryBackupManager {
             val animals = root.getJSONArray("animals").toAnimals()
             val health = root.getJSONArray("animalHealth").toHealth()
             val diaries = root.getJSONArray("diaries").toDiaries()
-            val animalIds = animals.map { it.id }.toSet()
-            require(health.all { it.animalId in animalIds }) { "Backup has animal health records without a matching animal" }
-            val requiredPhotos = diaries.flatMap { it.photoPaths.toPhotoNames() }.distinct()
-            require(requiredPhotos.all { stagedPhotos.containsKey(it) }) { "A photo referenced by the diary is missing from the backup" }
+            val requiredPhotos = DiaryBackupValidation.validate(farmers, animals, health, diaries, stagedPhotos.keys)
 
             val photoMap = mutableMapOf<String, String>()
             val photoDirectory = File(context.filesDir, "diary_photos").apply { mkdirs() }
@@ -150,6 +166,19 @@ object DiaryBackupManager {
         db.animalHealthRecordDao().getConfirmedReminders().forEach { record ->
             runCatching { AnimalReminderScheduler.schedule(context, record.id, record.nextReminderDate) }
         }
+    }
+
+    private fun copyLimited(input: java.io.InputStream, output: java.io.OutputStream, max: Long): Long {
+        val buffer = ByteArray(8192)
+        var count = 0L
+        while (true) {
+            val read = input.read(buffer)
+            if (read < 0) break
+            count += read
+            require(count <= max) { "Backup entry is too large" }
+            output.write(buffer, 0, read)
+        }
+        return count
     }
 
     private fun readLimited(input: java.io.InputStream, max: Long): ByteArray {
