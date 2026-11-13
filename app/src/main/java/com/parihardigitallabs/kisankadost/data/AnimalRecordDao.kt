@@ -22,6 +22,9 @@ interface AnimalRecordDao {
     @Delete
     suspend fun delete(record: AnimalRecordEntity)
 
+    @Query("SELECT * FROM animal_records WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Long): AnimalRecordEntity?
+
     @Query("SELECT COUNT(*) FROM animal_records")
     fun observeCount(): Flow<Int>
 }
