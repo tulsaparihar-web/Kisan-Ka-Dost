@@ -196,11 +196,12 @@ object DiaryBackupManager {
         require(animals.all { it.id > 0 && it.name.isNotBlank() && it.species.isNotBlank() }) { "Backup contains an invalid animal profile" }
         require(animals.map { it.id }.distinct().size == animals.size) { "Backup contains duplicate animal IDs" }
         val animalIds = animals.map { it.id }.toSet()
-        require(health.all { it.id > 0 && it.animalId in animalIds }) { "Backup has animal health records without a matching animal" }
+        require(health.all { it.id > 0 && it.animalId in animalIds && it.eventTitle.isNotBlank() }) { "Backup has an invalid animal health record or a record without a matching animal" }
         require(health.map { it.id }.distinct().size == health.size) { "Backup contains duplicate animal health IDs" }
         health.forEach {
             require(runCatching { LocalDate.parse(it.eventDate) }.isSuccess) { "Backup contains an invalid animal health date" }
             require(it.nextReminderDate.isBlank() || runCatching { LocalDate.parse(it.nextReminderDate) }.isSuccess) { "Backup contains an invalid animal reminder date" }
+            require(it.nextReminderDate.isBlank() || it.veterinarianConfirmed) { "Backup contains an animal reminder without veterinary confirmation" }
         }
         require(diaries.all { it.id > 0 && it.title.isNotBlank() && it.recordType in setOf("FIELD", "GARDEN", "ANIMAL", "EXPENSE", "LABOUR", "INPUT", "PRODUCTION") }) {
             "Backup contains an invalid diary entry"
