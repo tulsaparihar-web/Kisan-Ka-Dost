@@ -39,6 +39,7 @@ object DiaryBackupManager {
             )
         }
         val photoNames = snapshot.diaries.flatMap { it.photoPaths.toPhotoNames() }.distinct()
+        DiaryBackupValidation.validate(snapshot.farmers, snapshot.animals, snapshot.health, snapshot.diaries, photoNames.toSet())
         require(photoNames.size + 1 <= MAX_ENTRIES) { "There are too many photos for one backup" }
         val json = encode(snapshot).toByteArray(Charsets.UTF_8)
         require(json.size <= MAX_JSON_BYTES) { "Backup data is too large" }
