@@ -1,5 +1,6 @@
 package com.parihardigitallabs.kisankadost
 
+import android.content.Context
 import android.graphics.Bitmap
 import org.json.JSONObject
 import java.io.File
@@ -36,9 +37,9 @@ object PlantNetApi {
         }.sortedByDescending { it.confidence }.take(3)
     }
 
-    fun identify(bitmap: Bitmap, apiKey: String): List<PlantPrediction> {
+    fun identify(context: Context, bitmap: Bitmap, apiKey: String): List<PlantPrediction> {
         require(apiKey.isNotBlank()) { "A Pl@ntNet API key is required." }
-        val photo = File.createTempFile("plantnet_", ".jpg")
+        val photo = File.createTempFile("plantnet_", ".jpg", context.cacheDir)
         try {
             photo.outputStream().use { output ->
                 check(bitmap.compress(Bitmap.CompressFormat.JPEG, 90, output)) { "Could not prepare the plant photo." }
