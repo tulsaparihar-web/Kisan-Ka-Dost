@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
+import androidx.core.content.FileProvider
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.exifinterface.media.ExifInterface
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -136,8 +138,8 @@ private val plantGuides = listOf(
     PlantGuide("Lemongrass", "लेमनग्रास", "Herb", "हर्ब", "Full sun", "पूरा धूप", "Water regularly while establishing; reduce in cool weather.", "स्थापित होते समय नियमित पानी दें; ठंड में कम करें।", "Fertile, well-drained soil", "उपजाऊ, अच्छी जल निकासी वाली मिट्टी", "Divide clumps when crowded and harvest outer leaves.", "घना होने पर गुच्छों को बाँटें और बाहरी पत्तियों की कटाई करें।")
 )
 
-data class PlantPrediction(val label: String, val confidence: Float)
-data class PlantDoctorState(val bitmap: Bitmap? = null, val predictions: List<PlantPrediction> = emptyList(), val analyzing: Boolean = false, val error: String? = null)
+data class PlantPrediction(val label: String, val confidence: Float, val source: String = "Offline crop model")
+data class PlantDoctorState(val bitmap: Bitmap? = null, val predictions: List<PlantPrediction> = emptyList(), val analyzing: Boolean = false, val error: String? = null, val notice: String? = null)
 
 class PlantDoctorViewModel(application: Application) : AndroidViewModel(application) {
     private val diagnosisDao = AppDatabase.getInstance(application).plantDiagnosisDao()
@@ -148,6 +150,10 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
     private var labels: List<String> = emptyList()
 
     fun showError(message: String) { _state.value = _state.value.copy(analyzing = false, error = message) }
+
+    fun hasPlantNetKey(): Boolean = !PlantNetKeyStore.read(getApplication()).isNullOrBlank()
+    fun readPlantNetKey(): String = PlantNetKeyStore.read(getApplication()).orEmpty()
+    fun savePlantNetKey(value: String) = PlantNetKeyStore.save(getApplication(), value)
 
     fun deleteHistory(record: PlantDiagnosisEntity) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -186,62 +192,75 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    fun analyze(bitmap: Bitmap) {
+    fun analyze(bitmap: Bitmap, isHindi: Boolean) {
         _state.value = PlantDoctorState(bitmap = bitmap, analyzing = true)
         viewModelScope.launch(Dispatchers.Default) {
+            var notice: String? = null
             try {
-                val model = interpreter ?: loadModel().also { interpreter = it }
-                val inputShape = model.getInputTensor(0).shape()
-                val outputShape = model.getOutputTensor(0).shape()
-                require(inputShape.size == 4 && inputShape[0] == 1 && inputShape[3] == 3 && inputShape[1] > 0 && inputShape[2] > 0) { "Unsupported model input shape" }
-                require(outputShape.size == 2 && outputShape[0] == 1 && outputShape[1] > 0) { "Unsupported model output shape" }
-                require(model.getInputTensor(0).dataType() == org.tensorflow.lite.DataType.FLOAT32) { "Unsupported model input type" }
-                require(model.getOutputTensor(0).dataType() == org.tensorflow.lite.DataType.FLOAT32) { "Unsupported model output type" }
-                val height = inputShape[1]
-                val width = inputShape[2]
-                val outputCount = outputShape.last()
-                if (labels.isEmpty()) {
-                    labels = getApplication<Application>().assets.open("plant_disease_labels.txt")
-                        .bufferedReader().useLines { it.filter(String::isNotBlank).toList() }
+                val apiKey = PlantNetKeyStore.read(getApplication())
+                val onlineResults = if (!apiKey.isNullOrBlank()) {
+                    runCatching {
+                        withContext(Dispatchers.IO) { PlantNetApi.identify(getApplication(), bitmap, apiKey) }
+                    }.onFailure {
+                        notice = if (isHindi) "ऑनलाइन पहचान अभी उपलब्ध नहीं है; ऑफलाइन फसल मॉडल से जाँच की गई।" else "Online identification is unavailable; the offline crop model was used instead."
+                    }.getOrDefault(emptyList())
+                } else {
+                    notice = if (isHindi) "व्यापक पौधा प्रजाति पहचान के लिए मुफ्त Pl@ntNet API key जोड़ें। अभी सीमित ऑफलाइन फसल मॉडल उपयोग हो रहा है।" else "Add a free Pl@ntNet API key for broader plant species identification. The limited offline crop model is being used for now."
+                    emptyList()
                 }
-                require(labels.size == outputCount) { "Model labels do not match model output." }
-
-                // Center-crop to the model's square input while preserving the leaf's proportions.
-                val cropSide = minOf(bitmap.width, bitmap.height)
-                require(cropSide > 0) { "The selected image is empty." }
-                val square = Bitmap.createBitmap(
-                    bitmap, (bitmap.width - cropSide) / 2, (bitmap.height - cropSide) / 2,
-                    cropSide, cropSide
-                )
-                val resized = Bitmap.createScaledBitmap(square, width, height, true)
-                val output = Array(1) { FloatArray(outputCount) }
-                try {
-                    val pixels = IntArray(width * height)
-                    resized.getPixels(pixels, 0, width, 0, 0, width, height)
-                    val input = ByteBuffer.allocateDirect(4 * width * height * 3).order(ByteOrder.nativeOrder())
-                    pixels.forEach { pixel ->
-                        input.putFloat(((pixel shr 16) and 0xFF) / 255f)
-                        input.putFloat(((pixel shr 8) and 0xFF) / 255f)
-                        input.putFloat((pixel and 0xFF) / 255f)
-                    }
-                    input.rewind()
-                    model.run(input, output)
-                } finally {
-                    if (resized !== square && resized !== bitmap) resized.recycle()
-                    if (square !== bitmap) square.recycle()
-                }
-                val results = output[0].mapIndexed { index, score -> PlantPrediction(labels[index], score) }
-                    .filter { it.confidence.isFinite() && it.confidence in 0f..1f }
-                    .sortedByDescending { it.confidence }.take(3)
-                check(results.isNotEmpty()) { "Model returned no valid scores" }
+                val results = if (onlineResults.isNotEmpty()) onlineResults else runOfflineModel(bitmap)
+                if (results.isEmpty()) throw IllegalStateException("No usable result was returned.")
                 results.firstOrNull()?.let { prediction -> runCatching { saveHistory(bitmap, prediction) } }
-                withContext(Dispatchers.Main) { _state.value = PlantDoctorState(bitmap = bitmap, predictions = results) }
+                withContext(Dispatchers.Main) {
+                    _state.value = PlantDoctorState(bitmap = bitmap, predictions = results, notice = notice)
+                }
             } catch (error: Exception) {
                 withContext(Dispatchers.Main) {
-                    _state.value = PlantDoctorState(bitmap = bitmap, error = "ANALYSIS_FAILED")
+                    _state.value = PlantDoctorState(bitmap = bitmap, error = "ANALYSIS_FAILED", notice = notice)
                 }
             }
         }
+    }
+
+    private fun runOfflineModel(bitmap: Bitmap): List<PlantPrediction> {
+        val model = interpreter ?: loadModel().also { interpreter = it }
+        val inputShape = model.getInputTensor(0).shape()
+        val outputShape = model.getOutputTensor(0).shape()
+        require(inputShape.size == 4 && inputShape[0] == 1 && inputShape[3] == 3 && inputShape[1] > 0 && inputShape[2] > 0) { "Unsupported model input shape" }
+        require(outputShape.size == 2 && outputShape[0] == 1 && outputShape[1] > 0) { "Unsupported model output shape" }
+        require(model.getInputTensor(0).dataType() == org.tensorflow.lite.DataType.FLOAT32) { "Unsupported model input type" }
+        require(model.getOutputTensor(0).dataType() == org.tensorflow.lite.DataType.FLOAT32) { "Unsupported model output type" }
+        val height = inputShape[1]
+        val width = inputShape[2]
+        val outputCount = outputShape.last()
+        if (labels.isEmpty()) {
+            labels = getApplication<Application>().assets.open("plant_disease_labels.txt")
+                .bufferedReader().useLines { it.filter(String::isNotBlank).toList() }
+        }
+        require(labels.size == outputCount) { "Model labels do not match model output." }
+        val cropSide = minOf(bitmap.width, bitmap.height)
+        require(cropSide > 0) { "The selected image is empty." }
+        val square = Bitmap.createBitmap(bitmap, (bitmap.width - cropSide) / 2, (bitmap.height - cropSide) / 2, cropSide, cropSide)
+        val resized = Bitmap.createScaledBitmap(square, width, height, true)
+        val output = Array(1) { FloatArray(outputCount) }
+        try {
+            val pixels = IntArray(width * height)
+            resized.getPixels(pixels, 0, width, 0, 0, width, height)
+            val input = ByteBuffer.allocateDirect(4 * width * height * 3).order(ByteOrder.nativeOrder())
+            pixels.forEach { pixel ->
+                input.putFloat(((pixel shr 16) and 0xFF) / 255f)
+                input.putFloat(((pixel shr 8) and 0xFF) / 255f)
+                input.putFloat((pixel and 0xFF) / 255f)
+            }
+            input.rewind()
+            model.run(input, output)
+        } finally {
+            if (resized !== square && resized !== bitmap) resized.recycle()
+            if (square !== bitmap) square.recycle()
+        }
+        return output[0].mapIndexed { index, score -> PlantPrediction(labels[index], score) }
+            .filter { it.confidence.isFinite() && it.confidence in 0f..1f }
+            .sortedByDescending { it.confidence }.take(3)
     }
 
     private fun loadModel(): Interpreter {
