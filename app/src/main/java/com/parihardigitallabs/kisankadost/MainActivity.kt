@@ -84,6 +84,7 @@ private data class Feature(
     val tint: Color
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun KisanKaDostApp() {
     val context = LocalContext.current
@@ -94,6 +95,24 @@ private fun KisanKaDostApp() {
     val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
     val animalRegistryViewModel: AnimalRegistryViewModel = viewModel()
     val diaryViewModel: DiaryViewModel = viewModel()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+    val rootRoutes = setOf("home", "tools", "diary", "learn")
+    val toolRoutes = setOf("tools", "myfarm", "animal-records", "crops", "calendar", "plants", "animals", "trees", "soil", "water", "protection", "harvest", "schemes")
+
+    fun navigateRoot(route: String) {
+        val popped = navController.popBackStack(route, inclusive = false)
+        if (!popped) {
+            navController.navigate(route) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    inclusive = false
+                    saveState = false
+                }
+                launchSingleTop = true
+                restoreState = false
+            }
+        }
+    }
 
     MaterialTheme(
         colorScheme = lightColorScheme(
@@ -113,28 +132,44 @@ private fun KisanKaDostApp() {
     ) {
         Scaffold(
             containerColor = WarmWhite,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                            Text(if (isHindi) "किसान का दोस्त" else "Kisan Ka Dost", fontWeight = FontWeight.Bold, color = Forest, fontSize = 18.sp)
+                            Text(if (isHindi) "खेती • बागवानी • पशुपालन" else "Farming • Horticulture • Livestock", color = Muted, fontSize = 10.sp)
+                        }
+                    },
+                    navigationIcon = {
+                        if (currentRoute !in rootRoutes) {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Default.ArrowBack, contentDescription = if (isHindi) "वापस" else "Back")
+                            }
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            navController.navigate("settings") { launchSingleTop = true }
+                        }) {
+                            Icon(Icons.Default.Settings, contentDescription = c.settings, tint = Forest)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                )
+            },
             bottomBar = {
-                NavigationBar(
-                    containerColor = Color.White,
-                    tonalElevation = 4.dp
-                ) {
+                NavigationBar(containerColor = Color.White, tonalElevation = 4.dp) {
                     val items = listOf(
                         Triple("home", c.home, Icons.Default.Home),
+                        Triple("tools", if (isHindi) "टूल्स" else "Tools", Icons.Default.Build),
                         Triple("diary", c.diary, Icons.Default.MenuBook),
-                        Triple("learn", c.learn, Icons.Default.School),
-                        Triple("settings", c.settings, Icons.Default.Settings)
+                        Triple("learn", c.learn, Icons.Default.School)
                     )
-                    val current = navController.currentBackStackEntryAsState().value?.destination?.route
                     items.forEach { (route, label, icon) ->
+                        val selected = currentRoute == route || (route == "tools" && currentRoute in toolRoutes)
                         NavigationBarItem(
-                            selected = current == route,
-                            onClick = {
-                                navController.navigate(route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
+                            selected = selected,
+                            onClick = { navigateRoot(route) },
                             icon = { Icon(icon, contentDescription = label) },
                             label = { Text(label, maxLines = 1) }
                         )
@@ -149,6 +184,9 @@ private fun KisanKaDostApp() {
             ) {
                 composable("home") {
                     HomeScreen(c, isHindi, onFeature = { navController.navigate(it) })
+                }
+                composable("tools") {
+                    ToolsScreen(isHindi) { navController.navigate(it) }
                 }
                 composable("diary") { DiaryScreen(isHindi = isHindi, viewModel = diaryViewModel) }
                 composable("learn") {
@@ -368,6 +406,42 @@ private fun CompactFeatureCard(feature: Feature, isHindi: Boolean, modifier: Mod
                 lineHeight = 16.sp
             )
         }
+    }
+}
+
+@Composable
+private fun ToolsScreen(isHindi: Boolean, onFeature: (String) -> Unit) {
+    val tools = listOf(
+        Feature("फसल की जानकारी", "Crop guides", Icons.Default.Grass, "crops", Color(0xFFE6F1E7)),
+        Feature("फसल कैलेंडर", "Crop calendar", Icons.Default.EventNote, "calendar", Color(0xFFEAF0FA)),
+        Feature("पौधा डॉक्टर", "Plant Doctor", Icons.Default.Spa, "plants", Color(0xFFEAF3DF)),
+        Feature("बागवानी और पौधे", "Horticulture & plants", Icons.Default.Park, "trees", Color(0xFFE4F0E8)),
+        Feature("पशु देखभाल", "Animal care", Icons.Default.Pets, "animals", Color(0xFFFFF0D8)),
+        Feature("पशु रिकॉर्ड", "Animal records", Icons.Default.MedicalServices, "animal-records", Color(0xFFFFF0D8)),
+        Feature("मेरा खेत", "My Farm", Icons.Default.Agriculture, "myfarm", Color(0xFFE3F0E7)),
+        Feature("मिट्टी और पोषण", "Soil & nutrients", Icons.Default.Grain, "soil", Color(0xFFF5EBDD)),
+        Feature("सिंचाई और जल", "Water management", Icons.Default.WaterDrop, "water", Color(0xFFE1F1F7)),
+        Feature("फसल सुरक्षा", "Crop protection", Icons.Default.Shield, "protection", Color(0xFFF3E9E5)),
+        Feature("कटाई और भंडारण", "Harvest & storage", Icons.Default.Inventory2, "harvest", Color(0xFFF2EBDD)),
+        Feature("सरकारी योजनाएं", "Government schemes", Icons.Default.AccountBalance, "schemes", Color(0xFFE8EAF5))
+    )
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp),
+        verticalArrangement = Arrangement.spacedBy(13.dp)
+    ) {
+        Text(if (isHindi) "किसान टूलकिट" else "Farmer Toolkit", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Ink)
+        Text(
+            if (isHindi) "खेती, बागवानी और पशुपालन के सभी उपयोगी टूल एक जगह।" else "All practical tools for crops, horticulture and livestock in one place.",
+            fontSize = 13.sp, color = Muted
+        )
+        tools.forEach { feature ->
+            PillarCard(feature, isHindi) { onFeature(feature.route) }
+        }
+        Text(
+            if (isHindi) "जानकारी सामान्य मार्गदर्शन है। स्थानीय कृषि निर्णय के लिए कृषि विशेषज्ञ और पशु स्वास्थ्य के लिए योग्य पशु चिकित्सक से सलाह लें।"
+            else "Guides provide general information. Consult local agricultural experts for crop decisions and qualified veterinarians for animal health.",
+            fontSize = 12.sp, color = Muted, modifier = Modifier.padding(vertical = 8.dp)
+        )
     }
 }
 
