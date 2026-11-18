@@ -1,70 +1,77 @@
-# किसान का दोस्त – Android App
+# किसान का दोस्त – Kisan Ka Dost
 
 **Parihar Digital Labs**  
 **Tagline:** खेती • बागवानी • पशुपालन  
 Hindi + English | Rajasthan-first | Offline-first | Free for everyone
 
-**किसान का दोस्त (Kisan Ka Dost)** is an all-round digital companion for **कृषि (खेती), बागवानी and पशुपालन**. The product scope includes field crops, horticulture, livestock, farm records, soil and water, weather, markets, government schemes and farm economics. See [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md) for the detailed feature blueprint and [MILESTONE_TRACKER.md](MILESTONE_TRACKER.md) for the implementation audit, acceptance checklist and delivery sequence.
+Kisan Ka Dost is a practical digital companion for farmers and rural households. It brings together **field agriculture, horticulture and animal husbandry**, with offline farm records, learning guides, plant screening, animal care and a farm diary.
 
-## Our promise: free for everyone
+## Our promise
 
-Kisan Ka Dost will remain free for every user—no subscriptions, premium tiers, paywalls or paid feature restrictions. All three pillars (खेती, बागवानी and पशुपालन) stay accessible without payment. We aim to sustain the project through responsible, clearly identified and non-disruptive advertising, voluntary donations and mission-aligned institutional/CSR support. Donations never change access. We will not sell or rent farmers' personal information, farm records, photos, phone numbers or precise location data to advertisers. Personal/farm records remain on-device by default; any sync or sharing must be explicit. Advertising must be screened for misleading or unsafe claims and kept separate from independent agricultural guidance.
+- Free for everyone: no subscriptions, premium tiers, paywalls or paid feature locks.
+- Farmer and farm records stay on the device by default. Export and restore are user-controlled.
+- No sale or rental of personal information, farm records, photos, phone numbers or precise location data.
+- Agricultural and veterinary guidance must be grounded in reliable sources and must not replace local experts.
+- Live weather, mandi rates, scheme status and advisories must show their source and last-updated time. Never display invented or stale information as current.
 
 ## Project details
+
 - App display name: **किसान का दोस्त**
-- English brand name: **Kisan Ka Dost**
-- Tagline: **खेती • बागवानी • पशुपालन**
+- English name: **Kisan Ka Dost**
 - Parent brand: **Parihar Digital Labs**
-- Repository: Kisan-Ka-Dost (unchanged)
-- Package: com.parihardigitallabs.kisankadost
+- Package: `com.parihardigitallabs.kisankadost`
 - Kotlin + Jetpack Compose + Material 3
 - MVVM + Repository pattern
-- Room database for on-device farmer profile and future farm records
-- TensorFlow Lite for on-device plant leaf screening
+- Room database for local records
+- TensorFlow Lite for bounded offline leaf-image screening
 - Minimum Android: API 26 (Android 8.0)
 - Compile/Target SDK: 35
 - Java/JVM target: 17
 
+## Implemented foundations
+
+- Bilingual Hindi/English interface with saved language preference.
+- Farmer profile and basic farm details stored locally.
+- Rajasthan-focused bilingual crop, horticulture, soil, irrigation, crop-stage, IPM and harvest learning content.
+- Offline Plant Doctor leaf screening for supported crop classes, with top-three results, cautious guidance and local diagnosis history.
+- Animal-care library, animal profiles and veterinarian-confirmed health-event reminders.
+- Offline farm/garden/livestock diary with add/edit/delete, search, categories, private photo attachments, reminders and CSV export.
+- User-selected ZIP backup and restore for farmer, animal, animal-health, diary and Plant Doctor records/photos, with legacy backup compatibility.
+- Professional dashboard and Learning Hub work is in progress in [draft PR #7](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/pull/7).
+
+## Delivery status
+
+| Area | Status |
+|---|---|
+| M1 – App foundation | Implemented; cloud builds available |
+| M2 – Farmer profile | Implemented; single basic farm profile |
+| M3 – Agriculture and horticulture foundation | Implemented; physical-device acceptance pending |
+| M4 – Animal husbandry foundation | Implemented; physical-device acceptance pending |
+| M5 – Farm and livestock diary | Implemented; physical-device acceptance pending |
+| Professional UI refresh | In progress – draft PR #7 |
+| M6 – Rajasthan advisory services | Reactivated; not yet implemented |
+| M7 – Markets, schemes and local services | Reactivated; not yet implemented |
+| M8 – Farm economics and smart assistance | Reactivated; not yet implemented |
+
+The complete audit, known limitations and device acceptance checklist are in [MILESTONE_TRACKER.md](MILESTONE_TRACKER.md). The product blueprint is in [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md).
+
 ## Build APK using GitHub Actions
-No Android Studio or local Android SDK is required.
 
 1. Open the [Actions page](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions).
-2. Open the latest successful **Android APK Build** run.
-3. Download the Kisan-Ka-Dost-debug-apk artifact.
-4. Extract the ZIP and install app-debug.apk on an Android phone.
+2. Open the latest successful **Android APK Build** run for the intended commit.
+3. Download the `Kisan-Ka-Dost-debug-apk` artifact.
+4. Extract the ZIP and install `app-debug.apk` on an Android phone.
 
-Every push to main triggers a cloud build. Older in-progress builds are cancelled when a newer commit arrives.
-
-## Implemented and build-verified foundations
-- Home dashboard and feature navigation
-- Hindi / English language switch, saved locally
-- My Farm profile: farmer name, mobile number, village, tehsil, district
-- Farm details: land area/unit, irrigation source, main crops and livestock
-- Farmer profile stored locally using Room; no account or internet connection required
-- Plant Doctor: camera photo and gallery image input
-- Offline TensorFlow Lite leaf screening with top-three predictions and confidence display
-- Bilingual first-step care guidance and low-confidence warnings
-- Searchable bilingual care guide for field crops, vegetables, fruit trees, indoor plants, decorative flowers, herbs and medicinal plants
-- Bilingual soil-health learning guide covering soil sampling/testing, pH and salinity indicators, nutrients, organic matter and responsible fertilizer use (general education, not personalized fertilizer prescriptions)
-
-## Development milestones
-- **M1 – App foundation:** complete; cloud APK build verified.
-- **M2 – Farmer and farm setup:** complete; offline farmer profile and basic farm details, cloud APK build verified.
-- **M3 – Agriculture, horticulture and gardening:** in progress; 15-crop Rajasthan guide, offline Plant Doctor screening for selected crop-leaf classes, 19 bilingual horticulture/gardening guides, and a general Kharif/Rabi/Zaid crop calendar are implemented. District-validated crop windows, irrigation/water conservation, deeper crop/IPM content, orchard/nursery and kitchen-garden coverage remain open. A foundational soil-health and nutrient guide is build-verified. Irrigation/water conservation, crop-stage/IPM and expanded horticulture starter guides (kitchen/terrace garden, nursery, propagation, pruning and protected growing) are implemented and awaiting cloud-build verification.
-- **M4 – Animal husbandry:** planned; species/breed library, feeding, housing, preventive-care records and animal profiles.
-- **M5 – Farm, garden and livestock diaries:** planned.
-- **M6 – Rajasthan advisory services:** deferred until core M3–M5 foundations are stable and explicitly reactivated.
-- **M7 – Markets, schemes and services:** planned.
-- **M8 – Farm economics and smart assistance:** planned.
+Always back up existing app data before installing a build that may have a different debug signing key. Do not uninstall an existing installation until the backup is confirmed.
 
 ## Plant Doctor model scope
-The current model has 39 output classes, including a background class, and covers selected crop leaf classes. It is not a general plant species identifier. Indoor and ornamental plants currently have searchable care guides; broader photo-based identification is a later enhancement.
 
-The model is downloaded from a pinned upstream revision during GitHub Actions and its Git blob hash is verified before the APK build. Attribution and the upstream MIT license are included in THIRD_PARTY_NOTICES.md and the app assets.
+The current model has 39 output classes including a background class, covering selected leaf classes across 14 crop types. It is not a general plant identifier and has not been established as a definitive diagnostic model for Rajasthan field conditions. Model scores are not calibrated disease probabilities. Results are screening hints only; the app must not prescribe pesticides or dosages.
 
 ## Content and safety
-- Agricultural, horticultural and veterinary content will be based on official and research-backed sources, localized by district/region, season and crop/species.
-- AI output is advisory screening, not a confirmed diagnosis.
-- Do not treat an AI result as a pesticide or veterinary prescription. Seek qualified local advice before treatment.
-- Weather, live mandi prices and scheme updates must show their source and last-updated time; no live data is claimed until connected.
-- Farmer records work offline by default. Optional sharing/sync must be explicit.
+
+- Prefer ICAR, Rajasthan agricultural universities, KVKs and official state/central government sources.
+- Distinguish general education from locally validated recommendations.
+- Do not publish unsupported universal sowing dates, seed rates, fertilizer quantities, pesticide doses, veterinary medicines or vaccination schedules.
+- For serious crop or animal health issues, direct farmers to a qualified local expert.
+- Keep network-fed information timestamped and clearly label cached data when offline.

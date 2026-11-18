@@ -21,10 +21,18 @@ class FarmerSetupViewModel(application: Application) : AndroidViewModel(applicat
         initialValue = null
     )
 
-    fun save(profile: FarmerProfileEntity, onSaved: () -> Unit) {
+    fun save(
+        profile: FarmerProfileEntity,
+        onSaved: () -> Unit,
+        onError: (Throwable) -> Unit = {}
+    ) {
         viewModelScope.launch {
-            repository.save(profile)
-            onSaved()
+            try {
+                repository.save(profile)
+                onSaved()
+            } catch (error: Exception) {
+                onError(error)
+            }
         }
     }
 }
