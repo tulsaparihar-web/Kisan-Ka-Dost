@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -60,7 +59,7 @@ private val hi = Copy(
     "होम", "खेत डायरी", "जानकारी", "सेटिंग्स",
     "फसल देखभाल", "पौधा डॉक्टर", "पशुपालन", "बागवानी व गार्डन", "मिट्टी और खाद", "सिंचाई और जल संरक्षण",
     "सरकारी योजनाएं", "यह सुविधा अगले चरण में जोड़ी जाएगी",
-    "भाषा", "ऐप के बारे में", "खेती • बागवानी • पशुपालन"
+    "भाषा", "ऐप के बारे में", "खेती • बागवानी • पशुपालन", "किसान उपकरण"
 )
 private val en = Copy(
     "Namaste, Kisan!", "Your companion for farming, gardening and animal care",
@@ -70,7 +69,7 @@ private val en = Copy(
     "Home", "Farm Diary", "Learn", "Settings",
     "Crop Care", "Plants", "Animal Care", "Horticulture & Garden", "Soil & Fertilizer", "Irrigation & Water Saving",
     "Government Schemes", "This feature will be added in a future milestone",
-    "Language", "About the app", "Farming • Gardening • Animal Husbandry"
+    "Language", "About the app", "Farming • Gardening • Animal Husbandry", "Farm Tools"
 )
 
 private data class Feature(val titleHi: String, val titleEn: String, val icon: ImageVector, val route: String, val tint: Color)
@@ -94,23 +93,41 @@ private fun KisanKaDostApp() {
     ) {
         Scaffold(
             containerColor = WarmWhite,
+            topBar = {
+                Row(
+                    modifier = Modifier.fillMaxWidth().background(Color.White).padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = {
+                        navController.navigate("settings") { launchSingleTop = true }
+                    }) {
+                        Icon(Icons.Default.Settings, contentDescription = c.settings, tint = Forest)
+                    }
+                }
+            },
             bottomBar = {
                 NavigationBar(containerColor = Color.White) {
                     val items = listOf(
                         Triple("home", c.home, Icons.Default.Home),
                         Triple("diary", c.diary, Icons.Default.MenuBook),
-                        Triple("learn", c.learn, Icons.Default.School),
-                        Triple("settings", c.settings, Icons.Default.Settings)
+                        Triple("tools", c.tools, Icons.Default.Build),
+                        Triple("learn", c.learn, Icons.Default.School)
                     )
                     val current = navController.currentBackStackEntryAsState().value?.destination?.route
+                    val selectedRoot = when (current) {
+                        "diary" -> "diary"
+                        "tools" -> "tools"
+                        "learn" -> "learn"
+                        else -> "home"
+                    }
                     items.forEach { (route, label, icon) ->
                         NavigationBarItem(
-                            selected = current == route,
+                            selected = selectedRoot == route,
                             onClick = {
                                 navController.navigate(route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                    popUpTo("home") { inclusive = false }
                                     launchSingleTop = true
-                                    restoreState = true
                                 }
                             },
                             icon = { Icon(icon, contentDescription = label) },
@@ -130,6 +147,7 @@ private fun KisanKaDostApp() {
                 }
                 composable("diary") { DiaryScreen(isHindi = isHindi, viewModel = diaryViewModel) }
                 composable("learn") { PlaceholderScreen(if (isHindi) "किसान ज्ञान" else "Farmer Knowledge", c.coming, Icons.Default.MenuBook) }
+                composable("tools") { ToolsScreen(isHindi = isHindi, onOpen = { route -> navController.navigate(route) }) }
                 composable("myfarm") { MyFarmScreen(isHindi = isHindi, viewModel = farmerSetupViewModel) }
                 composable("animal-records") { AnimalRegistryScreen(isHindi = isHindi, viewModel = animalRegistryViewModel) }
                 composable("settings") {
@@ -180,7 +198,8 @@ private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
         Feature("फसल अवस्था व सुरक्षा", "Crop Stages & Protection", Icons.Default.Shield, "protection", Color(0xFFF3E9E5)),
         Feature("कटाई और भंडारण", "Harvest & Storage", Icons.Default.Inventory2, "harvest", Color(0xFFF2EBDD)),
         Feature("सरकारी योजनाएं", "Government Schemes", Icons.Default.AccountBalance, "schemes", Color(0xFFE8EAF5)),
-        Feature("मेरा खेत", "My Farm", Icons.Default.Agriculture, "myfarm", Color(0xFFE3F0E7))
+        Feature("मेरा खेत", "My Farm", Icons.Default.Agriculture, "myfarm", Color(0xFFE3F0E7)),
+        Feature("किसान उपकरण", "Farm Tools", Icons.Default.Build, "tools", Color(0xFFE9EEF7))
     )
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
@@ -231,6 +250,38 @@ private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
                 Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     Text(c.tip, fontWeight = FontWeight.Bold, color = Ink)
                     Text(c.tipText, fontSize = 12.sp, lineHeight = 17.sp, color = Color(0xFF62543A))
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun ToolsScreen(isHindi: Boolean, onOpen: (String) -> Unit) {
+    val tools = listOf(
+        Triple(if (isHindi) "फसल कैलेंडर" else "Crop Calendar", "calendar", Icons.Default.EventNote),
+        Triple(if (isHindi) "मिट्टी और खाद" else "Soil & Fertilizer", "soil", Icons.Default.Grain),
+        Triple(if (isHindi) "सिंचाई और जल संरक्षण" else "Irrigation & Water Saving", "water", Icons.Default.WaterDrop),
+        Triple(if (isHindi) "फसल अवस्था व सुरक्षा" else "Crop Stages & Protection", "protection", Icons.Default.Shield),
+        Triple(if (isHindi) "कटाई और भंडारण" else "Harvest & Storage", "harvest", Icons.Default.Inventory2),
+        Triple(if (isHindi) "मेरे पशुओं के रिकॉर्ड" else "My Animal Records", "animal-records", Icons.Default.Pets),
+        Triple(if (isHindi) "मेरा खेत" else "My Farm", "myfarm", Icons.Default.Agriculture)
+    )
+    Column(Modifier.fillMaxSize().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(if (isHindi) "किसान उपकरण" else "Farm Tools", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Ink)
+        Text(if (isHindi) "रोजमर्रा के खेती और खेत प्रबंधन के उपयोगी उपकरण।" else "Useful tools for everyday farming and farm management.", color = Color(0xFF66766B), fontSize = 13.sp)
+        tools.forEach { (title, route, icon) ->
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable { onOpen(route) },
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(15.dp)
+            ) {
+                Row(Modifier.fillMaxWidth().padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(icon, contentDescription = null, tint = Forest)
+                    Spacer(Modifier.width(12.dp))
+                    Text(title, modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold, color = Ink)
+                    Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color(0xFF66766B))
                 }
             }
         }
