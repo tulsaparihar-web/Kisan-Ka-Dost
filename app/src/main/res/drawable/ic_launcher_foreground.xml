@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Sunrise -->
+    <path android:fillColor="#FFC83D" android:pathData="M54,13a19,19 0,1 0,0.1 0" />
+    <!-- Rolling fields -->
+    <path android:fillColor="#2E8B45" android:pathData="M0,69 C19,57 33,65 49,70 C68,77 87,61 108,66 L108,108 L0,108 Z" />
+    <path android:fillColor="#58A83F" android:pathData="M0,82 C20,69 35,76 54,82 C73,88 91,73 108,78 L108,108 L0,108 Z" />
+    <path android:fillColor="#A7D65A" android:pathData="M0,94 C22,84 39,89 54,94 C72,100 92,86 108,90 L108,108 L0,108 Z" />
+    <!-- Furrows -->
+    <path android:fillColor="#00000000" android:strokeColor="#D6EFA1" android:strokeWidth="2" android:pathData="M8,99 C30,89 42,94 54,99 M100,96 C82,89 70,94 58,99" />
+    <!-- Stem -->
+    <path android:fillColor="#F2D16B" android:pathData="M52,93 C52,75 52,57 54,40 C56,58 57,76 57,93 Z" />
+    <!-- Left leaf -->
+    <path android:fillColor="#B7E36B" android:pathData="M53,57 C37,34 17,37 16,42 C22,59 39,66 53,61 Z" />
+    <path android:fillColor="#4D9B3D" android:pathData="M50,58 C38,48 28,44 19,42 C31,51 40,57 50,60 Z" />
+    <!-- Right leaf -->
+    <path android:fillColor="#8DCE45" android:pathData="M55,49 C66,25 88,26 92,32 C87,49 70,58 55,54 Z" />
+    <path android:fillColor="#3C8739" android:pathData="M58,51 C70,42 81,36 90,33 C78,43 68,49 58,53 Z" />
+    <!-- Small fruit / seed -->
+    <path android:fillColor="#E85D3F" android:pathData="M78,73 C72,67 74,60 80,60 C84,60 87,64 86,69 C85,73 81,76 78,73 Z" />
+    <path android:fillColor="#6FB34B" android:pathData="M79,61 C77,57 82,56 84,60 C82,60 80,61 79,61 Z" />
+</vector>
