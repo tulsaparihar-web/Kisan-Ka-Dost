@@ -352,8 +352,9 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     runCatching {
                         val directory = File(context.cacheDir, "plant-captures").apply { mkdirs() }
                         val photo = File(directory, "leaf_\${System.currentTimeMillis()}.jpg")
-                        captureUri = FileProvider.getUriForFile(context, "\${context.packageName}.fileprovider", photo)
-                        camera.launch(captureUri)
+                        val outputUri = FileProvider.getUriForFile(context, "\${context.packageName}.fileprovider", photo)
+                        captureUri = outputUri
+                        camera.launch(outputUri)
                     }.onFailure {
                         viewModel.showError(if (isHindi) "कैमरा शुरू नहीं हो सका।" else "Could not open the camera.")
                     }
