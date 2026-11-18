@@ -141,7 +141,7 @@ private fun KisanKaDostApp() {
                         }
                     },
                     navigationIcon = {
-                        if (currentRoute !in rootRoutes) {
+                        if (currentRoute == null || currentRoute !in rootRoutes) {
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(Icons.Default.ArrowBack, contentDescription = if (isHindi) "वापस" else "Back")
                             }
@@ -166,7 +166,7 @@ private fun KisanKaDostApp() {
                         Triple("learn", c.learn, Icons.Default.School)
                     )
                     items.forEach { (route, label, icon) ->
-                        val selected = currentRoute == route || (route == "tools" && currentRoute in toolRoutes)
+                        val selected = currentRoute == route || (route == "tools" && currentRoute != null && currentRoute in toolRoutes)
                         NavigationBarItem(
                             selected = selected,
                             onClick = { navigateRoot(route) },
