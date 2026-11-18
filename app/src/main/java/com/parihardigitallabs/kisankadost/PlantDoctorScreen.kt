@@ -80,7 +80,8 @@ private fun decodePlantBitmap(context: Context, uri: Uri): Bitmap? {
 private data class PlantGuide(
     val en: String, val hi: String, val category: String, val categoryHi: String,
     val lightEn: String, val lightHi: String, val waterEn: String, val waterHi: String,
-    val soilEn: String, val soilHi: String, val careEn: String, val careHi: String
+    val soilEn: String, val soilHi: String, val careEn: String, val careHi: String,
+    val aliases: List<String> = emptyList()
 )
 
 private val plantGuides = listOf(
@@ -110,7 +111,17 @@ private val plantGuides = listOf(
     PlantGuide("Jasmine", "चमेली", "Ornamental flower", "सजावटी फूल", "Sun to partial shade", "धूप से आंशिक छाया", "Keep evenly moist during active growth.", "सक्रिय वृद्धि के दौरान समान नमी रखें।", "Fertile, well-drained soil", "उपजाऊ, अच्छी जल निकासी वाली मिट्टी", "Support climbing types and prune lightly after flowering.", "बेल वाली किस्मों को सहारा दें और फूलों के बाद हल्की छँटाई करें।"),
     PlantGuide("Tulsi", "तुलसी", "Medicinal / aromatic", "औषधीय / सुगंधित", "4–6 hours sun", "4–6 घंटे धूप", "Water when topsoil begins to dry.", "ऊपरी मिट्टी सूखने लगे तो पानी दें।", "Well-drained potting mix", "अच्छी जल निकासी वाला पॉटिंग मिक्स", "Pinch flower spikes for leafy growth and provide airflow.", "अधिक पत्तियों के लिए फूलों की मंजरी तोड़ें और हवा का आवागमन रखें।"),
     PlantGuide("Neem", "नीम", "Tree", "पेड़", "Full sun", "पूरा धूप", "Young trees need establishment watering; mature trees tolerate dry periods.", "नए पेड़ों को शुरुआती सिंचाई चाहिए; बड़े पेड़ सूखा सह सकते हैं।", "Well-drained soil", "अच्छी जल निकासी वाली मिट्टी", "Give adequate space and avoid damaging main roots.", "पर्याप्त जगह दें और मुख्य जड़ों को नुकसान न पहुँचाएँ।"),
-    PlantGuide("Lemongrass", "लेमनग्रास", "Herb", "हर्ब", "Full sun", "पूरा धूप", "Water regularly while establishing; reduce in cool weather.", "स्थापित होते समय नियमित पानी दें; ठंड में कम करें।", "Fertile, well-drained soil", "उपजाऊ, अच्छी जल निकासी वाली मिट्टी", "Divide clumps when crowded and harvest outer leaves.", "घना होने पर गुच्छों को बाँटें और बाहरी पत्तियों की कटाई करें।")
+    PlantGuide("Lemongrass", "लेमनग्रास", "Herb", "हर्ब", "Full sun", "पूरा धूप", "Water regularly while establishing; reduce in cool weather.", "स्थापित होते समय नियमित पानी दें; ठंड में कम करें।", "Fertile, well-drained soil", "उपजाऊ, अच्छी जल निकासी वाली मिट्टी", "Divide clumps when crowded and harvest outer leaves.", "घना होने पर गुच्छों को बाँटें और बाहरी पत्तियों की कटाई करें।"),
+    PlantGuide("Rosemary", "रोजमेरी", "Herb", "हर्ब", "Full sun", "पूरा धूप", "Allow the top layer to dry slightly between watering.", "दो सिंचाइयों के बीच ऊपरी मिट्टी को थोड़ा सूखने दें।", "Sharp-draining sandy mix", "तेज जल निकास वाला रेतीला मिश्रण", "Avoid waterlogged pots; trim lightly to encourage branching.", "गमले में पानी न रुकने दें; शाखाएँ बढ़ाने के लिए हल्की छँटाई करें।", listOf("rosemary herb", "गुलमेंहदी")),
+    PlantGuide("Lavender", "लैवेंडर", "Ornamental flower", "सजावटी फूल", "Full sun", "पूरा धूप", "Water sparingly after establishment; avoid soggy soil.", "स्थापित होने के बाद सीमित पानी दें; गीली मिट्टी से बचें।", "Very well-drained soil", "बहुत अच्छी जल निकासी वाली मिट्टी", "Provide airflow and prune lightly after flowering.", "हवा का आवागमन रखें और फूल आने के बाद हल्की छँटाई करें।", listOf("lavender flower", "लैवेंडर फूल")),
+    PlantGuide("Chrysanthemum", "गुलदाउदी", "Ornamental flower", "सजावटी फूल", "Bright sun", "अच्छी धूप", "Keep evenly moist while growing; avoid waterlogging.", "बढ़वार के समय समान नमी रखें; जलभराव से बचें।", "Fertile, well-drained soil", "उपजाऊ, अच्छी जल निकासी वाली मिट्टी", "Pinch growing tips early for bushier plants.", "घने पौधे के लिए शुरुआती अवस्था में ऊपरी बढ़वार हल्की तोड़ें।", listOf("mums", "guldaudi", "गुलदाउदी फूल")),
+    PlantGuide("Sunflower", "सूरजमुखी", "Ornamental flower", "सजावटी फूल", "Full sun", "पूरा धूप", "Water deeply during establishment and flowering, adjusted to soil.", "स्थापना और फूल आने पर मिट्टी के अनुसार गहरी सिंचाई करें।", "Well-drained soil", "अच्छी जल निकासी वाली मिट्टी", "Choose a suitable variety and support tall plants in windy sites.", "उपयुक्त किस्म चुनें और तेज हवा वाले स्थान पर लंबे पौधों को सहारा दें।", listOf("surajmukhi", "सूरजमुखी फूल")),
+    PlantGuide("Papaya", "पपीता", "Fruit tree", "फलदार पौधा", "Full sun", "पूरा धूप", "Keep moisture steady but avoid standing water.", "नमी समान रखें लेकिन पानी जमा न होने दें।", "Rich, freely drained soil", "उपजाऊ और अच्छी जल निकासी वाली मिट्टी", "Protect young plants from strong wind and cold.", "नए पौधों को तेज हवा और ठंड से बचाएँ।", listOf("papita", "पपीते का पौधा")),
+    PlantGuide("Banana", "केला", "Fruit tree", "फलदार पौधा", "Full sun to light shade", "धूप से हल्की छाया", "Needs regular moisture; drainage is essential.", "नियमित नमी चाहिए; जल निकास आवश्यक है।", "Deep, fertile, well-drained soil", "गहरी, उपजाऊ और जल निकास वाली मिट्टी", "Mulch to conserve moisture and remove dry leaves.", "नमी बचाने के लिए मल्च करें और सूखी पत्तियाँ हटाएँ।", listOf("kela", "केले का पौधा")),
+    PlantGuide("Curry Leaf", "करी पत्ता", "Tree", "पेड़", "Full sun", "पूरा धूप", "Water when the topsoil begins to dry; avoid waterlogging.", "ऊपरी मिट्टी सूखने लगे तो पानी दें; जलभराव से बचें।", "Well-drained loam", "अच्छी जल निकासी वाली दोमट", "Prune lightly to encourage branching and harvest leaves regularly.", "शाखाएँ बढ़ाने के लिए हल्की छँटाई करें और पत्तियाँ नियमित तोड़ें।", listOf("curry patta", "meethi neem", "मीठी नीम", "करी पत्ता पौधा")),
+    PlantGuide("Amla", "आंवला", "Fruit tree", "फलदार पौधा", "Full sun", "पूरा धूप", "Water young trees during establishment; mature trees tolerate dry spells.", "नए पेड़ों को स्थापना के समय पानी दें; बड़े पेड़ कुछ सूखा सह सकते हैं।", "Well-drained soil", "अच्छी जल निकासी वाली मिट्टी", "Select locally suitable planting material and avoid waterlogging.", "क्षेत्रानुकूल पौध सामग्री चुनें और जलभराव से बचें।", listOf("indian gooseberry", "amla tree", "आँवला")),
+    PlantGuide("Drumstick", "सहजन", "Tree", "पेड़", "Full sun", "पूरा धूप", "Water during establishment; reduce once established unless very dry.", "स्थापना के समय सिंचाई करें; जमने के बाद जरूरत अनुसार पानी दें।", "Well-drained soil", "अच्छी जल निकासी वाली मिट्टी", "Prune to manageable height and protect young plants from strong wind.", "उचित ऊँचाई बनाए रखने के लिए छँटाई करें और नए पौधों को तेज हवा से बचाएँ।", listOf("moringa", "सहजन का पेड़", "मोरिंगा")),
+    PlantGuide("Coriander", "धनिया", "Herb", "हर्ब", "Sun to partial shade", "धूप से आंशिक छाया", "Keep soil lightly and evenly moist.", "मिट्टी में हल्की और समान नमी रखें।", "Well-drained loam", "अच्छी जल निकासी वाली दोमट", "Harvest outer leaves gradually or allow plants to set seed.", "बाहरी पत्तियाँ धीरे-धीरे काटें या बीज बनने दें।", listOf("cilantro", "dhania", "धनिया पत्ती"))
 )
 
 data class PlantPrediction(val label: String, val confidence: Float)
@@ -310,9 +321,14 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     FilterChip(selected = category == item, onClick = { category = item }, label = { Text(if (isHindi) categoryHindi(item) else item) })
                 }
             }
-            val filtered = plantGuides.filter {
-                (category == "All" || it.category == category || (category == "Medicinal / aromatic" && it.category.startsWith("Medicinal"))) &&
-                    (search.isBlank() || it.en.contains(search, true) || it.hi.contains(search))
+            val normalizedQuery = normalizePlantQuery(search)
+            val filtered = plantGuides.filter { guide ->
+                val categoryMatches = category == "All" || guide.category == category ||
+                    (category == "Medicinal / aromatic" && guide.category.startsWith("Medicinal"))
+                val searchableNames = listOf(guide.en, guide.hi) + guide.aliases
+                val queryMatches = normalizedQuery.isBlank() ||
+                    searchableNames.any { normalizePlantQuery(it).contains(normalizedQuery) }
+                categoryMatches && queryMatches
             }
             if (filtered.isEmpty()) Text(if (isHindi) "कोई पौधा नहीं मिला।" else "No plants found.", color = PlantMuted)
             filtered.forEach { guide ->
@@ -333,6 +349,12 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
         Spacer(Modifier.height(8.dp))
     }
 }
+
+private fun normalizePlantQuery(value: String): String = value
+    .lowercase()
+    .trim()
+    .replace(Regex("[\\u200B-\\u200D\\uFEFF]"), "")
+    .replace(Regex("[\\p{Punct}\\s]+"), "")
 
 private fun displayDiseaseLabel(label: String, isHindi: Boolean): String {
     val crop = label.substringBefore(" ")
