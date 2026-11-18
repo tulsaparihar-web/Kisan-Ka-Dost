@@ -288,14 +288,27 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
     var search by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("All") }
 
-    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        if (bitmap != null) viewModel.analyze(bitmap)
+    val uriHandler = LocalUriHandler.current
+    var captureUri by remember { mutableStateOf<Uri?>(null) }
+    var keyDialogOpen by remember { mutableStateOf(false) }
+    var apiKeyInput by remember { mutableStateOf(viewModel.readPlantNetKey()) }
+    var plantNetConfigured by remember { mutableStateOf(viewModel.hasPlantNetKey()) }
+
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { saved ->
+        val uri = captureUri
+        if (saved && uri != null) scope.launch(Dispatchers.IO) {
+            val bitmap = runCatching { decodePlantBitmap(context, uri) }.getOrNull()
+            withContext(Dispatchers.Main) {
+                if (bitmap != null) viewModel.analyze(bitmap, isHindi)
+                else viewModel.showError(if (isHindi) "फोटो नहीं खुल सकी। दूसरी फोटो लें।" else "Could not open the captured photo. Please try again.")
+            }
+        }
     }
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         if (uri != null) scope.launch(Dispatchers.IO) {
             val bitmap = runCatching { decodePlantBitmap(context, uri) }.getOrNull()
             withContext(Dispatchers.Main) {
-                if (bitmap != null) viewModel.analyze(bitmap)
+                if (bitmap != null) viewModel.analyze(bitmap, isHindi)
                 else viewModel.showError(if (isHindi) "फोटो नहीं खुल सकी। दूसरी फोटो चुनें।" else "Could not open this photo. Please choose another image.")
             }
         }
@@ -316,19 +329,35 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
         }
 
         if (selectedTab == 0) {
+            OutlinedButton(onClick = { keyDialogOpen = true }, modifier = Modifier.fillMaxWidth()) {
+                Text(if (plantNetConfigured) {
+                    if (isHindi) "Pl@ntNet पहचान सेटिंग बदलें" else "Manage broad plant identification"
+                } else {
+                    if (isHindi) "सभी प्रकार के पौधों की पहचान जोड़ें" else "Enable broad plant identification"
+                })
+            }
             Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFEAF3E9)), shape = RoundedCornerShape(15.dp)) {
                 Row(Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
                     Icon(Icons.Default.Info, contentDescription = null, tint = PlantGreen)
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        if (isHindi) "ऑफलाइन AI मॉडल 14 फसलों की 39 श्रेणियों तक सीमित है—सेब, ब्लूबेरी, चेरी, मक्का, अंगूर, संतरा, आड़ू, शिमला मिर्च, आलू, रास्पबेरी, सोयाबीन, स्क्वैश, स्ट्रॉबेरी और टमाटर। अन्य पौधों पर भरोसेमंद पहचान का दावा नहीं किया जाता। परिणाम अंतिम निदान नहीं है।"
-                        else "The offline AI model is limited to 39 output classes across 14 crops: apple, blueberry, cherry, maize, grape, orange, peach, bell pepper, potato, raspberry, soybean, squash, strawberry and tomato. It does not reliably identify other plants. Results are not a confirmed diagnosis.",
+                        if (isHindi) "ऑफलाइन मॉडल 14 फसलों की 39 श्रेणियों तक सीमित है। व्यापक प्रजाति पहचान के लिए Pl@ntNet सेवा वैकल्पिक रूप से उपयोग की जा सकती है; फोटो भेजने से पहले सेटिंग में अपनी API key जोड़ें."
+                        else "The offline model is limited to 39 classes across 14 crops. Optional Pl@ntNet online identification provides broader species coverage; add your own API key before sending a photo.",
                         color = PlantInk, fontSize = 12.sp, lineHeight = 17.sp
                     )
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(9.dp), modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = { camera.launch(null) }, enabled = !state.analyzing, modifier = Modifier.weight(1f)) {
+                Button(onClick = {
+                    runCatching {
+                        val directory = File(context.cacheDir, "plant-captures").apply { mkdirs() }
+                        val photo = File(directory, "leaf_\${System.currentTimeMillis()}.jpg")
+                        captureUri = FileProvider.getUriForFile(context, "\${context.packageName}.fileprovider", photo)
+                        camera.launch(captureUri)
+                    }.onFailure {
+                        viewModel.showError(if (isHindi) "कैमरा शुरू नहीं हो सका।" else "Could not open the camera.")
+                    }
+                }, enabled = !state.analyzing, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null)
                     Spacer(Modifier.width(5.dp))
                     Text(if (isHindi) "फोटो लें" else "Take photo")
@@ -344,8 +373,12 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                 Card {
                     Column(Modifier.fillMaxWidth().padding(18.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(9.dp)) {
                         CircularProgressIndicator(color = PlantGreen)
-                        Text(if (isHindi) "पत्ती की जाँच हो रही है…" else "Checking the leaf…", fontWeight = FontWeight.SemiBold)
-                        Text(if (isHindi) "यह जाँच फोन पर ऑफलाइन होती है।" else "Analysis runs offline on this phone.", color = PlantMuted, fontSize = 12.sp)
+                        Text(if (isHindi) "पौधे की जाँच हो रही है…" else "Identifying the plant…", fontWeight = FontWeight.SemiBold)
+                        Text(if (plantNetConfigured) {
+                            if (isHindi) "ऑनलाइन पहचान की कोशिश की जा रही है।" else "Trying online species identification."
+                        } else {
+                            if (isHindi) "फोन पर उपलब्ध ऑफलाइन मॉडल उपयोग हो रहा है।" else "Using the on-device offline model."
+                        }, color = PlantMuted, fontSize = 12.sp)
                     }
                 }
             }
@@ -358,16 +391,29 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
             } }
             if (state.predictions.isNotEmpty()) {
                 val top = state.predictions.first()
-                val background = top.label.contains("background", true)
-                val low = top.confidence < 0.60f
+                val isSpecies = top.source == "Pl@ntNet"
+                val background = !isSpecies && top.label.contains("background", true)
+                val low = top.confidence < if (isSpecies) 0.15f else 0.60f
                 Card(shape = RoundedCornerShape(17.dp)) {
                     Column(Modifier.fillMaxWidth().padding(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                        Text(if (isHindi) "AI जाँच का परिणाम" else "AI scan result", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = PlantInk)
-                        Text(if (background) (if (isHindi) "स्पष्ट पत्ती नहीं मिली" else "No supported leaf detected") else displayDiseaseLabel(top.label, isHindi), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = PlantGreen)
+                        Text(if (isSpecies) {
+                            if (isHindi) "संभावित पौधा पहचान" else "Possible plant identification"
+                        } else {
+                            if (isHindi) "ऑफलाइन फसल जाँच" else "Offline crop scan"
+                        }, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = PlantInk)
+                        Text(if (background) (if (isHindi) "ऑफलाइन मॉडल इस पौधे से मेल नहीं खा सका" else "Offline model could not match this plant") else if (isSpecies) top.label else displayDiseaseLabel(top.label, isHindi), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = PlantGreen)
                         Text((if (isHindi) "मॉडल स्कोर: " else "Model score: ") + (top.confidence * 100).toInt().toString() + "%", color = PlantMuted, fontSize = 13.sp)
                         LinearProgressIndicator(progress = { top.confidence.coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth(), color = PlantGreen)
                         if (low || background) {
-                            Text(if (isHindi) "विश्वास कम है। इसे पक्की बीमारी न मानें। एक साफ, पास से ली गई पत्ती की फोटो दोबारा लें।" else "Confidence is low. Do not treat this as a confirmed diagnosis. Retake a clear close-up photo of one leaf.", color = Color(0xFF8A5A16), fontSize = 13.sp)
+                            Text(if (isSpecies) {
+                                if (isHindi) "पहचान निश्चित नहीं है। पूरे पौधे, फूल या फल की साफ फोटो भी लें और स्थानीय विशेषज्ञ से पुष्टि करें।"
+                                else "The match is uncertain. Try clear photos of the whole plant, flower or fruit as well, and confirm locally."
+                            } else {
+                                if (isHindi) "ऑफलाइन मॉडल सीमित फसलों के लिए है। अन्य पौधों के लिए Pl@ntNet API key जोड़ें या स्थानीय विशेषज्ञ से पहचान कराएँ।"
+                                else "The offline model covers selected crops only. Add a Pl@ntNet API key for broader species identification or ask a local expert."
+                            }, color = Color(0xFF8A5A16), fontSize = 13.sp)
+                        } else if (isSpecies) {
+                            Text(if (isHindi) "यह प्रजाति का AI सुझाव है, बीमारी का निदान नहीं। निर्णय से पहले पहचान की पुष्टि करें।" else "This is an AI species suggestion, not a disease diagnosis. Verify the plant before acting.", color = PlantMuted, fontSize = 12.sp)
                         } else {
                             Text(if (isHindi) "यह AI आधारित प्रारंभिक अनुमान है, अंतिम निदान नहीं।" else "This is an AI-assisted preliminary indication, not a confirmed diagnosis.", color = PlantMuted, fontSize = 12.sp)
                             Text(if (isHindi) "संभावित देखभाल के कदम" else "Suggested first care steps", fontWeight = FontWeight.Bold, color = PlantInk)
@@ -378,7 +424,7 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                             Text(if (isHindi) "अन्य संभावित परिणाम" else "Other possible matches", fontWeight = FontWeight.SemiBold)
                             state.predictions.drop(1).forEach { p ->
                                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Text(displayDiseaseLabel(p.label, isHindi), modifier = Modifier.weight(1f), color = PlantMuted, fontSize = 12.sp)
+                                    Text(if (p.source == "Pl@ntNet") p.label else displayDiseaseLabel(p.label, isHindi), modifier = Modifier.weight(1f), color = PlantMuted, fontSize = 12.sp)
                                     Text((p.confidence * 100).toInt().toString() + "%", color = PlantMuted, fontSize = 12.sp)
                                 }
                             }
@@ -386,7 +432,8 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     }
                 }
             }
-            Text(if (isHindi) "बेहतर परिणाम के लिए एक पत्ती को पास से, साफ रोशनी में और बिना धुंधलेपन के फोटो लें।" else "For best results, photograph one leaf close-up in good light and in focus.", color = PlantMuted, fontSize = 12.sp)
+            state.notice?.let { Text(it, color = Color(0xFF8A5A16), fontSize = 12.sp, lineHeight = 17.sp) }
+            Text(if (isHindi) "बेहतर परिणाम के लिए साफ रोशनी में फोटो लें। पौधे की कई तस्वीरें एक ही पौधे की हों।" else "For best results, use clear light. If sending multiple photos, make sure they show the same plant.", color = PlantMuted, fontSize = 12.sp)
         } else if (selectedTab == 1) {
             OutlinedTextField(value = search, onValueChange = { search = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, leadingIcon = { Icon(Icons.Default.Search, null) }, label = { Text(if (isHindi) "पौधे का नाम खोजें" else "Search plants") })
             val categories = listOf("All", "Field crop", "Vegetable", "Fruit tree", "Indoor plant", "Ornamental flower", "Medicinal / aromatic", "Herb")
@@ -443,6 +490,40 @@ private fun PlantDiagnosisHistoryCard(record: PlantDiagnosisEntity, isHindi: Boo
             IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, contentDescription = if (isHindi) "हटाएँ" else "Delete", tint = PlantMuted) }
         }
     }
+
+    if (keyDialogOpen) {
+        AlertDialog(
+            onDismissRequest = { keyDialogOpen = false },
+            title = { Text(if (isHindi) "व्यापक पौधा पहचान" else "Broad plant identification") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                    Text(if (isHindi) "Pl@ntNet API key आपके फोन पर Android Keystore से encrypt करके रखी जाएगी। पहचान के समय चुनी गई फोटो Pl@ntNet सेवा को भेजी जाएगी। मुफ्त योजना की सीमा 500 पहचान प्रतिदिन है।" else "Your Pl@ntNet API key is encrypted on this phone using Android Keystore. The selected photo is sent to Pl@ntNet when you identify a plant. Its free plan currently allows 500 identifications per day.", fontSize = 13.sp, lineHeight = 18.sp)
+                    OutlinedTextField(value = apiKeyInput, onValueChange = { apiKeyInput = it }, modifier = Modifier.fillMaxWidth(), singleLine = true, label = { Text("API key") })
+                    TextButton(onClick = { uriHandler.openUri("https://my.plantnet.org/") }) {
+                        Text(if (isHindi) "मुफ्त API key प्राप्त करें" else "Get a free API key")
+                    }
+                    if (plantNetConfigured) {
+                        TextButton(onClick = {
+                            viewModel.savePlantNetKey("")
+                            apiKeyInput = ""
+                            plantNetConfigured = false
+                        }) { Text(if (isHindi) "सहेजी गई key हटाएँ" else "Remove saved key") }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    runCatching { viewModel.savePlantNetKey(apiKeyInput.trim()) }
+                        .onSuccess { plantNetConfigured = apiKeyInput.isNotBlank(); keyDialogOpen = false }
+                        .onFailure { viewModel.showError(if (isHindi) "API key सुरक्षित नहीं रखी जा सकी।" else "Could not securely save the API key.") }
+                }) { Text(if (isHindi) "सहेजें" else "Save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { keyDialogOpen = false }) { Text(if (isHindi) "रद्द करें" else "Cancel") }
+            }
+        )
+    }
+
 }
 
 private fun displayDiseaseLabel(label: String, isHindi: Boolean): String {
