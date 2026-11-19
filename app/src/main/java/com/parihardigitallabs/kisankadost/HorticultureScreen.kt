@@ -67,7 +67,7 @@ private val gardenSearchAliases = mapOf(
     "Holy Basil" to listOf("tulsi", "तुलसी"),
     "Mint" to listOf("pudina", "pudinaa", "पुदीना"),
     "Aloe Vera" to listOf("ghritkumari", "कुमारी", "घृतकुमारी"),
-    "Money Plant / Pothos" to listOf("moneyplant", "pothos", "मनीप्लांट", "मनीप्लांट"),
+    "Money Plant / Pothos" to listOf("moneyplant", "pothos", "मनी प्लांट", "मनीप्लांट"),
     "Snake Plant" to listOf("sansevieria", "mother in law tongue", "स्नेक प्लांट"),
     "Hibiscus" to listOf("gudhal", "jaswand", "गुड़हल", "जास्वंद"),
     "Tuberose" to listOf("rajnigandha", "रजनीगंधा")
@@ -192,6 +192,17 @@ fun HorticultureScreen(isHindi: Boolean) {
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            if (filtered.isEmpty()) {
+                item {
+                    Text(
+                        if (isHindi) "कोई मेल खाता पौधा नहीं मिला। दूसरा नाम या अंग्रेज़ी नाम आज़माएँ।"
+                        else "No matching plant found. Try another common name or the English name.",
+                        fontSize = 13.sp,
+                        color = Color(0xFF66766B),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp)
+                    )
+                }
+            }
             items(filtered, key = { it.nameEn }) { guide ->
                 val expanded = expandedName == guide.nameEn
                 Card(
