@@ -10,7 +10,6 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.onNode
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,13 +26,10 @@ class AppNavigationSmokeTest {
         composeRule.onNodeWithText("किसान ज्ञान सहायक").assertIsDisplayed()
         composeRule.onNode(hasSetTextAction()).performTextInput("मिट्टी")
         composeRule.onNodeWithText("मिट्टी").assertExists()
-    }
-
-    @Test
-    fun settingsCanSwitchTheAppToEnglish() {
         composeRule.onNodeWithContentDescription("सेटिंग्स").performClick()
         composeRule.onNodeWithText("English").performClick()
         composeRule.onNodeWithText("Settings").assertIsDisplayed()
         composeRule.onNodeWithText("Kisan Ka Dost").assertExists()
     }
+
 }
