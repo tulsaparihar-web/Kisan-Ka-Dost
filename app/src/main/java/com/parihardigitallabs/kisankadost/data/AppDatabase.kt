@@ -19,7 +19,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun diaryRecordDao(): DiaryRecordDao
 
     companion object {
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
+        internal val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     """
@@ -40,7 +40,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATION_2_3 = object : Migration(2, 3) {
+        internal val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     """
@@ -61,13 +61,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATION_3_4 = object : Migration(3, 4) {
+        internal val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE animal_records ADD COLUMN breed TEXT NOT NULL DEFAULT ''")
             }
         }
 
-        private val MIGRATION_4_5 = object : Migration(4, 5) {
+        internal val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("""
                     CREATE TABLE IF NOT EXISTS diary_records (
@@ -88,18 +88,23 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATION_5_6 = object : Migration(5, 6) {
+        internal val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE diary_records ADD COLUMN photoPaths TEXT NOT NULL DEFAULT ''")
             }
         }
 
-        private val MIGRATION_6_7 = object : Migration(6, 7) {
+        internal val MIGRATION_6_7 = object : Migration(6, 7) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE diary_records ADD COLUMN reminderNotified INTEGER NOT NULL DEFAULT 0")
                 database.execSQL("ALTER TABLE animal_health_records ADD COLUMN reminderNotified INTEGER NOT NULL DEFAULT 0")
             }
         }
+
+        internal val ALL_MIGRATIONS = arrayOf(
+            MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
+            MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7
+        )
 
         @Volatile
         private var INSTANCE: AppDatabase? = null
@@ -110,7 +115,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "kisan_ka_dost.db"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                ).addMigrations(*ALL_MIGRATIONS)
                     .build().also { INSTANCE = it }
             }
     }
