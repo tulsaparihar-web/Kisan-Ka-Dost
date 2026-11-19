@@ -173,7 +173,7 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
 
     fun showError(message: String) { _state.value = _state.value.copy(analyzing = false, error = message) }
 
-    fun analyze(bitmap: Bitmap) {
+    fun analyze(bitmap: Bitmap, expectedCrop: String) {
         _state.value = PlantDoctorState(bitmap = bitmap, analyzing = true)
         viewModelScope.launch(Dispatchers.Default) {
             try {
@@ -220,7 +220,16 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
                 val results = output[0].mapIndexed { index, score -> PlantPrediction(labels[index], score) }
                     .filter { it.confidence.isFinite() }
                     .sortedByDescending { it.confidence }.take(3)
-                withContext(Dispatchers.Main) { _state.value = PlantDoctorState(bitmap = bitmap, predictions = results) }
+                val topLabel = results.firstOrNull()?.label.orEmpty().lowercase()
+                val belongsToSelectedCrop = topLabel == "background" ||
+                    topLabel.startsWith(expectedCrop.lowercase())
+                withContext(Dispatchers.Main) {
+                    _state.value = if (belongsToSelectedCrop) {
+                        PlantDoctorState(bitmap = bitmap, predictions = results)
+                    } else {
+                        PlantDoctorState(bitmap = bitmap, error = "CROP_MISMATCH")
+                    }
+                }
             } catch (error: Exception) {
                 withContext(Dispatchers.Main) {
                     _state.value = PlantDoctorState(bitmap = bitmap, error = "ANALYSIS_FAILED")
@@ -252,9 +261,27 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
     var selectedTab by remember { mutableIntStateOf(0) }
     var search by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("All") }
+    var selectedCrop by remember { mutableStateOf("") }
+    var cropMenuExpanded by remember { mutableStateOf(false) }
+    val supportedCropOptions = listOf(
+        "apple" to (if (isHindi) "सेब" else "Apple"),
+        "blueberry" to (if (isHindi) "ब्लूबेरी" else "Blueberry"),
+        "cherry" to (if (isHindi) "चेरी" else "Cherry"),
+        "corn maize" to (if (isHindi) "मक्का" else "Corn / Maize"),
+        "grape" to (if (isHindi) "अंगूर" else "Grape"),
+        "orange" to (if (isHindi) "संतरा" else "Orange"),
+        "peach" to (if (isHindi) "आड़ू" else "Peach"),
+        "pepper bell" to (if (isHindi) "शिमला मिर्च" else "Bell pepper"),
+        "potato" to (if (isHindi) "आलू" else "Potato"),
+        "raspberry" to (if (isHindi) "रास्पबेरी" else "Raspberry"),
+        "soybean" to (if (isHindi) "सोयाबीन" else "Soybean"),
+        "squash" to (if (isHindi) "स्क्वैश" else "Squash"),
+        "strawberry" to (if (isHindi) "स्ट्रॉबेरी" else "Strawberry"),
+        "tomato" to (if (isHindi) "टमाटर" else "Tomato")
+    )
 
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        if (bitmap != null) viewModel.analyze(bitmap)
+        if (bitmap != null && selectedCrop.isNotBlank() && selectedCrop != "unsupported") viewModel.analyze(bitmap, selectedCrop)
     }
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         if (uri != null) scope.launch(Dispatchers.IO) {
@@ -291,13 +318,41 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     )
                 }
             }
+            Box {
+                OutlinedButton(onClick = { cropMenuExpanded = true }, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        supportedCropOptions.firstOrNull { it.first == selectedCrop }?.second
+                            ?: if (isHindi) "पहले फसल चुनें" else "Select the crop first"
+                    )
+                }
+                DropdownMenu(expanded = cropMenuExpanded, onDismissRequest = { cropMenuExpanded = false }) {
+                    supportedCropOptions.forEach { (key, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = { selectedCrop = key; cropMenuExpanded = false }
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = { Text(if (isHindi) "अन्य पौधा / सूची में नहीं" else "Other plant / Not listed") },
+                        onClick = { selectedCrop = "unsupported"; cropMenuExpanded = false }
+                    )
+                }
+            }
+            Text(
+                when (selectedCrop) {
+                    "unsupported" -> if (isHindi) "यह पौधा मौजूदा AI मॉडल में शामिल नहीं है। इस फोटो पर बीमारी का अनुमान नहीं दिया जाएगा।" else "This plant is not covered by the current AI model. No disease prediction will be shown for it."
+                    "" -> if (isHindi) "गलत पौधे का नाम बताने से बचने के लिए फोटो जाँच से पहले फसल चुनना जरूरी है।" else "Choose the crop before scanning so the app can check whether the model result matches it."
+                    else -> if (isHindi) "यदि फोटो में चुनी गई फसल नहीं है, तो ऐप परिणाम रोक देगा।" else "If the photo does not match the selected crop, the app will withhold the result."
+                },
+                color = PlantMuted, fontSize = 12.sp, lineHeight = 17.sp
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(9.dp), modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = { camera.launch(null) }, enabled = !state.analyzing, modifier = Modifier.weight(1f)) {
+                Button(onClick = { camera.launch(null) }, enabled = !state.analyzing && selectedCrop.isNotBlank() && selectedCrop != "unsupported", modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null)
                     Spacer(Modifier.width(5.dp))
                     Text(if (isHindi) "फोटो लें" else "Take photo")
                 }
-                OutlinedButton(onClick = { gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }, enabled = !state.analyzing, modifier = Modifier.weight(1f)) {
+                OutlinedButton(onClick = { gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }, enabled = !state.analyzing && selectedCrop.isNotBlank() && selectedCrop != "unsupported", modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.PhotoLibrary, contentDescription = null)
                     Spacer(Modifier.width(5.dp))
                     Text(if (isHindi) "गैलरी" else "Gallery")
@@ -317,6 +372,9 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                 val message = if (error == "ANALYSIS_FAILED") {
                     if (isHindi) "फोटो की जाँच नहीं हो सकी। साफ फोटो चुनें और फिर प्रयास करें।"
                     else "Unable to analyse this image. Choose a clear photo and try again."
+                } else if (error == "CROP_MISMATCH") {
+                    if (isHindi) "फोटो का AI परिणाम चुनी गई फसल से मेल नहीं खाता। गलत परिणाम दिखाने के बजाय जाँच रोक दी गई है। सही फसल चुनकर एक साफ फोटो लें।"
+                    else "The AI result does not match the crop you selected. The app has withheld the result rather than show a potentially incorrect diagnosis. Confirm the crop and retake a clear photo."
                 } else error
                 Text((if (isHindi) "जाँच पूरी नहीं हो सकी: " else "Analysis failed: ") + message, Modifier.padding(13.dp), color = Color(0xFF8A3D20), fontSize = 13.sp)
             } }
