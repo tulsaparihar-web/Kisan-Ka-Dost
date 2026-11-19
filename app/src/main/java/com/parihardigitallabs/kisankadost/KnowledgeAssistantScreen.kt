@@ -113,7 +113,7 @@ fun KnowledgeAssistantScreen(isHindi: Boolean) {
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = { })
         )
-        Row(Modifier.fillMaxWidth().horizontalScrollForKnowledge(), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             categories.forEachIndexed { index, category ->
                 FilterChip(selected = selectedCategory == category, onClick = { selectedCategory = category }, label = { Text(if (isHindi) hindiCategories[index] else if (category == "all") "All" else category) })
             }
