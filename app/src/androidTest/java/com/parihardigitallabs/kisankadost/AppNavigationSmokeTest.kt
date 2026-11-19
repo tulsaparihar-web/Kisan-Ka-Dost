@@ -6,9 +6,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.onNodeWithPlaceholder
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.onNode
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,21 +20,12 @@ class AppNavigationSmokeTest {
     @get:Rule
     val composeRule = createAndroidComposeRule<MainActivity>()
 
-    @Before
-    fun resetLanguagePreference() {
-        InstrumentationRegistry.getInstrumentation().targetContext
-            .getSharedPreferences("kisan_preferences", 0)
-            .edit()
-            .clear()
-            .commit()
-    }
-
     @Test
     fun homeCanNavigateToOfflineKnowledgeSearch() {
         composeRule.onNodeWithText("नमस्ते किसान भाई!").assertIsDisplayed()
         composeRule.onNodeWithText("जानकारी").performClick()
         composeRule.onNodeWithText("किसान ज्ञान सहायक").assertIsDisplayed()
-        composeRule.onNodeWithPlaceholder("अपना सवाल या शब्द लिखें...").performTextInput("मिट्टी")
+        composeRule.onNode(hasSetTextAction()).performTextInput("मिट्टी")
         composeRule.onNodeWithText("मिट्टी").assertExists()
     }
 
