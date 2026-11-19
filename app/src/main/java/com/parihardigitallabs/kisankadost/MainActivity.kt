@@ -81,9 +81,6 @@ private fun KisanKaDostApp() {
     var isHindi by remember { mutableStateOf(prefs.getBoolean("is_hindi", true)) }
     val c = if (isHindi) hi else en
     val navController = rememberNavController()
-    val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
-    val animalRegistryViewModel: AnimalRegistryViewModel = viewModel()
-    val diaryViewModel: DiaryViewModel = viewModel()
 
     MaterialTheme(
         colorScheme = lightColorScheme(
@@ -145,11 +142,20 @@ private fun KisanKaDostApp() {
                 composable("home") {
                     HomeScreen(c, isHindi, onFeature = { navController.navigate(it) })
                 }
-                composable("diary") { DiaryScreen(isHindi = isHindi, viewModel = diaryViewModel) }
+                composable("diary") {
+                    val diaryViewModel: DiaryViewModel = viewModel()
+                    DiaryScreen(isHindi = isHindi, viewModel = diaryViewModel)
+                }
                 composable("learn") { PlaceholderScreen(if (isHindi) "किसान ज्ञान" else "Farmer Knowledge", c.coming, Icons.Default.MenuBook) }
                 composable("tools") { ToolsScreen(isHindi = isHindi, onOpen = { route -> navController.navigate(route) }) }
-                composable("myfarm") { MyFarmScreen(isHindi = isHindi, viewModel = farmerSetupViewModel) }
-                composable("animal-records") { AnimalRegistryScreen(isHindi = isHindi, viewModel = animalRegistryViewModel) }
+                composable("myfarm") {
+                    val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
+                    MyFarmScreen(isHindi = isHindi, viewModel = farmerSetupViewModel)
+                }
+                composable("animal-records") {
+                    val animalRegistryViewModel: AnimalRegistryViewModel = viewModel()
+                    AnimalRegistryScreen(isHindi = isHindi, viewModel = animalRegistryViewModel)
+                }
                 composable("settings") {
                     SettingsScreen(c, isHindi, onLanguageChange = {
                         isHindi = it
