@@ -13,7 +13,6 @@ This register records candidate public datasets for offline educational/referenc
 | Rajasthan crop profile | ICAR Rajasthan state profile | State crop priorities, rainfed context, pearl millet, maize, chickpea, mustard, clusterbean and spices | High-level state context only; do not treat as district-level sowing advice. |
 | Livestock species and breed reference | FAO DAD-IS | Breed profiles, species-country listings and diversity information | Data may include third-party copyrighted/proprietary content; do not bulk-republish breed text or photos without checking each rights statement. |
 | Indian livestock breed home tracts | ICAR-NBAGR species-wise registered breed lists | Official breed names, home tracts and accession references for cattle, buffalo, goat, sheep, camel and chicken; used to refine the Rajasthan livestock guide | Treat home tract as registration reference, not a guarantee of purity or performance of an individual animal. Recheck official lists periodically; verify animal identity and suitability with local experts. |
-| Indian livestock and poultry breeds | ICAR-NBAGR breed registration and species-wise breed lists | Registered breed names, home tracts and accession references for cattle, buffalo, goat, sheep, camel and poultry | Use official lists for names and home tracts; avoid copying full descriptors without attribution/permission. Recheck the register periodically because new breeds are added. |
 | India livestock statistics | 20th Livestock Census, data.gov.in | State/district livestock and poultry counts | Released under India's NDSAP policy; check the dataset's specific terms and attribution before bundling. Statistics are not animal-care instructions. |
 
 ## Current in-app catalogue coverage (after the M7 content update)
@@ -63,7 +62,5 @@ The horticulture catalogue now includes starter reference entries for lasora (Co
 - ICAR-NBAGR buffalo breeds: https://nbagr.res.in/buffalo-breed
 - ICAR-NBAGR camel breeds: https://nbagr.res.in/camel-yak-Mithun
 - ICAR-NBAGR chicken breeds: https://nbagr.res.in/chicken-breeds
-- ICAR-NBAGR cattle breeds: https://nbagr.res.in/cattle-breed
-- ICAR-NBAGR goat breeds: https://nbagr.res.in/goat-breed
 - ICAR-NBAGR breed registration achievements: https://nbagr.res.in/brc
 - ICAR update on newly registered livestock breeds (2025): https://icar.gov.in/en/icar-nbagr-registers-16-new-livestock-and-poultry-breeds-strengthening-indias-animal-genetic
