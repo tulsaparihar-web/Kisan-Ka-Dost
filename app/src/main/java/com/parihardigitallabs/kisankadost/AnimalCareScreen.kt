@@ -96,7 +96,7 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
     val query = normalizeAnimalSearch(search)
     val filtered = animalGuides.filter { guide ->
         (selected == "All" || guide.key == selected) &&
-            (query.isBlank() || animalSearchTerms(guide).any { normalizeAnimalSearch(it).contains(query) })
+            animalSearchMatches(guide.key, guide.titleHi, guide.titleEn, guide.breedsHi, guide.breedsEn, query)
     }
 
     Column(
@@ -271,6 +271,16 @@ private val animalBreedAliases = mapOf(
     "Poultry" to listOf("mewari", "desi murgi", "backyard poultry")
 )
 
-private fun animalSearchTerms(guide: AnimalGuide): List<String> =
-    listOf(guide.titleEn, guide.titleHi, guide.breedsEn, guide.breedsHi) +
-        animalSearchAliases[guide.key].orEmpty() + animalBreedAliases[guide.key].orEmpty()
+internal fun animalSearchMatches(
+    key: String,
+    titleHi: String,
+    titleEn: String,
+    breedsHi: String,
+    breedsEn: String,
+    normalizedQuery: String
+): Boolean {
+    if (normalizedQuery.isBlank()) return true
+    val terms = listOf(titleEn, titleHi, breedsEn, breedsHi) +
+        animalSearchAliases[key].orEmpty() + animalBreedAliases[key].orEmpty()
+    return terms.any { normalizeAnimalSearch(it).contains(normalizedQuery) }
+}
