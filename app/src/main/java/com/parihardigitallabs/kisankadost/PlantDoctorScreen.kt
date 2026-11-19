@@ -292,8 +292,8 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
         if (uri != null) scope.launch(Dispatchers.IO) {
             val bitmap = runCatching { decodePlantBitmap(context, uri) }.getOrNull()
             withContext(Dispatchers.Main) {
-                if (bitmap != null) viewModel.analyze(bitmap)
-                else viewModel.showError(if (isHindi) "फोटो नहीं खुल सकी। दूसरी फोटो चुनें।" else "Could not open this photo. Please choose another image.")
+                if (bitmap != null && selectedCrop.isNotBlank() && selectedCrop != "unsupported") viewModel.analyze(bitmap, selectedCrop)
+                else if (bitmap == null) viewModel.showError(if (isHindi) "फोटो नहीं खुल सकी। दूसरी फोटो चुनें।" else "Could not open this photo. Please choose another image.")
             }
         }
     }
