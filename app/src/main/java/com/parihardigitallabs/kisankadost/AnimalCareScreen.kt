@@ -93,10 +93,10 @@ fun AnimalCareScreen(isHindi: Boolean, onManageRecords: () -> Unit) {
     var selected by remember { mutableStateOf("All") }
     var expanded by remember { mutableStateOf<String?>(null) }
     val categories = listOf("All", "Cattle", "Buffalo", "Goat", "Sheep", "Camel", "Poultry")
+    val query = normalizeAnimalSearch(search)
     val filtered = animalGuides.filter { guide ->
         (selected == "All" || guide.key == selected) &&
-            (search.isBlank() || guide.titleEn.contains(search, true) ||
-                guide.titleHi.contains(search) || guide.breedsEn.contains(search, true) || guide.breedsHi.contains(search))
+            (query.isBlank() || animalSearchTerms(guide).any { normalizeAnimalSearch(it).contains(query) })
     }
 
     Column(
@@ -249,3 +249,29 @@ private fun AnimalDetail(label: String, value: String) {
         Text(value, fontSize = 13.sp, lineHeight = 18.sp, color = Color(0xFF394A40))
     }
 }
+
+
+private fun normalizeAnimalSearch(value: String): String =
+    value.lowercase().filter { it.isLetterOrDigit() }
+
+private val animalSearchAliases = mapOf(
+    "Cattle" to listOf("cow", "bull", "gaay", "gai", "gay", "bail", "desi cow"),
+    "Buffalo" to listOf("bhains", "bhainsa", "buffalo"),
+    "Goat" to listOf("bakri", "bakara", "bakra", "goat farming"),
+    "Sheep" to listOf("bhed", "bhed palan", "sheep farming"),
+    "Camel" to listOf("oont", "unt", "oonth", "camel rearing"),
+    "Poultry" to listOf("murgi", "murghi", "murga", "chicken", "desi chicken", "poultry farming")
+)
+
+private val animalBreedAliases = mapOf(
+    "Cattle" to listOf("rathi", "tharparkar", "tharparker", "kankrej", "nagori", "mewati", "nari", "sanchori"),
+    "Buffalo" to listOf("murrah", "bhadawari", "mehsana", "jafarabadi", "jaffarabadi", "banni"),
+    "Goat" to listOf("sirohi", "jakhrana", "jakrana", "marwari", "sojat", "karauli", "gujari", "totapuri", "battisi"),
+    "Sheep" to listOf("chokla", "magra", "malpura", "marwari", "nali", "jaisalmeri", "pugal", "sonadi", "kheri", "avishaan"),
+    "Camel" to listOf("bikaneri", "jaisalmeri", "marwari", "jalori", "mewari", "mewati"),
+    "Poultry" to listOf("mewari", "desi murgi", "backyard poultry")
+)
+
+private fun animalSearchTerms(guide: AnimalGuide): List<String> =
+    listOf(guide.titleEn, guide.titleHi, guide.breedsEn, guide.breedsHi) +
+        animalSearchAliases[guide.key].orEmpty() + animalBreedAliases[guide.key].orEmpty()
