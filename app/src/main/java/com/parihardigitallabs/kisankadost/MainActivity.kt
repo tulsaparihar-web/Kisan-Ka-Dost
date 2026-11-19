@@ -178,6 +178,7 @@ private fun KisanKaDostApp() {
                             "harvest" -> HarvestPostHarvestScreen(isHindi = isHindi)
                             "plants" -> PlantDoctorScreen(isHindi = isHindi)
                             "trees" -> HorticultureScreen(isHindi = isHindi)
+                            "schemes" -> GovernmentSchemesScreen(isHindi = isHindi)
                             else -> {
                                 val title = when (route) {
                                     "animals" -> c.animals
