@@ -8,8 +8,20 @@ This register records candidate public datasets for offline educational/referenc
 | India crop production | India District Crop Dataset (1997–2015) | 34,903 district-season records and 63 dominant crops | Repository states CC BY 4.0 for data and MIT for code; retain source citation and attribution. Check Rajasthan district coverage before using. |
 | Plant taxonomy and names | Pl@ntNet observations via GBIF | Validated plant observations and taxonomy; broad species coverage | Portal states CC BY 4.0 for published data. Image rights are record-specific; do not bundle photos without checking each record licence. |
 | Plant names and descriptions | World Flora Online | Accepted names, synonyms, classification and botanical descriptions | Site states CC BY 4.0 unless otherwise noted. Preserve citations and any record-level exceptions. |
+| Rajasthan crop and livestock advisories | ICAR Rabi Agro-Advisory for Farmers 2021–22 | Rajasthan/Haryana/Delhi zone crop priorities, recommended varieties, sowing-window emphasis and livestock management context | Use as a dated advisory, not a timeless prescription; verify current variety and district recommendations. |
+| Arid horticulture | ICAR-ATARI Jodhpur / ICAR articles on date palm, fig and arid fruit-based systems | Rajasthan-specific context for date palm, fig, aonla, ber, bael, khejri and mixed fruit systems | Use as regional reference; validate local cultivar, planting material, water and market suitability with KVK/horticulture experts. |
+| Rajasthan crop profile | ICAR Rajasthan state profile | State crop priorities, rainfed context, pearl millet, maize, chickpea, mustard, clusterbean and spices | High-level state context only; do not treat as district-level sowing advice. |
 | Livestock species and breed reference | FAO DAD-IS | Breed profiles, species-country listings and diversity information | Data may include third-party copyrighted/proprietary content; do not bulk-republish breed text or photos without checking each rights statement. |
 | India livestock statistics | 20th Livestock Census, data.gov.in | State/district livestock and poultry counts | Released under India's NDSAP policy; check the dataset's specific terms and attribution before bundling. Statistics are not animal-care instructions. |
+
+## Current in-app catalogue coverage (after the M7 content update)
+
+- 20 crop guides (including maize, sesame, soybean, black gram and fennel additions).
+- 42 horticulture / garden guides (including date palm, fig, Indian gooseberry, bael and khejri additions).
+- 35 Plant Doctor guide entries.
+- 6 livestock groups with breed, feeding, housing and care guidance (cattle, buffalo, goat, sheep, camel and poultry).
+
+These are curated bilingual starter guides, not a comprehensive agronomic or veterinary database. Additional species and district-specific recommendations should be imported only with source, date, licence and expert validation.
 
 ## Implementation rules
 
@@ -28,3 +40,8 @@ This register records candidate public datasets for offline educational/referenc
 - World Flora Online: https://worldfloraonline.org/
 - FAO DAD-IS: https://www.fao.org/dad-is/
 - India 20th Livestock Census: https://www.data.gov.in/catalog/20th-livestock-census
+- ICAR Rabi Agro-Advisory 2021–22: https://www.icar.gov.in/sites/default/files/2022-09/Rabi-Agro-Advisory-2021-22_0.pdf
+- ICAR Rajasthan state profile: https://www.icar.gov.in/en/node/17288
+- ICAR Date Palm in Barmer: https://icar.gov.in/en/node/5899
+- ICAR Fig cultivation in Thar region: https://icar.gov.in/en/fig-cultivation-pursuit-profit-thar-region-rajasthan
+- ICAR fruit-based cropping systems: https://www.icar.gov.in/sites/default/files/2022-04/ICAR-News-April-June-2013%20Print.pdf
