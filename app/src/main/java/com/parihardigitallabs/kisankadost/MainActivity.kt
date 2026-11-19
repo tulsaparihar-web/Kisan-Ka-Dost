@@ -146,7 +146,7 @@ private fun KisanKaDostApp() {
                     val diaryViewModel: DiaryViewModel = viewModel()
                     DiaryScreen(isHindi = isHindi, viewModel = diaryViewModel)
                 }
-                composable("learn") { PlaceholderScreen(if (isHindi) "किसान ज्ञान" else "Farmer Knowledge", c.coming, Icons.Default.MenuBook) }
+                composable("learn") { KnowledgeAssistantScreen(isHindi = isHindi) }
                 composable("tools") { ToolsScreen(isHindi = isHindi, onOpen = { route -> navController.navigate(route) }) }
                 composable("myfarm") {
                     val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
