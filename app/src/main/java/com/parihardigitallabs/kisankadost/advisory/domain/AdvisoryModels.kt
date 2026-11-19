@@ -56,12 +56,6 @@ fun parseImdWarningCodes(raw: String?): List<Int> {
         .distinct()
 }
 
-fun warningSeverityFromImdColor(colorCode: Int?): WarningSeverity = when (colorCode) {
-    1, 4 -> WarningSeverity.GREEN
-    2, 3 -> WarningSeverity.YELLOW
-    else -> WarningSeverity.UNKNOWN
-}
-
 /** IMD district-warning color codes: 1 red, 2 orange, 3 yellow, 4 green. */
 fun districtWarningSeverityFromImdColor(colorCode: Int?): WarningSeverity = when (colorCode) {
     1 -> WarningSeverity.RED
