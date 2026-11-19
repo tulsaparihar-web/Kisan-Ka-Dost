@@ -17,11 +17,15 @@ This register records candidate public datasets for offline educational/referenc
 ## Current in-app catalogue coverage (after the M7 content update)
 
 - 20 crop guides (including maize, sesame, soybean, black gram and fennel additions).
-- 42 horticulture / garden guides (including date palm, fig, Indian gooseberry, bael and khejri additions).
+- 50 horticulture / garden guides (including date palm, fig, Indian gooseberry, bael, khejri, lasora, ker, karonda, phalsa, cactus pear, kachri and mateera additions).
 - 35 Plant Doctor guide entries.
 - 6 livestock groups with breed, feeding, housing and care guidance (cattle, buffalo, goat, sheep, camel and poultry).
 
 These are curated bilingual starter guides, not a comprehensive agronomic or veterinary database. Additional species and district-specific recommendations should be imported only with source, date, licence and expert validation.
+
+## M7 content update — arid Rajasthan horticulture
+
+The horticulture catalogue now includes starter reference entries for lasora (Cordia), ker (Capparis), karonda (Carissa), phalsa (Grewia), cactus pear (Opuntia), kachri and mateera, alongside the earlier ber, date palm, pomegranate, aonla, bael and khejri entries. The ICAR-CIAH pages above support crop relevance, germplasm and institute variety references. The new in-app entries are concise bilingual educational summaries; they are not a reproduction of ICAR bulletins and do not claim complete production packages. Verify planting material, cultivar, spacing, irrigation and commercial suitability with current KVK/SAU guidance.
 
 ## Implementation rules
 
@@ -45,3 +49,8 @@ These are curated bilingual starter guides, not a comprehensive agronomic or vet
 - ICAR Date Palm in Barmer: https://icar.gov.in/en/node/5899
 - ICAR Fig cultivation in Thar region: https://icar.gov.in/en/fig-cultivation-pursuit-profit-thar-region-rajasthan
 - ICAR fruit-based cropping systems: https://www.icar.gov.in/sites/default/files/2022-04/ICAR-News-April-June-2013%20Print.pdf
+- ICAR-CIAH Bikaner research achievements and varieties: https://icar-ciah.org/index.php?do=achivmnts_highlits&mod=achivmnts
+- ICAR-CIAH institute-identified varieties: https://www.icar-ciah.org/index.php?do=veriti_identifid&mod=veriti
+- ICAR-CIAH germplasm repository: https://www.icar-ciah.org/index.php?do=resrch_GermDevelp&mod=resrch
+- ICAR-CIAH technical bulletin on arid horticulture adoption: https://www.icar-ciah.org/include/pdf/technical_bulletin/Adotion_Arid_Hort_Tech.pdf
+- ICAR-CIAH AICRP arid-zone fruit crop centres: https://www.icar-ciah.org/AICRP/index.php?do=AICRP_centers&mod=AICRP
