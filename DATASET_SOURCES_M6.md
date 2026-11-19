@@ -12,6 +12,7 @@ This register records candidate public datasets for offline educational/referenc
 | Arid horticulture | ICAR-ATARI Jodhpur / ICAR articles on date palm, fig and arid fruit-based systems | Rajasthan-specific context for date palm, fig, aonla, ber, bael, khejri and mixed fruit systems | Use as regional reference; validate local cultivar, planting material, water and market suitability with KVK/horticulture experts. |
 | Rajasthan crop profile | ICAR Rajasthan state profile | State crop priorities, rainfed context, pearl millet, maize, chickpea, mustard, clusterbean and spices | High-level state context only; do not treat as district-level sowing advice. |
 | Livestock species and breed reference | FAO DAD-IS | Breed profiles, species-country listings and diversity information | Data may include third-party copyrighted/proprietary content; do not bulk-republish breed text or photos without checking each rights statement. |
+| Indian livestock and poultry breeds | ICAR-NBAGR breed registration and species-wise breed lists | Registered breed names, home tracts and accession references for cattle, buffalo, goat, sheep, camel and poultry | Use official lists for names and home tracts; avoid copying full descriptors without attribution/permission. Recheck the register periodically because new breeds are added. |
 | India livestock statistics | 20th Livestock Census, data.gov.in | State/district livestock and poultry counts | Released under India's NDSAP policy; check the dataset's specific terms and attribution before bundling. Statistics are not animal-care instructions. |
 
 ## Current in-app catalogue coverage (after the M7 content update)
@@ -54,3 +55,8 @@ The horticulture catalogue now includes starter reference entries for lasora (Co
 - ICAR-CIAH germplasm repository: https://www.icar-ciah.org/index.php?do=resrch_GermDevelp&mod=resrch
 - ICAR-CIAH technical bulletin on arid horticulture adoption: https://www.icar-ciah.org/include/pdf/technical_bulletin/Adotion_Arid_Hort_Tech.pdf
 - ICAR-CIAH AICRP arid-zone fruit crop centres: https://www.icar-ciah.org/AICRP/index.php?do=AICRP_centers&mod=AICRP
+- ICAR-NBAGR breed registration: https://nbagr.res.in/breed-registration
+- ICAR-NBAGR cattle breeds: https://nbagr.res.in/cattle-breed
+- ICAR-NBAGR goat breeds: https://nbagr.res.in/goat-breed
+- ICAR-NBAGR breed registration achievements: https://nbagr.res.in/brc
+- ICAR update on newly registered livestock breeds (2025): https://icar.gov.in/en/icar-nbagr-registers-16-new-livestock-and-poultry-breeds-strengthening-indias-animal-genetic
