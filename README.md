@@ -47,15 +47,32 @@ Every push to main triggers a cloud build. Older in-progress builds are cancelle
 - Searchable bilingual care guide for field crops, vegetables, fruit trees, indoor plants, decorative flowers, herbs and medicinal plants
 - Bilingual soil-health learning guide covering soil sampling/testing, pH and salinity indicators, nutrients, organic matter and responsible fertilizer use (general education, not personalized fertilizer prescriptions)
 
-## Development milestones
-- **M1 – App foundation:** complete; cloud APK build verified.
-- **M2 – Farmer and farm setup:** complete; offline farmer profile and basic farm details, cloud APK build verified.
-- **M3 – Agriculture, horticulture and gardening:** in progress; 15-crop Rajasthan guide, offline Plant Doctor screening for selected crop-leaf classes, 19 bilingual horticulture/gardening guides, and a general Kharif/Rabi/Zaid crop calendar are implemented. District-validated crop windows, irrigation/water conservation, deeper crop/IPM content, orchard/nursery and kitchen-garden coverage remain open. A foundational soil-health and nutrient guide is build-verified. Irrigation/water conservation, crop-stage/IPM and expanded horticulture starter guides (kitchen/terrace garden, nursery, propagation, pruning and protected growing) are implemented and awaiting cloud-build verification.
-- **M4 – Animal husbandry:** planned; species/breed library, feeding, housing, preventive-care records and animal profiles.
-- **M5 – Farm, garden and livestock diaries:** planned.
-- **M6 – Rajasthan advisory services:** deferred until core M3–M5 foundations are stable and explicitly reactivated.
-- **M7 – Markets, schemes and services:** planned.
-- **M8 – Farm economics and smart assistance:** planned.
+## Current implementation status (feature branch)
+
+The active feature branch contains the following build-integrated modules. A successful CI build confirms compilation, configured JVM unit tests and APK packaging; it does not replace physical-device acceptance.
+
+- **App foundation:** Home dashboard, Compose navigation, Hindi/English preference and settings.
+- **My Farm:** Offline Room-backed farmer/farm profile.
+- **Crop Care and Crop Calendar:** Bilingual general crop guides and seasonal calendar.
+- **Plant Doctor:** Offline TensorFlow Lite preliminary leaf screening for selected model classes; physical-device accuracy, camera/gallery and performance validation remain open.
+- **Horticulture:** Searchable bilingual plant and garden guidance.
+- **Soil Health, Irrigation, Crop Protection and Harvest:** General bilingual educational guides; local prescription-level agronomy is not claimed.
+- **Animal Care and Animal Registry:** Bilingual care guidance, offline animal profiles, health-event history and veterinarian-confirmed reminders; device reminder/migration acceptance remains open.
+- **Farm Diary:** Offline field/garden/animal/expense/labour/input/production/sales records, local photos, CSV export, reminders and user-triggered ZIP backup/restore; physical-device backup/restore acceptance remains open.
+- **District Advisory:** District selection and stored/general advisory information; no live weather feed is claimed.
+- **Government Schemes:** Offline scheme information with official external links; live eligibility/status is not claimed.
+- **M8 Offline Knowledge Assistant:** Offline bilingual keyword-based knowledge search. This is general educational content, not AI diagnosis or individualized agronomy/veterinary advice.
+
+**Not yet delivered as live services:** live weather/alerts, live mandi prices, cloud sync, multi-device conflict resolution, personalized crop prescriptions, farm economics/profit-loss analytics, and AI chat/LLM assistance. The offline Knowledge Assistant does not mean those separate capabilities are complete.
+
+## Milestones and release status
+
+- **M1–M5 foundations:** implemented and cloud-build verified on prior milestones; physical-device regression and migration/backup/reminder acceptance remain necessary.
+- **M6 – Rajasthan advisory services:** live, source-attributed weather/alerts remain deferred.
+- **M7 – Markets, schemes and services:** offline Government Schemes information is implemented; live mandi data and verified service directory remain open.
+- **M8 – Offline Knowledge Assistant:** implemented on the active feature branch and build-verified. Farm economics calculations and any AI/LLM capability are separate future scope and are not included in this delivery.
+
+See [QA_AUDIT.md](QA_AUDIT.md) for the static engineering audit, confirmed test coverage boundaries and prioritized release gaps. See [MILESTONE_TRACKER.md](MILESTONE_TRACKER.md) for the broader product scope and acceptance checklist.
 
 ## Plant Doctor model scope
 The current model has 39 output classes, including a background class, and covers selected crop leaf classes. It is not a general plant species identifier. Indoor and ornamental plants currently have searchable care guides; broader photo-based identification is a later enhancement.
