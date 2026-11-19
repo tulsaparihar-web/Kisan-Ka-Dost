@@ -24,4 +24,12 @@ class PlantSearchNormalizationTest {
     fun removesZeroWidthCharacters() {
         assertEquals("tulsi", normalizePlantQuery("tu\u200Bl\u200Bsi"))
     }
+
+    @Test
+    fun acceptsOnlyPredictionsForTheSelectedCrop() {
+        assertEquals(true, plantPredictionMatchesSelectedCrop("pepper bell healthy", "pepper bell"))
+        assertEquals(false, plantPredictionMatchesSelectedCrop("pepper bell healthy", "tomato"))
+        assertEquals(true, plantPredictionMatchesSelectedCrop("background", "tomato"))
+        assertEquals(false, plantPredictionMatchesSelectedCrop("neem healthy", "tomato"))
+    }
 }
