@@ -48,6 +48,37 @@ private data class GardenGuide(
     val careEn: String
 )
 
+
+/** Common English, Hindi and transliterated names used by farmers in India. */
+private val gardenSearchAliases = mapOf(
+    "Pomegranate" to listOf("anar", "anaar", "dadim", "दाड़िम"),
+    "Guava" to listOf("amrood", "amrud", "peru", "अमरूद"),
+    "Lemon / Kinnow" to listOf("nimbu", "neembu", "kinnow", "नींबू", "किन्नू"),
+    "Ber" to listOf("ber", "bor", "jujube", "बेर"),
+    "Mango" to listOf("aam", "am", "आम"),
+    "Tomato" to listOf("tamatar", "टमाटर"),
+    "Chilli" to listOf("mirch", "mirchi", "हरी मिर्च", "मिर्च"),
+    "Okra" to listOf("bhindi", "bhendi", "ladyfinger", "भिंडी"),
+    "Brinjal" to listOf("baingan", "बैंगन"),
+    "Spinach" to listOf("palak", "पालक"),
+    "Marigold" to listOf("genda", "gendaa", "गेंदा"),
+    "Rose" to listOf("gulab", "गुलाब"),
+    "Jasmine" to listOf("mogra", "motia", "chameli", "मोगरा", "चमेली"),
+    "Holy Basil" to listOf("tulsi", "तुलसी"),
+    "Mint" to listOf("pudina", "pudinaa", "पुदीना"),
+    "Aloe Vera" to listOf("ghritkumari", "कुमारी", "घृतकुमारी"),
+    "Money Plant / Pothos" to listOf("moneyplant", "pothos", "मनीप्लांट", "मनीप्लांट"),
+    "Snake Plant" to listOf("sansevieria", "mother in law tongue", "स्नेक प्लांट"),
+    "Hibiscus" to listOf("gudhal", "jaswand", "गुड़हल", "जास्वंद"),
+    "Tuberose" to listOf("rajnigandha", "रजनीगंधा")
+)
+
+private fun normalizeGardenSearch(value: String): String = value
+    .lowercase()
+    .trim()
+    .replace(Regex("[\\u200B-\\u200D\\uFEFF]"), "")
+    .replace(Regex("[\\p{Punct}\\s]+"), "")
+
 private val gardenGuides = listOf(
     GardenGuide("अनार", "Pomegranate", "फलदार पौधे", "Fruit plants", "गर्म और शुष्क क्षेत्रों में उपयुक्त; रोपण का समय स्थानीय सिंचाई और मौसम के अनुसार चुनें।", "Suitable for warm, relatively dry areas; choose planting time according to local irrigation and weather.", "खुली धूप", "Full sun", "जड़ जमने तक नियमित सिंचाई; बाद में मिट्टी और मौसम देखकर पानी दें।", "Water regularly while establishing; later adjust to soil and weather.", "जलभराव से बचाएँ। सूखी/रोगग्रस्त टहनियाँ हटाएँ और फल फटने या धब्बों की निगरानी करें।", "Avoid waterlogging. Remove dead or diseased branches and monitor fruit cracking and spots."),
     GardenGuide("अमरूद", "Guava", "फलदार पौधे", "Fruit plants", "स्थानीय नर्सरी से क्षेत्र के अनुकूल पौधा लें; मानसून या सिंचित मौसम में रोपण किया जा सकता है।", "Choose a locally adapted plant; planting can be done during monsoon or an irrigated season.", "धूप", "Sun", "नई पौध को नियमित पानी दें; स्थापित पेड़ में जरूरत के अनुसार सिंचाई करें।", "Water young plants regularly; irrigate established trees as needed.", "पेड़ को खुला और हवादार रखें। फल मक्खी प्रभावित फल हटाएँ और स्वच्छता रखें।", "Keep the canopy open and airy. Remove fruit-fly-damaged fruit and maintain orchard hygiene."),
@@ -106,14 +137,17 @@ fun HorticultureScreen(isHindi: Boolean) {
         Triple("Protected cultivation", "संरक्षित खेती", "Protected"),
         Triple("Indoor / Ornamental", "इनडोर", "Indoor")
     )
+    val query = normalizeGardenSearch(search)
+    val queryParts = search.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+        .map(::normalizeGardenSearch)
     val filtered = gardenGuides.filter { guide ->
         val matchesCategory = selectedCategory == "all" || guide.categoryEn == selectedCategory
-        val q = search.trim()
-        val matchesSearch = q.isBlank() ||
-            guide.nameHi.contains(q, ignoreCase = true) ||
-            guide.nameEn.contains(q, ignoreCase = true) ||
-            guide.categoryHi.contains(q, ignoreCase = true) ||
-            guide.categoryEn.contains(q, ignoreCase = true)
+        val searchable = listOf(guide.nameHi, guide.nameEn, guide.categoryHi, guide.categoryEn) +
+            gardenSearchAliases[guide.nameEn].orEmpty()
+        val normalizedNames = searchable.map(::normalizeGardenSearch)
+        val matchesSearch = query.isBlank() ||
+            normalizedNames.any { it.contains(query) } ||
+            queryParts.all { part -> part.isBlank() || normalizedNames.any { it.contains(part) } }
         matchesCategory && matchesSearch
     }
 
