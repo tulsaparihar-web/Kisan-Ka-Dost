@@ -52,9 +52,10 @@ fun CropCareScreen(isHindi: Boolean) {
     var expanded by remember { mutableStateOf<String?>(null) }
     var showAgroZones by remember { mutableStateOf(false) }
     val seasons = listOf("All", "Kharif", "Rabi", "Both")
+    val query = normalizeCropSearch(search)
     val filtered = rajasthanCrops.filter { crop ->
         (season == "All" || crop.group == season || (season == "Kharif" && crop.group == "Kharif / Zaid") || (season == "Rabi" && crop.group == "Rabi / Zaid")) &&
-            (search.isBlank() || crop.nameEn.contains(search, true) || crop.nameHi.contains(search))
+            (query.isBlank() || cropSearchTerms(crop).any { normalizeCropSearch(it).contains(query) })
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(if (isHindi) "खेती और फसल मार्गदर्शिका" else "Farming & Crop Guide", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF203128))
@@ -137,3 +138,33 @@ private fun GuideLine(title: String, description: String) {
         Text(description, fontSize = 13.sp, lineHeight = 18.sp, color = Color(0xFF203128))
     }
 }
+
+
+private fun normalizeCropSearch(value: String): String =
+    value.lowercase().filter { it.isLetterOrDigit() }
+
+private val cropSearchAliases = mapOf(
+    "Pearl millet" to listOf("bajra", "bajri", "bajaro"),
+    "Guar" to listOf("cluster bean", "guwar", "guar phali"),
+    "Moong bean" to listOf("moong", "mung", "mung bean", "green gram"),
+    "Moth bean" to listOf("moth", "matki", "moth dal"),
+    "Groundnut" to listOf("peanut", "mungfali", "moongfali"),
+    "Mustard" to listOf("sarson", "rai", "raya"),
+    "Wheat" to listOf("gehun", "gehu", "kanak"),
+    "Chickpea" to listOf("gram", "chana", "kabuli chana", "desi chana"),
+    "Barley" to listOf("jau"),
+    "Cumin" to listOf("jeera", "jira"),
+    "Coriander" to listOf("dhania", "dhaniya"),
+    "Fenugreek" to listOf("methi"),
+    "Isabgol" to listOf("ispaghol", "psyllium"),
+    "Cotton" to listOf("kapas", "rui"),
+    "Maize" to listOf("makka", "makai", "corn"),
+    "Sesame" to listOf("til", "sesamum"),
+    "Soybean" to listOf("soya", "soya bean"),
+    "Black gram" to listOf("urad", "urd", "maash"),
+    "Fennel" to listOf("saunf", "sonf"),
+    "Sorghum" to listOf("jowar", "jwaar")
+)
+
+private fun cropSearchTerms(crop: CropGuide): List<String> =
+    listOf(crop.nameEn, crop.nameHi) + cropSearchAliases[crop.nameEn].orEmpty()
