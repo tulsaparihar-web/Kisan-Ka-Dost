@@ -138,3 +138,17 @@ M3 must not be closed until all applicable items below are delivered or explicit
 ## 5. Scope control
 
 The three equal product pillars are **खेती**, **बागवानी**, and **पशुपालन**. Shared farm records, advisory services, markets, schemes and economics support those pillars. Do not skip a pillar or move to the next milestone simply because a basic screen has been added. When scope must be deferred, document it here and preserve it in the forward plan.
+
+
+---
+
+## 6. Audit update – 2026-11-19 (active feature branch)
+
+This dated addendum supersedes earlier statements in this tracker that M8 had not started. It does not silently close the broader farm-economics scope.
+
+- **M8 Offline Knowledge Assistant:** added on `feature/m6-ux-plant-search-tools`. It provides bilingual, offline, keyword-based search across a small bundled set of general agriculture, horticulture, soil, water, livestock, storage and safety topics. It is not an LLM, AI diagnosis, personalized recommendation engine or farm-economics calculator.
+- **Government Schemes:** an offline bilingual scheme-information screen with official external links is present on the active branch. Live eligibility/status and live mandi prices are not included.
+- **Build verification:** GitHub Actions run [44509661674](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/44509661674) passed JVM unit tests and debug APK packaging for commit `ab5b87ce23c66a90e4cf63af3e9ec9290979ecf0`.
+- **QA audit:** see [QA_AUDIT.md](QA_AUDIT.md). Room migration instrumentation, Compose UI smoke tests, physical-device Plant Doctor validation, reminder lifecycle acceptance, backup/restore acceptance, performance and accessibility baselines remain open.
+- **Release status:** build-verified is not the same as field-accepted. M3–M5 device acceptance remains pending as already noted above. M8 Knowledge Assistant is build-verified, with functional/domain and field acceptance still pending.
+- **Branch boundary:** these updates apply to the feature branch only. Do not merge to `main` without explicit user approval.
