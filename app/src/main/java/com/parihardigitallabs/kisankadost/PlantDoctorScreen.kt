@@ -162,6 +162,12 @@ private val plantGuides = listOf(
     PlantGuide("Drumstick", "सहजन", "Tree", "पेड़", "Full sun", "पूरा धूप", "Water during establishment; reduce once established unless very dry.", "स्थापना के समय सिंचाई करें; जमने के बाद जरूरत अनुसार पानी दें।", "Well-drained soil", "अच्छी जल निकासी वाली मिट्टी", "Prune to manageable height and protect young plants from strong wind.", "उचित ऊँचाई बनाए रखने के लिए छँटाई करें और नए पौधों को तेज हवा से बचाएँ।", listOf("moringa", "सहजन का पेड़", "मोरिंगा")),
 )
 
+internal fun plantPredictionMatchesSelectedCrop(predictedLabel: String, selectedCrop: String): Boolean {
+    val label = predictedLabel.trim().lowercase()
+    val crop = selectedCrop.trim().lowercase()
+    return label == "background" || (crop.isNotBlank() && label.startsWith(crop))
+}
+
 data class PlantPrediction(val label: String, val confidence: Float)
 data class PlantDoctorState(val bitmap: Bitmap? = null, val predictions: List<PlantPrediction> = emptyList(), val analyzing: Boolean = false, val error: String? = null)
 
@@ -221,8 +227,7 @@ class PlantDoctorViewModel(application: Application) : AndroidViewModel(applicat
                     .filter { it.confidence.isFinite() }
                     .sortedByDescending { it.confidence }.take(3)
                 val topLabel = results.firstOrNull()?.label.orEmpty().lowercase()
-                val belongsToSelectedCrop = topLabel == "background" ||
-                    topLabel.startsWith(expectedCrop.lowercase())
+                val belongsToSelectedCrop = plantPredictionMatchesSelectedCrop(topLabel, expectedCrop)
                 withContext(Dispatchers.Main) {
                     _state.value = if (belongsToSelectedCrop) {
                         PlantDoctorState(bitmap = bitmap, predictions = results)
@@ -312,8 +317,8 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
                     Icon(Icons.Default.Info, contentDescription = null, tint = PlantGreen)
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        if (isHindi) "ऑफलाइन AI जाँच केवल कुछ फसलों—जैसे टमाटर, आलू, मक्का, अंगूर, सेब और शिमला मिर्च—की 39 श्रेणियों तक सीमित है। अन्य पौधों की फोटो गलत वर्गीकृत हो सकती है। परिणाम को अंतिम निदान न मानें।"
-                        else "Offline AI checking is limited to 39 classes across selected crops such as tomato, potato, maize, grape, apple and bell pepper. Other plants may be misclassified. Do not treat the result as a confirmed diagnosis.",
+                        if (isHindi) "ऑफलाइन AI जाँच केवल कुछ फसलों—जैसे टमाटर, आलू, मक्का, अंगूर, सेब और शिमला मिर्च—की 38 रोग श्रेणियों तक सीमित है। अन्य पौधों की फोटो गलत वर्गीकृत हो सकती है। परिणाम को अंतिम निदान न मानें।"
+                        else "Offline AI checking is limited to 38 disease classes across 14 selected crops such as tomato, potato, maize, grape, apple and bell pepper. Other plants may be misclassified. Do not treat the result as a confirmed diagnosis.",
                         color = PlantInk, fontSize = 12.sp, lineHeight = 17.sp
                     )
                 }
