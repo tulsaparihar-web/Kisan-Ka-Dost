@@ -250,7 +250,7 @@ private fun AnimalDetail(label: String, value: String) {
 }
 
 
-private fun normalizeAnimalSearch(value: String): String =
+internal fun normalizeAnimalSearch(value: String): String =
     value.lowercase().filter { it.isLetterOrDigit() }
 
 private val animalSearchAliases = mapOf(
