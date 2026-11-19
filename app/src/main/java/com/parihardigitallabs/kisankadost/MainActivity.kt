@@ -152,6 +152,10 @@ private fun KisanKaDostApp() {
                     val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
                     MyFarmScreen(isHindi = isHindi, viewModel = farmerSetupViewModel)
                 }
+                composable("advisory") {
+                    val farmerSetupViewModel: FarmerSetupViewModel = viewModel()
+                    DistrictAdvisoryScreen(isHindi = isHindi, viewModel = farmerSetupViewModel)
+                }
                 composable("animal-records") {
                     val animalRegistryViewModel: AnimalRegistryViewModel = viewModel()
                     AnimalRegistryScreen(isHindi = isHindi, viewModel = animalRegistryViewModel)
@@ -205,7 +209,8 @@ private fun HomeScreen(c: Copy, isHindi: Boolean, onFeature: (String) -> Unit) {
         Feature("कटाई और भंडारण", "Harvest & Storage", Icons.Default.Inventory2, "harvest", Color(0xFFF2EBDD)),
         Feature("सरकारी योजनाएं", "Government Schemes", Icons.Default.AccountBalance, "schemes", Color(0xFFE8EAF5)),
         Feature("मेरा खेत", "My Farm", Icons.Default.Agriculture, "myfarm", Color(0xFFE3F0E7)),
-        Feature("किसान उपकरण", "Farm Tools", Icons.Default.Build, "tools", Color(0xFFE9EEF7))
+        Feature("किसान उपकरण", "Farm Tools", Icons.Default.Build, "tools", Color(0xFFE9EEF7)),
+        Feature("जिला कृषि सलाह", "District Advisory", Icons.Default.Cloud, "advisory", Color(0xFFE4EFF5))
     )
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
