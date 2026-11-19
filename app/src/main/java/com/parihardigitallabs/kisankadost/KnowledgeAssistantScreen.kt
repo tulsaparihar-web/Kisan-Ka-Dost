@@ -153,7 +153,3 @@ fun KnowledgeAssistantScreen(isHindi: Boolean) {
         }
     }
 }
-
-@Composable
-private fun Modifier.horizontalScroll(rememberScrollState()): Modifier =
-    this.then(Modifier)
