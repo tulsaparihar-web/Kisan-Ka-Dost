@@ -350,7 +350,7 @@ fun PlantDoctorScreen(isHindi: Boolean, viewModel: PlantDoctorViewModel = viewMo
     }
 }
 
-private fun normalizePlantQuery(value: String): String = value
+internal fun normalizePlantQuery(value: String): String = value
     .lowercase()
     .trim()
     .replace(Regex("[\\u200B-\\u200D\\uFEFF]"), "")
