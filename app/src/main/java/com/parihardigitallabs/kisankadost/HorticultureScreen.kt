@@ -145,7 +145,8 @@ fun HorticultureScreen(isHindi: Boolean) {
         Triple("Home gardens", "घर का बगीचा", "Home garden"),
         Triple("Nursery & propagation", "नर्सरी", "Nursery"),
         Triple("Protected cultivation", "संरक्षित खेती", "Protected"),
-        Triple("Indoor / Ornamental", "इनडोर", "Indoor")
+        Triple("Indoor / Ornamental", "इनडोर", "Indoor"),
+        Triple("Trees & agroforestry", "पेड़ और कृषि वानिकी", "Trees")
     )
     val query = normalizeGardenSearch(search)
     val queryParts = search.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
