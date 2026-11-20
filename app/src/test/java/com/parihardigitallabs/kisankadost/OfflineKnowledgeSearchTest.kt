@@ -52,4 +52,40 @@ class OfflineKnowledgeSearchTest {
         assertEquals("animal-water", results.first().id)
     }
 
+
+    @Test
+    fun rajasthanRainfallQueryFindsLocalCropPlanningGuidance() {
+        val results = searchOfflineKnowledge("राजस्थान खरीफ बाजरा ग्वार")
+        assertTrue(results.any { it.id == "rajasthan-crop-planning" })
+    }
+
+    @Test
+    fun fodderConservationQueryFindsLivestockGuidance() {
+        val results = searchOfflineKnowledge("silage fodder चारा")
+        assertTrue(results.any { it.id == "fodder-conservation" })
+    }
+
+    @Test
+    fun calfColostrumQueryFindsNewbornCareGuidance() {
+        val results = searchOfflineKnowledge("बछड़ा खीस colostrum")
+        assertTrue(results.any { it.id == "calf-colostrum" })
+    }
+
+    @Test
+    fun orchardAndHomeGardenTopicsAreSearchable() {
+        assertTrue(searchOfflineKnowledge("फलदार बाग orchard").any { it.id == "orchard-planting" })
+        assertTrue(searchOfflineKnowledge("गमला गर्मी home garden").any { it.id == "summer-garden" })
+    }
+
+    @Test
+    fun cleanMilkingAndVaccinationTopicsAreSearchable() {
+        assertTrue(searchOfflineKnowledge("दूध दुहना hygiene").any { it.id == "clean-milking" })
+        assertTrue(searchOfflineKnowledge("पशु vaccination टीकाकरण").any { it.id == "livestock-vaccination" })
+    }
+
+    @Test
+    fun cropResidueAndRainfallRiskTopicsAreSearchable() {
+        assertTrue(searchOfflineKnowledge("पराली crop residue").any { it.id == "crop-residue" })
+        assertTrue(searchOfflineKnowledge("तेज बारिश जलभराव").any { it.id == "rainfall-waterlogging" })
+    }
 }
