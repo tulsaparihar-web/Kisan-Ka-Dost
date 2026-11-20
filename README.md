@@ -54,25 +54,31 @@ The active feature branch contains the following build-integrated modules. A suc
 - **App foundation:** Home dashboard, Compose navigation, Hindi/English preference and settings.
 - **My Farm:** Offline Room-backed farmer/farm profile.
 - **Crop Care and Crop Calendar:** Bilingual general crop guides and seasonal calendar.
-- **Plant Doctor:** Offline TensorFlow Lite preliminary leaf screening for selected model classes; physical-device accuracy, camera/gallery and performance validation remain open.
+- **Plant Doctor:** Offline TensorFlow Lite preliminary leaf screening for selected model classes; the user has confirmed that the current APK works on their phone. Model accuracy across a broad expert-labelled dataset is not claimed.
 - **Horticulture:** Searchable bilingual plant and garden guidance.
 - **Soil Health, Irrigation, Crop Protection and Harvest:** General bilingual educational guides; local prescription-level agronomy is not claimed.
-- **Animal Care and Animal Registry:** Bilingual care guidance, offline animal profiles, health-event history and veterinarian-confirmed reminders; device reminder/migration acceptance remains open.
-- **Farm Diary:** Offline field/garden/animal/expense/labour/input/production/sales records, local photos, CSV export, reminders and user-triggered ZIP backup/restore; physical-device backup/restore acceptance remains open.
+- **Animal Care and Animal Registry:** Bilingual care guidance, offline animal profiles, health-event history and veterinarian-confirmed reminders. The current APK has been smoke-tested by the user; exhaustive migration and reminder edge-case testing is not claimed.
+- **Farm Diary:** Offline field/garden/animal/expense/labour/input/production/sales records, local photos, CSV export, reminders and user-triggered ZIP backup/restore. The current APK has been smoke-tested by the user; exhaustive backup/restore edge-case testing is not claimed.
 - **District Advisory:** District selection and stored/general advisory information; no live weather feed is claimed.
 - **Government Schemes:** Offline scheme information with official external links; live eligibility/status is not claimed.
 - **M8 Offline Knowledge Assistant:** Offline bilingual keyword-based knowledge search. This is general educational content, not AI diagnosis or individualized agronomy/veterinary advice.
 
-**Not yet delivered as live services:** live weather/alerts, live mandi prices, cloud sync, multi-device conflict resolution, personalized crop prescriptions, farm economics/profit-loss analytics, and AI chat/LLM assistance. The offline Knowledge Assistant does not mean those separate capabilities are complete.
+**Excluded from this release:** live weather/alerts, live mandi prices, third-party API integrations, cloud sync, multi-device conflict resolution, personalized crop prescriptions, farm economics/profit-loss analytics, and AI chat/LLM assistance. The offline Knowledge Assistant is a small keyword-based learning aid, not an AI chatbot or personalized advisor.
 
 ## Milestones and release status
 
 - **M1–M5 foundations:** implemented and cloud-build verified on prior milestones; physical-device regression and migration/backup/reminder acceptance remain necessary.
-- **M6 – Rajasthan advisory services:** live, source-attributed weather/alerts remain deferred.
-- **M7 – Markets, schemes and services:** offline Government Schemes information is implemented; live mandi data and verified service directory remain open.
-- **M8 – Offline Knowledge Assistant:** implemented on the active feature branch and build-verified. Farm economics calculations and any AI/LLM capability are separate future scope and are not included in this delivery.
+- **M6 – Rajasthan advisory services:** excluded from this release; no live weather/API integration.
+- **M7 – Markets, schemes and services:** offline Government Schemes information is included. Live mandi prices and a new service directory are excluded.
+- **Offline Knowledge Assistant:** implemented and build-verified on the active feature branch. Farm economics calculations and AI/LLM chat are not included.
 
 See [QA_AUDIT.md](QA_AUDIT.md) for the static engineering audit, confirmed test coverage boundaries and prioritized release gaps. See [MILESTONE_TRACKER.md](MILESTONE_TRACKER.md) for the broader product scope and acceptance checklist.
+
+## Release scope freeze – 2026-11-20
+
+The current release is focused on the working offline-first app. No new feature modules are planned for this release. Do not add paid or third-party APIs, live mandi/weather services, cloud accounts/sync, or extra directories. Keep the three pillars—खेती, बागवानी and पशुपालन—easy to find and simple to use. Prioritize correctness, stability, clear Hindi/English wording, data safety and regression fixes. The user has confirmed that the current APK works on their Android phone; this is a user-reported smoke test, not a claim that every migration, reminder, backup/restore edge case or Plant Doctor model class has undergone exhaustive validation.
+
+The successful latest build and unit tests are recorded in [GitHub Actions run 44687212246](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/44687212246). Its APK artifact was uploaded successfully.
 
 ## Plant Doctor model scope
 The current model has 39 output classes, including a background class, and covers selected crop leaf classes. It is not a general plant species identifier. Indoor and ornamental plants currently have searchable care guides; broader photo-based identification is a later enhancement.
