@@ -152,3 +152,29 @@ This dated addendum supersedes earlier statements in this tracker that M8 had no
 - **QA audit:** see [QA_AUDIT.md](QA_AUDIT.md). Room migration instrumentation, Compose UI smoke tests, physical-device Plant Doctor validation, reminder lifecycle acceptance, backup/restore acceptance, performance and accessibility baselines remain open.
 - **Release status:** build-verified is not the same as field-accepted. M3–M5 device acceptance remains pending as already noted above. M8 Knowledge Assistant is build-verified, with functional/domain and field acceptance still pending.
 - **Branch boundary:** these updates apply to the feature branch only. Do not merge to `main` without explicit user approval.
+
+
+---
+
+## 7. Release finalization update – 2026-11-20
+
+This update freezes the current release scope and supersedes earlier roadmap language where it suggests starting M6/M7/M8 expansion now.
+
+### Release scope
+- Keep the existing three pillars: **खेती, बागवानी and पशुपालन**, plus the already implemented My Farm, Animal Registry, Farm Diary, Plant Doctor, Government Schemes information and Offline Knowledge Assistant.
+- **No new feature modules** for this release. Do not add live mandi rates, live weather, paid/third-party APIs, mandatory accounts, cloud sync, a service directory, farm-economics expansion or AI/LLM chat.
+- M6 advisory services and live parts of M7 are deferred. Offline Government Schemes information already present remains in scope. Farm economics remains future scope; the Offline Knowledge Assistant is not a farm-economics feature.
+- Prioritize stability, data safety, simple navigation, bilingual consistency and regression fixes. Keep all features free and usable offline where designed.
+
+### Latest verification
+- **Build and JVM tests:** successful GitHub Actions run [44687212246](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/44687212246), commit `e977cc13d401f7c682c46f939050c81e602459b6`. Kotlin build, configured unit tests, APK packaging and artifact upload all passed.
+- **APK artifact:** `Kisan-Ka-Dost-debug-apk` uploaded successfully (artifact ID `14606817851`).
+- **Physical phone:** the user reports installing/testing this APK and confirms that it works. Record this as a successful user-reported smoke test, not as exhaustive validation of every migration, reminder, backup/restore edge case or Plant Doctor model class.
+- **Branch boundary:** all release-scope documentation updates remain on `feature/m6-ux-plant-search-tools`. `main` remains untouched; do not merge without explicit user approval.
+
+### Remaining finish-line work
+1. Review the current app for genuine defects only; do not introduce new feature scope.
+2. Run the existing JVM tests and debug APK workflow on the final documentation/source commit.
+3. Confirm the latest run and APK artifact correspond to the final commit; inspect the APK archive.
+4. Keep the known deeper QA items (historical populated Room migrations, full backup/restore edge cases, notification lifecycle and broad Plant Doctor accuracy evaluation) clearly labelled as not exhaustively verified unless actually tested.
+5. Present the final APK and release notes. Ask before merging the feature branch to `main`.
