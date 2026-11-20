@@ -34,4 +34,22 @@ class OfflineKnowledgeSearchTest {
         val results = searchOfflineKnowledge("KVK")
         assertTrue(results.any { it.id == "kvk" })
     }
+    @Test
+    fun titleMatchesRankAheadOfIncidentalAnswerMatches() {
+        val results = searchOfflineKnowledge("soil test")
+        assertEquals("soil-test", results.first().id)
+    }
+
+    @Test
+    fun punctuationAndExtraWhitespaceDoNotBreakSearch() {
+        val results = searchOfflineKnowledge("  yellow,   leaves! ")
+        assertEquals("yellow-leaves", results.first().id)
+    }
+
+    @Test
+    fun hindiTopicSearchRanksMatchingQuestionFirst() {
+        val results = searchOfflineKnowledge("पशुओं को साफ पानी")
+        assertEquals("animal-water", results.first().id)
+    }
+
 }
