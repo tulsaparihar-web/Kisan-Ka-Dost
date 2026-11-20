@@ -33,7 +33,7 @@ No Android Studio or local Android SDK is required.
 3. Download the Kisan-Ka-Dost-debug-apk artifact.
 4. Extract the ZIP and install app-debug.apk on an Android phone.
 
-Every push to main triggers a cloud build. Older in-progress builds are cancelled when a newer commit arrives.
+Every push to `main` or a feature branch triggers the APK workflow. It runs JVM unit tests, assembles the APK and uploads the artifact without waiting for an Android emulator. Emulator instrumentation tests are kept in the separate, manually triggered [Android Instrumentation Tests workflow](.github/workflows/android-instrumentation.yml), so emulator startup failures cannot block APK delivery. Both workflows avoid cancelling an active run.
 
 ## Implemented and build-verified foundations
 - Home dashboard and feature navigation
