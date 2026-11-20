@@ -103,3 +103,31 @@ The earlier audit above is a static review dated 2026-11-19. This addendum recor
 Do not describe these deeper checks as passed unless evidence is recorded. The current APK is user-smoke-tested and CI build/unit-test verified; release readiness still requires a final commit build/artifact check and an explicit decision about whether the remaining deeper QA items are release blockers or accepted limitations.
 
 **Branch protection:** this update is for `feature/m6-ux-plant-search-tools` only. Do not merge to `main` without explicit approval.
+
+
+---
+
+## Phase 1 QA review – 2026-11-20
+
+Reviewed the current test sources and workflow definitions on `feature/m6-ux-plant-search-tools` after the release-candidate build.
+
+### Confirmed test assets
+- `AppDatabaseMigrationTest` creates a populated version-4 database and verifies the v4→v7 migration preserves a farmer profile, animal and animal-health record; it also checks diary table availability and health-record cascade deletion.
+- This is useful coverage, but it does **not** independently verify populated upgrades originating from schema versions 1, 2 or 3. It also does not exercise a full v4→v7 user backup/restore round trip.
+- `AppNavigationSmokeTest` checks the home screen, navigation to the offline Knowledge Assistant, a text search, and switching the UI language to English. It does **not** yet exercise farmer profile editing, animal registration/editing, diary CRUD, photo attachment, CSV export or backup/restore.
+- The instrumentation workflow `.github/workflows/android-instrumentation.yml` is configured for manual `workflow_dispatch` only and runs `:app:testDebugUnitTest :app:connectedDebugAndroidTest` on an API 35 emulator.
+- The normal APK workflow does not execute Android instrumentation tests. A green APK workflow must not be reported as a green emulator/UI test run.
+
+### Phase 1 acceptance status
+- [x] Reviewed existing Room migration test source and identified its exact v4→v7 coverage.
+- [x] Reviewed existing Compose navigation smoke-test source and identified its exact scope.
+- [x] Confirmed the separate emulator workflow and its manual trigger configuration.
+- [ ] Execute the emulator instrumentation workflow on the final feature-branch commit and inspect the test result.
+- [ ] Add/verify migration coverage for populated v1, v2 and v3 databases before production release.
+- [ ] Expand end-to-end UI coverage for core farmer, animal, diary and backup/restore journeys.
+- [ ] Complete real-device backup/restore, notification lifecycle and Plant Doctor validation.
+
+### Release decision
+Phase 1 review is **in progress, not passed**. The latest debug APK remains a successful build and user-reported smoke-tested candidate, but the instrumentation and deeper data-integrity checks remain open. No production signing or Play Store release should be declared complete on this evidence alone.
+
+The feature scope remains frozen. Fix only defects uncovered by testing and add only the test coverage needed to validate existing functionality. Keep all work on the feature branch; do not merge to `main` without explicit user approval.
