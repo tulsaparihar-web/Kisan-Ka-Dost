@@ -178,3 +178,20 @@ This update freezes the current release scope and supersedes earlier roadmap lan
 3. Confirm the latest run and APK artifact correspond to the final commit; inspect the APK archive.
 4. Keep the known deeper QA items (historical populated Room migrations, full backup/restore edge cases, notification lifecycle and broad Plant Doctor accuracy evaluation) clearly labelled as not exhaustively verified unless actually tested.
 5. Present the final APK and release notes. Ask before merging the feature branch to `main`.
+
+
+---
+
+## 8. Release candidate milestone – 2026-11-20
+
+<badge>Release candidate build milestone completed</badge>
+
+- **Final documentation/source commit:** `2dfe7f03b44eb4833039b03496523f139960609b` on `feature/m6-ux-plant-search-tools`.
+- **Final GitHub Actions verification:** [run 44692579122](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/44692579122) completed successfully. The configured JVM unit tests, Kotlin build, debug APK packaging and artifact upload passed.
+- **APK artifact:** `Kisan-Ka-Dost-debug-apk`, artifact ID `14608923424`; downloaded successfully. Artifact retention is scheduled through 2026-12-04.
+- **User device feedback:** the user previously installed the delivered APK on an Android phone and reported that it was working fine. This is recorded as a user-reported smoke test, not exhaustive acceptance of every feature or edge case.
+- **Scope:** release scope remains frozen. No new feature modules were added; this milestone records build and delivery readiness only.
+- **Branch boundary:** work remains on `feature/m6-ux-plant-search-tools`. The `main` branch has not been changed or merged. A merge still requires explicit user approval.
+- **Outstanding QA:** historical populated Room migration, full backup/restore edge cases, reminder lifecycle and broad Plant Doctor accuracy/device testing remain open until separately verified.
+
+**Milestone decision:** The final release-candidate build and APK delivery milestone is **complete and cloud-build verified**. Do not describe the entire product as fully field-accepted or production-released until the remaining QA and release/merge decision are addressed.
