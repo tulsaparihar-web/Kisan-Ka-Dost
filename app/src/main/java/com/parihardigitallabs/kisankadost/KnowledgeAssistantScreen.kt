@@ -65,11 +65,24 @@ internal fun searchOfflineKnowledge(query: String, entries: List<KnowledgeEntry>
     if (normalized.isBlank()) return emptyList()
     val terms = normalized.split(" ").filter { it.length > 1 }.toSet()
     if (terms.isEmpty()) return emptyList()
+
     return entries.mapNotNull { entry ->
-        val searchable = normalizeKnowledgeText(listOf(entry.questionHi, entry.questionEn, entry.answerHi, entry.answerEn, entry.keywords, entry.categoryHi, entry.categoryEn).joinToString(" "))
-        val matched = terms.count { term -> searchable.contains(term) }
-        val phraseBonus = if (searchable.contains(normalized)) 3 else 0
-        val score = matched * 2 + phraseBonus
+        val question = normalizeKnowledgeText("${entry.questionHi} ${entry.questionEn}")
+        val answers = normalizeKnowledgeText("${entry.answerHi} ${entry.answerEn}")
+        val keywords = normalizeKnowledgeText(entry.keywords)
+        val category = normalizeKnowledgeText("${entry.categoryHi} ${entry.categoryEn}")
+        val questionTerms = question.split(" ").toSet()
+        val answerTerms = answers.split(" ").toSet()
+        val keywordTerms = keywords.split(" ").toSet()
+        val categoryTerms = category.split(" ").toSet()
+
+        val score = terms.sumOf { term ->
+            (if (term in questionTerms) 5 else 0) +
+                (if (term in keywordTerms) 4 else 0) +
+                (if (term in answerTerms) 2 else 0) +
+                (if (term in categoryTerms) 1 else 0)
+        } + if (question.contains(normalized)) 6 else 0
+
         if (score > 0) entry to score else null
     }.sortedWith(compareByDescending<Pair<KnowledgeEntry, Int>> { it.second }.thenBy { it.first.questionEn })
         .map { it.first }
