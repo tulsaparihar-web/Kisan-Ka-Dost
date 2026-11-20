@@ -13,6 +13,12 @@ Kisan Ka Dost will remain free to every user. There will be no subscriptions, pr
 The project may sustain itself through responsible, limited and clearly identified advertising; voluntary donations; and mission-aligned institutional, CSR, university, NGO or cooperative support. Donations never affect access. Advertising must not interrupt essential tasks, imitate independent advice, or promote misleading/unsafe products. Farmer personal information, farm records, photos, phone numbers and precise location data must never be sold or rented to advertisers. Personal/farm records remain on-device by default; any sharing or sync must be explicit. Keep infrastructure lean and do not assume advertising or donations guarantee operating-cost coverage.
 
 
+## Current release scope freeze – 2026-11-20
+
+This blueprint contains long-term ideas; it is not a commitment to ship every item. The current release is limited to the working features already present on the active feature branch. Keep the app simple, bilingual, offline-first and free. The three equal pillars remain खेती, बागवानी and पशुपालन.
+
+Do not add live mandi rates, live weather, paid or third-party APIs, mandatory online accounts, cloud sync, a new service directory, farm-economics expansion or AI/LLM chat to this release. The existing offline Government Schemes information and offline keyword-based Knowledge Assistant remain as implemented. Future ideas stay deferred unless separately prioritized; they must not delay completion of the current app. Prefer bug fixes, data safety, navigation clarity, Hindi/English consistency and regression testing over feature count.
+
 ## Product vision
 
 Kisan Ka Dost is an all-round farm and rural livelihood companion. It must cover the complete practical cycle of **कृषि (खेती), बागवानी and पशुपालन**, not only plant identification. The app should help a farmer plan, learn, record, monitor and make better-informed decisions across crops, horticulture, animals and farm economics.
