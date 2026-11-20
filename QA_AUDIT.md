@@ -74,3 +74,32 @@ The successful workflow at [run 44509661674](https://github.com/tulsaparihar-web
 6. Establish repeatable performance and accessibility baselines.
 
 **Branch protection:** keep this audit and any follow-up changes on the feature branch. Do not merge to `main` without explicit approval.
+
+
+---
+
+## Release finalization update – 2026-11-20
+
+The earlier audit above is a static review dated 2026-11-19. This addendum records the latest build and the user's subsequent phone test; it does not imply that every deeper test case has been executed.
+
+### Confirmed since the earlier audit
+- The current feature branch contains added Room migration test infrastructure and a Compose navigation smoke test in the Android instrumentation source set. The emulator workflow is separate and manually triggered; the successful APK workflow does not run those instrumentation tests.
+- Offline Knowledge Assistant content was expanded with Rajasthan-focused agriculture, horticulture and livestock topics, with corresponding JVM search tests.
+- GitHub Actions run [44687212246](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/44687212246) on commit `e977cc13d401f7c682c46f939050c81e602459b6` passed the configured JVM unit tests, Kotlin build, debug APK packaging and artifact upload.
+- The user installed/tested the resulting APK on an Android phone and reported that it works. Treat this as a successful general smoke test only.
+
+### Scope decision
+- Freeze feature scope for the current release. Do not add live mandi prices, live weather, paid/third-party API dependencies, cloud sync, mandatory accounts, service directory expansion, farm-economics modules or AI/LLM chat.
+- Keep the existing offline features and three equal pillars. Work only on confirmed defects, data integrity, usability, localization and release documentation.
+
+### Still not exhaustively verified
+- Running the separate emulator instrumentation workflow and reviewing its results.
+- Populated historical Room migration paths on real upgrade data.
+- Full backup/restore including photos and animal-health history, plus corrupt/oversized archive and interrupted-restore cases.
+- Reminder delivery through permission changes, reboot, Doze and battery restrictions.
+- Plant Doctor class-by-class accuracy, unsupported-image false positives and performance across representative devices.
+- Formal accessibility and performance baselines.
+
+Do not describe these deeper checks as passed unless evidence is recorded. The current APK is user-smoke-tested and CI build/unit-test verified; release readiness still requires a final commit build/artifact check and an explicit decision about whether the remaining deeper QA items are release blockers or accepted limitations.
+
+**Branch protection:** this update is for `feature/m6-ux-plant-search-tools` only. Do not merge to `main` without explicit approval.
