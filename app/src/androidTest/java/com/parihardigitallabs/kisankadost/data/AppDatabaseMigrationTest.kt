@@ -105,7 +105,7 @@ class AppDatabaseMigrationTest {
         return db
     }
 
-    private fun assertFarmerPreserved(db: AppDatabase) {
+    private suspend fun assertFarmerPreserved(db: AppDatabase) {
         val farmer = db.farmerProfileDao().getAllForBackup().single()
         assertEquals("Test Farmer", farmer.farmerName)
         assertEquals("Jaipur", farmer.district)
