@@ -131,3 +131,32 @@ Reviewed the current test sources and workflow definitions on `feature/m6-ux-pla
 Phase 1 review is **in progress, not passed**. The latest debug APK remains a successful build and user-reported smoke-tested candidate, but the instrumentation and deeper data-integrity checks remain open. No production signing or Play Store release should be declared complete on this evidence alone.
 
 The feature scope remains frozen. Fix only defects uncovered by testing and add only the test coverage needed to validate existing functionality. Keep all work on the feature branch; do not merge to `main` without explicit user approval.
+
+
+---
+
+## CI verification update – 2026-11-23
+
+The separate emulator workflow and APK workflow were run on feature-branch commit
+`4a9601ff757b6fd23479f3e5cd1daa32869724ec`.
+
+### Confirmed results
+- Android instrumentation workflow [run 44729825655](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/44729825655) completed successfully. Its job steps, including the emulator test step, have a successful conclusion.
+- Debug APK workflow [run 44729825638](https://github.com/tulsaparihar-web/Kisan-Ka-Dost/actions/runs/44729825638) completed successfully, including debug APK packaging and artifact upload.
+- The emulator startup workaround is configured for the GitHub-hosted Linux runner using the Android emulator software-emulation fallback. This allowed the emulator to boot and execute the instrumentation suite.
+- The Compose navigation smoke test was corrected to accept multiple matching text nodes for a search term; the test now checks that at least one matching node exists.
+
+### Exact coverage boundary
+- The current migration instrumentation test creates a populated version-4 database and verifies the v4→v7 upgrade. It does not yet validate populated v1, v2 or v3 starting databases.
+- The current Compose smoke test covers home, navigation to the offline Knowledge Assistant, a text search and switching to English. It does not cover the complete farmer, animal, diary, photo, CSV or backup/restore journeys.
+- A successful emulator run is not a substitute for physical-device acceptance of Plant Doctor camera/gallery behavior, reminder delivery, or full backup/restore.
+- These CI results confirm the current tested commit only. They do not establish Play Store release readiness or production signing.
+
+### Next release-hardening sequence
+1. Add migration coverage for populated historical v1, v2 and v3 database states, after verifying the exact historical schemas.
+2. Execute a complete backup/restore acceptance test on a physical Android phone, including photos and animal-health history.
+3. Check reminder permission changes, rescheduling, app restart and reboot behavior on a phone.
+4. Validate Plant Doctor image capture/gallery flow, supported/unsupported images, inference behavior and safe wording on a phone.
+5. Decide and document any remaining accepted limitations before preparing a signed release build.
+
+**Scope and branch guard:** retain the frozen feature scope and keep all work on `feature/m6-ux-plant-search-tools`. Do not merge to `main` without explicit approval.
